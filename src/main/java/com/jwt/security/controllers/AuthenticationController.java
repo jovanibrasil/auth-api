@@ -48,7 +48,7 @@ public class AuthenticationController {
 	/*
 	 * Create and returns a new token JWT.
 	 */
-	@PostMapping
+	@PostMapping("/login")
 	public ResponseEntity<Response<TokenDto>> createTokenJwt(@Valid @RequestBody JwtAuthenticationDto authenticationDto, 
 			BindingResult result) throws AuthenticationException {
 		
