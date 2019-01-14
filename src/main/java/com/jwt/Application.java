@@ -1,5 +1,7 @@
 package com.jwt;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -27,13 +29,17 @@ public class Application {
 			
 			User user = new User();
 			user.setEmail("user@email.com");
+			user.setUserName("user");
 			user.setProfile(ProfileEnum.ROLE_USER);
+			user.setSignUpDate(new Date());
 			user.setPassword(PasswordUtils.generateHash("123456"));
 			this.userRepository.save(user);
 			
 			User admin = new User();
 			admin.setEmail("admin@email.com");
+			admin.setUserName("admin");
 			admin.setProfile(ProfileEnum.ROLE_ADMIN);
+			admin.setSignUpDate(new Date());
 			admin.setPassword(PasswordUtils.generateHash("123456"));
 			this.userRepository.save(admin);
 			

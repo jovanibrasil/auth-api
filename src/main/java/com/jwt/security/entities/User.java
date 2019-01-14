@@ -1,5 +1,7 @@
 package com.jwt.security.entities;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -20,12 +22,17 @@ public class User {
 	private Long id;
 	@Column(name="email", nullable=false)
 	private String email;
+	@Column(name="user_name", nullable=false)
+	private String userName;
 	@Column(name="password", nullable=false)
 	private String password;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(name="profile", nullable=false)
 	private ProfileEnum profile;
-	
+	@Column(name="date", nullable=false)
+	private Date signUpDate;
+
 	public User() {}
 
 	public Long getId() {
@@ -59,6 +66,22 @@ public class User {
 
 	public void setProfile(ProfileEnum profile) {
 		this.profile = profile;
+	}
+	
+	public Date getSignUpDate() {
+		return signUpDate;
+	}
+
+	public void setSignUpDate(Date signUpDate) {
+		this.signUpDate = signUpDate;
+	}
+	
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 	
 }

@@ -25,7 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jwt.response.Response;
 import com.jwt.security.dto.JwtAuthenticationDto;
 import com.jwt.security.dto.TokenDto;
+import com.jwt.security.dto.UserDto;
+import com.jwt.security.entities.User;
+import com.jwt.security.enums.ProfileEnum;
+import com.jwt.security.repositories.UserRepository;
 import com.jwt.security.utils.JwtTokenUtil;
+import com.jwt.utils.PasswordUtils;
 
 @RestController
 @RequestMapping("/auth")
@@ -45,6 +50,9 @@ public class AuthenticationController {
 	@Autowired
 	private UserDetailsService userDetailsService;
 	
+	@Autowired
+	private UserRepository userRepository;
+	
 	/*
 	 * Create and returns a new token JWT.
 	 */
@@ -60,12 +68,12 @@ public class AuthenticationController {
 			return ResponseEntity.badRequest().body(response);
 		}
 		
-		log.info("Generating token {}", authenticationDto.getEmail());
+		log.info("Generating token {}", authenticationDto.getUserName());
 		org.springframework.security.core.Authentication auth = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(authenticationDto.getEmail(), authenticationDto.getPassword()));
+				new UsernamePasswordAuthenticationToken(authenticationDto.getUserName(), authenticationDto.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(auth);
 				
-		UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDto.getEmail());
+		UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDto.getUserName());
 		String token = jwtTokenUtil.createToken(userDetails);
 		response.setData(new TokenDto(token));
 		return ResponseEntity.ok(response);
@@ -92,6 +100,29 @@ public class AuthenticationController {
 			
 		String refreshedToken = jwtTokenUtil.refreshToken(token.get());
 		response.setData(new TokenDto(refreshedToken));
+		
+		return ResponseEntity.ok(response);
+	}
+	
+	@PostMapping(value="/signup")
+	public ResponseEntity<Response<String>> sigupUser(@Valid @RequestBody UserDto userDto, BindingResult result){
+		
+		log.info("Creating new user");
+		Response<String> response = new Response<>();
+		
+		if(result.hasErrors()) {
+			log.error("Validation error {}", result.getAllErrors());
+			result.getAllErrors().forEach(err -> response.getErrors().add(err.getDefaultMessage()));
+			return ResponseEntity.badRequest().body(response);
+		}
+	
+		User user = new User();
+		user.setEmail(userDto.getEmail());
+		user.setUserName(userDto.getUserName());
+		user.setSignUpDate(userDto.getSignDate());
+		user.setProfile(ProfileEnum.ROLE_USER);
+		user.setPassword(PasswordUtils.generateHash(userDto.getPassword()));
+		this.userRepository.save(user);
 		
 		return ResponseEntity.ok(response);
 	}

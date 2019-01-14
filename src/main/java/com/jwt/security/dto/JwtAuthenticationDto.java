@@ -1,23 +1,28 @@
 package com.jwt.security.dto;
 
+import javax.validation.constraints.NotNull;
+
 public class JwtAuthenticationDto {
 
-	private String email;
+	@NotNull
+	private String userName;
+
+	@NotNull
 	private String password;
 	
 	public JwtAuthenticationDto() {}
 	
-	public JwtAuthenticationDto(String email, String password) {
+	public JwtAuthenticationDto(String userName, String password) {
 		super();
-		this.email = email;
+		this.userName = userName;
 		this.password = password;
 	}
 	
-	public String getEmail() {
-		return email;
+	public String getUserName() {
+		return this.userName;
 	}
-	public void setEmail(String email) {
-		this.email = email;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 	public String getPassword() {
 		return password;
