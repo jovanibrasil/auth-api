@@ -17,7 +17,7 @@ public class JwtUserFactory {
 	 * Create a JwtUser object based on User object information.
 	 */
 	public static JwtUser create(User user) {
-		return new JwtUser(user.getId(), user.getEmail(), user.getPassword(), mapToGrantedAuthorities(user.getProfile()));
+		return new JwtUser(user.getId(), user.getUserName(), user.getPassword(), mapToGrantedAuthorities(user.getProfile()));
 	}
 	
 	/*

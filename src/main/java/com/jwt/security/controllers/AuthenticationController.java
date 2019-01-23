@@ -6,6 +6,7 @@ import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,6 +103,35 @@ public class AuthenticationController {
 		response.setData(new TokenDto(refreshedToken));
 		
 		return ResponseEntity.ok(response);
+	}
+	
+	/*
+	 * Return a list of errors if the token has problems. Otherwise, returns an empty
+	 * list of errors.
+	 */
+	@PostMapping(value="/checkToken")
+	public ResponseEntity<Response<String>> checkToken(HttpServletRequest request){
+		log.info("Cheking JWT token");
+		Response<String> response = new Response<>();
+		Optional<String> token = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
+		
+		if(token.isPresent() && token.get().startsWith(BEARER_PREFIX))
+			token = Optional.of(token.get().substring(7));
+
+		if(!token.isPresent())
+			response.getErrors().add("The request do not contain a token.");
+		else if(!jwtTokenUtil.tokenIsValid(token.get()))
+			response.getErrors().add("The token is invalid or expired.");
+			
+		if(!response.getErrors().isEmpty())
+			return ResponseEntity.badRequest().body(response);
+
+		JSONObject json = new JSONObject();
+		json.put("userName", jwtTokenUtil.getUserNameFromToken(token.get()));
+		response.setData(json.toString());
+	
+		return ResponseEntity.ok(response);
+
 	}
 	
 	@PostMapping(value="/signup")

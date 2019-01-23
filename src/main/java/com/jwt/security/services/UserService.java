@@ -9,6 +9,6 @@ public interface UserService {
 	/*
 	 * Get user by email.
 	 */
-	Optional<User> getUserByName(String email);
+	Optional<User> getUserByName(String userName);
 	
 }
