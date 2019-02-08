@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 
 import com.jwt.security.entities.User;
@@ -14,7 +15,7 @@ import com.jwt.security.repositories.UserRepository;
 import com.jwt.utils.PasswordUtils;
 
 @SpringBootApplication
-public class Application {
+public class Application extends SpringBootServletInitializer {
 
 	@Autowired
 	private UserRepository userRepository;

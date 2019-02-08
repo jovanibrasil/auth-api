@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.api</groupId>
-	<artifactId>auth-jwt-api</artifactId>
+	<artifactId>auth-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>auth-jwt-api</name>
+	<name>auth-api</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -72,9 +72,11 @@
 		    <artifactId>json</artifactId>
 		    <version>20180813</version>
 		</dependency>
+		
 	</dependencies>
 
 	<build>
+		<finalName>auth-api</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

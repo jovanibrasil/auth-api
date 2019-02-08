@@ -115,17 +115,23 @@ public class AuthenticationController {
 		Response<String> response = new Response<>();
 		Optional<String> token = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
 		
-		if(token.isPresent() && token.get().startsWith(BEARER_PREFIX))
+		if(token.isPresent() && token.get().startsWith(BEARER_PREFIX)) {
 			token = Optional.of(token.get().substring(7));
+		}
 
-		if(!token.isPresent())
+		if(!token.isPresent()) {
+			log.error("The request do not contain a token");
 			response.getErrors().add("The request do not contain a token.");
-		else if(!jwtTokenUtil.tokenIsValid(token.get()))
+		}
+		else if(!jwtTokenUtil.tokenIsValid(token.get())) {
+			log.error("The token in invalid or expired");
 			response.getErrors().add("The token is invalid or expired.");
+		}
 			
-		if(!response.getErrors().isEmpty())
+		if(!response.getErrors().isEmpty()) {
 			return ResponseEntity.badRequest().body(response);
-
+		}
+			
 		JSONObject json = new JSONObject();
 		json.put("userName", jwtTokenUtil.getUserNameFromToken(token.get()));
 		response.setData(json.toString());
