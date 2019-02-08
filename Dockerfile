@@ -5,6 +5,6 @@ USER root
 
     COPY ./target/auth-api.war /usr/local/tomcat/webapps/auth-api.war
     #COPY ./target/auth-api /usr/local/tomcat/webapps/auth-api
-    EXPOSE 8080
+    EXPOSE 8083
 
 #USER jenkins
