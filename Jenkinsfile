@@ -39,7 +39,7 @@ pipeline {
             steps {
                 // sh 'docker stop auth-api'
                 // sh 'docker rm auth-api'                
-                sh 'docker run -p 8081:8080 --name=auth-api -d auth-api'
+                sh 'docker run -p 8083:8080 --name=auth-api -d auth-api'
             }
         }
 
