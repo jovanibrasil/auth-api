@@ -35,7 +35,7 @@ import com.jwt.utils.PasswordUtils;
 
 @RestController
 @RequestMapping("/auth")
-//@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*")
 public class AuthenticationController {
 
 	private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
