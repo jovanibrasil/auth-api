@@ -1,5 +1,6 @@
 package com.jwt.security.controllers;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import javax.naming.AuthenticationException;
@@ -131,17 +132,16 @@ public class AuthenticationController {
 		if(!response.getErrors().isEmpty()) {
 			return ResponseEntity.badRequest().body(response);
 		}
-			
+		log.info("The token was successfuly verified!");
 		JSONObject json = new JSONObject();
 		json.put("userName", jwtTokenUtil.getUserNameFromToken(token.get()));
 		response.setData(json.toString());
-	
 		return ResponseEntity.ok(response);
 
 	}
 	
 	@PostMapping(value="/signup")
-	public ResponseEntity<Response<String>> sigupUser(@Valid @RequestBody UserDto userDto, BindingResult result){
+	public ResponseEntity<Response<String>> sigupUser(@Valid @RequestBody UserDto userDto, BindingResult result, HttpServletRequest request){
 		
 		log.info("Creating new user");
 		Response<String> response = new Response<>();
