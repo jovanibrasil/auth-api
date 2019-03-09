@@ -1,11 +1,15 @@
 package com.jwt.security.entities;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,7 +37,13 @@ public class User {
 	@Column(name="date", nullable=false)
 	private Date signUpDate;
 
-	public User() {}
+	@Column(name="my_applications", nullable=false)
+	@ElementCollection(targetClass=String.class, fetch = FetchType.EAGER)
+	private List<String> myApplications;
+
+	public User() {
+		this.myApplications = new ArrayList<String>();
+	}
 
 	public Long getId() {
 		return id;
@@ -82,6 +92,14 @@ public class User {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public List<String> getMyApplications() {
+		return myApplications;
+	}
+
+	public void setMyApplications(List<String> myApplications) {
+		this.myApplications = myApplications;
 	}
 	
 }

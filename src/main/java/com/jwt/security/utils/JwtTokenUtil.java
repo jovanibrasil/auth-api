@@ -25,6 +25,7 @@ public class JwtTokenUtil {
 	static final String CLAIM_KEY_USERNAME = "sub";
 	static final String CLAIM_KEY_ROLE = "role";
 	static final String CLAIM_KEY_CREATED = "created";
+	static final String CLAIM_KEY_APPLICATION_NAME = "appname";
 	
 	// Get data from application.properties
 	@Value("${jwt.secret}")
@@ -45,11 +46,12 @@ public class JwtTokenUtil {
 	/*
 	 * Create a new token JWT.
 	 */
-	public String createToken(UserDetails userDetails) {
+	public String createToken(UserDetails userDetails, String applicationName) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
 		userDetails.getAuthorities().forEach(authority -> claims.put(CLAIM_KEY_ROLE, authority.getAuthority()));
 		claims.put(CLAIM_KEY_CREATED, new Date());
+		claims.put(CLAIM_KEY_APPLICATION_NAME, applicationName);
 		return createToken(claims);
 	}
 	
@@ -83,6 +85,19 @@ public class JwtTokenUtil {
 		try {
 			Claims claims = this.getClaimsFromToken(token);
 			return claims.getExpiration();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public String getApplicationName(String token) {
+		try {
+			Claims claims = this.getClaimsFromToken(token);
+			Object obj = claims.get(CLAIM_KEY_APPLICATION_NAME);
+			if(obj == null) {
+				return "";
+			}
+			return (String) obj; 
 		} catch (Exception e) {
 			return null;
 		}

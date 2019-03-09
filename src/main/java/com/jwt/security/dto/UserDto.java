@@ -1,13 +1,10 @@
 package com.jwt.security.dto;
 
-import java.util.Date;
-
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import com.validators.StringValidator;
 
 public class UserDto {
 
@@ -20,10 +17,9 @@ public class UserDto {
 	@NotNull
 	@Size(min=4, max=10)
 	private String password;
-	@NotNull
-	@Past
-	@DateTimeFormat(pattern="yyyy-MM-dd")
-	private Date signDate;
+	
+	@StringValidator(acceptedValues={"NOTES_APP", "BLOG_APP"}, message="Invalid dataType")
+	private String application;
 	
 	public UserDto() {}
 
@@ -58,13 +54,12 @@ public class UserDto {
 		this.password = password;
 	}
 	
-
-	public Date getSignDate() {
-		return signDate;
+	public String getApplication() {
+		return application;
 	}
 
-	public void setSignDate(Date signDate) {
-		this.signDate = signDate;
+	public void setApplication(String application) {
+		this.application = application;
 	}
 	
 }

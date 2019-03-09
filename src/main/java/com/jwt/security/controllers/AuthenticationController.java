@@ -1,6 +1,7 @@
 package com.jwt.security.controllers;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Optional;
 
 import javax.naming.AuthenticationException;
@@ -63,20 +64,38 @@ public class AuthenticationController {
 			BindingResult result) throws AuthenticationException {
 		
 		Response<TokenDto> response = new Response<>();
-		
+		// Verify form validation
 		if(result.hasErrors()) {
 			log.error("Validation error {}", result.getAllErrors());
 			result.getAllErrors().forEach(err -> response.getErrors().add(err.getDefaultMessage()));
 			return ResponseEntity.badRequest().body(response);
 		}
 		
+		// Verify if user has register for the required application
+		User user = userRepository.findByUserName(authenticationDto.getUserName());
+		if(user != null) {
+			if(!user.getMyApplications().contains(authenticationDto.getApplication())) {
+				log.error("Authentication error {}");
+				response.getErrors().add("Authentication error. User not registered for this application.");
+				return ResponseEntity.badRequest().body(response);		
+			}
+		}
+		
+		// Does user authentication 
 		log.info("Generating token {}", authenticationDto.getUserName());
 		org.springframework.security.core.Authentication auth = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(authenticationDto.getUserName(), authenticationDto.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(auth);
-				
+		
+		// Verify authentication result
+		if(!auth.isAuthenticated()) {
+			log.error("Authentication error {}");
+			response.getErrors().add("Authentication error. Invalid user name or password");
+			return ResponseEntity.badRequest().body(response);		
+		}	
+		
 		UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDto.getUserName());
-		String token = jwtTokenUtil.createToken(userDetails);
+		String token = jwtTokenUtil.createToken(userDetails, authenticationDto.getApplication());
 		response.setData(new TokenDto(token));
 		return ResponseEntity.ok(response);
 	}
@@ -114,19 +133,31 @@ public class AuthenticationController {
 	public ResponseEntity<Response<String>> checkToken(HttpServletRequest request){
 		log.info("Cheking JWT token");
 		Response<String> response = new Response<>();
-		Optional<String> token = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
 		
-		if(token.isPresent() && token.get().startsWith(BEARER_PREFIX)) {
-			token = Optional.of(token.get().substring(7));
+		Optional<String> optToken = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
+		if(optToken.isPresent() & optToken.get().startsWith(BEARER_PREFIX)) {
+			optToken = Optional.of(optToken.get().substring(7));
 		}
-
-		if(!token.isPresent()) {
+	
+		if(!optToken.isPresent()) {
 			log.error("The request do not contain a token");
 			response.getErrors().add("The request do not contain a token.");
-		}
-		else if(!jwtTokenUtil.tokenIsValid(token.get())) {
-			log.error("The token in invalid or expired");
-			response.getErrors().add("The token is invalid or expired.");
+		}else {
+			String token = optToken.get();
+			
+			if(!jwtTokenUtil.tokenIsValid(token)) {
+				log.error("The token in invalid or expired");
+				response.getErrors().add("The token is invalid or expired.");
+			}
+			
+			// Verify if user has register for the required application
+			User user = userRepository.findByUserName(jwtTokenUtil.getUserNameFromToken(token));
+			if(user != null) {
+				if(!user.getMyApplications().contains(jwtTokenUtil.getApplicationName(token))) {
+					log.error("Authentication error {}");
+					response.getErrors().add("Authentication error. User not registered for this application.");
+				}
+			}
 		}
 			
 		if(!response.getErrors().isEmpty()) {
@@ -134,12 +165,18 @@ public class AuthenticationController {
 		}
 		log.info("The token was successfuly verified!");
 		JSONObject json = new JSONObject();
-		json.put("userName", jwtTokenUtil.getUserNameFromToken(token.get()));
+		json.put("userName", jwtTokenUtil.getUserNameFromToken(optToken.get()));
 		response.setData(json.toString());
 		return ResponseEntity.ok(response);
 
 	}
 	
+	/*
+	 * 
+	 * TODO if user is already registered, update only applications attribute
+	 * 	maybe do this using other endpoint
+	 * 
+	 */
 	@PostMapping(value="/signup")
 	public ResponseEntity<Response<String>> sigupUser(@Valid @RequestBody UserDto userDto, BindingResult result, HttpServletRequest request){
 		
@@ -155,9 +192,10 @@ public class AuthenticationController {
 		User user = new User();
 		user.setEmail(userDto.getEmail());
 		user.setUserName(userDto.getUserName());
-		user.setSignUpDate(userDto.getSignDate());
+		user.setSignUpDate(new Date());
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user.setPassword(PasswordUtils.generateHash(userDto.getPassword()));
+		user.setMyApplications(Arrays.asList(userDto.getApplication()));
 		this.userRepository.save(user);
 		
 		return ResponseEntity.ok(response);

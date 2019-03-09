@@ -1,6 +1,13 @@
 pipeline {
     agent { label 'jenkins-slave' }
     
+    environment {
+        USERS_MYSQL_URL = credentials('USERS_MYSQL_URL')
+        USERS_MYSQL_CREDENTIALS = credentials('USERS_MYSQL_CREDENTIALS')
+        USERS_MYSQL_USERNAME = "${env.USERS_MYSQL_CREDENTIALS_USR}"
+        USERS_MYSQL_PASSWORD = "${env.USERS_MYSQL_CREDENTIALS_PSW}"
+    }
+    
     stages {
  
         stage("Environment configuration") {
