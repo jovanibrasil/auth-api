@@ -24,7 +24,7 @@ pipeline {
                 echo 'Cloning git ...'
                 git([url: 'https://github.com/jovanibrasil/auth-api.git', branch: 'master', credentialsId: '18a17f19-9870-4bcc-8c7b-75eec38a059a'])
                 echo 'Installing dependencies ...'
-                sh 'mvn package'
+                sh 'mvn package -Dspring.spring.datasource.url=USERS_MYSQL_URL -Dspring.spring.datasource.username=USERS_MYSQL_USERNAME -Dspring.spring.datasource.password=USERS_MYSQL_PASSWORD'
                 echo 'Building ...'
                 sh 'docker build -t auth-api ~/workspace/auth-api'
             }
