@@ -35,6 +35,34 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 	@Autowired
 	private UserServiceImpl userService;
 	
+//	@Override
+//	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+//			throws ServletException, IOException {
+//		
+//		String token = request.getHeader(AUTH_HEADER);
+//		if(token != null && token.startsWith(BEARER_PREFIX))
+//			token = token.substring(7);
+//		
+//		String userName = jwtTokenUtil.getUserNameFromToken(token);
+//		String applicationName = jwtTokenUtil.getApplicationName(token);
+//		if(userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+//			UserDetails userDetails = this.userDetailService.loadUserByUsername(userName);
+//			Optional<User> optUser = this.userService.getUserByName(userName);
+//			
+//			if(userDetails != null && jwtTokenUtil.tokenIsValid(token) && optUser.isPresent()) {
+//				User user = optUser.get();
+//				if(user.getMyApplications().contains(applicationName)) {
+//					UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+//							userDetails, null, userDetails.getAuthorities());
+//					auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//					SecurityContextHolder.getContext().setAuthentication(auth);
+//				}
+//			}
+//		}
+//		
+//		filterChain.doFilter(request, response);
+//	}
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
@@ -62,5 +90,5 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 		
 		filterChain.doFilter(request, response);
 	}
-
+	
 }
