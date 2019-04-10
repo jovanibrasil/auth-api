@@ -46,7 +46,7 @@ pipeline {
             steps {
                 // sh 'docker stop auth-api'
                 // sh 'docker rm auth-api'                
-                sh 'docker run -p 8083:8080 --network net --name=auth-api -d auth-api'
+                sh 'docker run -p 8083:8080 -e "SPRING_PROFILES_ACTIVE=prod" --network net --name=auth-api -d auth-api'
             }
         }
 

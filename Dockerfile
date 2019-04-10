@@ -1,7 +1,7 @@
 FROM tomcat
 LABEL maintainer="jovanibrasil@gmail.com"
 USER root
-    #COPY dist/ /app
+    RUN apt-get -y update && apt-get -y install netcat
 
 	ARG USERS_MYSQL_URL 
     ARG USERS_MYSQL_USERNAME 
@@ -12,7 +12,7 @@ USER root
 	ENV USERS_MYSQL_PASSWORD=$USERS_MYSQL_PASSWORD
 
     COPY ./target/auth-api.war /usr/local/tomcat/webapps/auth-api.war
-    #COPY ./target/auth-api /usr/local/tomcat/webapps/auth-api
+    COPY ./scripts/startup.sh /
     EXPOSE 8080
 
-#USER jenkins
+	CMD ["/bin/bash", "/startup.sh"]

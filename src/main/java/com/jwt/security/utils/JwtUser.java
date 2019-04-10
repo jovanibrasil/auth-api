@@ -9,21 +9,15 @@ public class JwtUser implements UserDetails {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Long id;
 	private String userName;
 	private String password;
 	private Collection<? extends GrantedAuthority> authorities;
 
-	public JwtUser(Long id, String userName, String password, Collection<? extends GrantedAuthority> authorities) {
+	public JwtUser(String userName, String password, Collection<? extends GrantedAuthority> authorities) {
 		super();
-		this.id = id;
 		this.userName = userName;
 		this.password = password;
 		this.authorities = authorities;
-	}
-
-	public Long getId() {
-		return this.id;
 	}
 
 	@Override

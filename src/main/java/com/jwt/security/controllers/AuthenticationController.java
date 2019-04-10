@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,7 @@ import com.jwt.response.Response;
 import com.jwt.security.dto.JwtAuthenticationDto;
 import com.jwt.security.dto.TokenDto;
 import com.jwt.security.dto.UserDto;
+import com.jwt.security.entities.TempUser;
 import com.jwt.security.entities.User;
 import com.jwt.security.enums.ProfileEnum;
 import com.jwt.security.repositories.UserRepository;
@@ -100,7 +102,7 @@ public class AuthenticationController {
 		return ResponseEntity.ok(response);
 	}
 	
-	@PostMapping(value="/refresh")
+	@GetMapping(value="/refresh")
 	public ResponseEntity<Response<TokenDto>> refreshTokenJwt(HttpServletRequest request){
 		
 		log.info("Refreshing JWT token");
@@ -129,14 +131,16 @@ public class AuthenticationController {
 	 * Return a list of errors if the token has problems. Otherwise, returns an empty
 	 * list of errors.
 	 */
-	@PostMapping(value="/checkToken")
-	public ResponseEntity<Response<String>> checkToken(HttpServletRequest request){
+	@GetMapping(value="/checkToken")
+	public ResponseEntity<Response<TempUser>> checkToken(HttpServletRequest request){
 		log.info("Cheking JWT token");
-		Response<String> response = new Response<>();
+		Response<TempUser> response = new Response<>();
 		
 		Optional<String> optToken = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
-		if(optToken.isPresent() & optToken.get().startsWith(BEARER_PREFIX)) {
-			optToken = Optional.of(optToken.get().substring(7));
+		if(optToken.isPresent()) {
+			if(optToken.get().startsWith(BEARER_PREFIX)) {
+				optToken = Optional.of(optToken.get().substring(7));
+			}
 		}
 	
 		if(!optToken.isPresent()) {
@@ -163,10 +167,12 @@ public class AuthenticationController {
 		if(!response.getErrors().isEmpty()) {
 			return ResponseEntity.badRequest().body(response);
 		}
-		log.info("The token was successfuly verified!");
-		JSONObject json = new JSONObject();
-		json.put("userName", jwtTokenUtil.getUserNameFromToken(optToken.get()));
-		response.setData(json.toString());
+
+		TempUser tempUser = new TempUser();
+		tempUser.setName(jwtTokenUtil.getUserNameFromToken(optToken.get()));
+		tempUser.setRole(ProfileEnum.valueOf(jwtTokenUtil.getAuthority(optToken.get())));
+		
+		response.setData(tempUser);
 		return ResponseEntity.ok(response);
 
 	}

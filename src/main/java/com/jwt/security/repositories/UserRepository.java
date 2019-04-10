@@ -9,6 +9,6 @@ import com.jwt.security.entities.User;
 
 //@Transactional(readOnly=true)
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, String> {
 	User findByUserName(String userName);
 }

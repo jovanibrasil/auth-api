@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -13,21 +14,20 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 import com.jwt.security.enums.ProfileEnum;
 
 @Entity
-@Table(name="user")
+@Table(name="users")
 public class User {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
-	@Column(name="email", nullable=false)
-	private String email;
 	@Column(name="user_name", nullable=false)
 	private String userName;
+	@Column(name="email", nullable=false)
+	private String email;
 	@Column(name="password", nullable=false)
 	private String password;
 	
@@ -37,20 +37,13 @@ public class User {
 	@Column(name="date", nullable=false)
 	private Date signUpDate;
 
-	@Column(name="my_applications", nullable=false)
+	@Column(name="application_name", nullable=false)
 	@ElementCollection(targetClass=String.class, fetch = FetchType.EAGER)
+	@CollectionTable(name="applications", joinColumns = @JoinColumn(name = "user_name"))
 	private List<String> myApplications;
 
 	public User() {
 		this.myApplications = new ArrayList<String>();
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getEmail() {

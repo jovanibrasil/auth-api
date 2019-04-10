@@ -49,7 +49,9 @@ public class JwtTokenUtil {
 	public String createToken(UserDetails userDetails, String applicationName) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
-		userDetails.getAuthorities().forEach(authority -> claims.put(CLAIM_KEY_ROLE, authority.getAuthority()));
+		userDetails.getAuthorities().forEach(authority -> {
+			claims.put(CLAIM_KEY_ROLE, authority.getAuthority());
+		});
 		claims.put(CLAIM_KEY_CREATED, new Date());
 		claims.put(CLAIM_KEY_APPLICATION_NAME, applicationName);
 		return createToken(claims);
@@ -62,6 +64,18 @@ public class JwtTokenUtil {
 		try {
 			Claims claims = this.getClaimsFromToken(token);
 			return claims.getSubject();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	/*
+	 * Get user name from the token JWT.
+	 */
+	public String getAuthority(String token) {
+		try {
+			Claims claims = this.getClaimsFromToken(token);
+			return claims.get(CLAIM_KEY_ROLE).toString();
 		} catch (Exception e) {
 			return null;
 		}
