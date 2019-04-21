@@ -18,12 +18,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 import com.jwt.security.enums.ProfileEnum;
+import com.jwt.utils.ApplicationType;
 
 @Entity
 @Table(name="users")
 public class User {
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	private Long id;
+	
 	@Column(name="user_name", nullable=false)
 	private String userName;
 	@Column(name="email", nullable=false)
@@ -38,12 +42,12 @@ public class User {
 	private Date signUpDate;
 
 	@Column(name="application_name", nullable=false)
-	@ElementCollection(targetClass=String.class, fetch = FetchType.EAGER)
-	@CollectionTable(name="applications", joinColumns = @JoinColumn(name = "user_name"))
-	private List<String> myApplications;
+	@ElementCollection(targetClass=ApplicationType.class, fetch = FetchType.EAGER)
+	@CollectionTable(name="applications", joinColumns = @JoinColumn(name = "id"))
+	private List<ApplicationType> applications;
 
 	public User() {
-		this.myApplications = new ArrayList<String>();
+		this.applications = new ArrayList<ApplicationType>();
 	}
 
 	public String getEmail() {
@@ -87,12 +91,26 @@ public class User {
 		this.userName = userName;
 	}
 
-	public List<String> getMyApplications() {
-		return myApplications;
+	public List<ApplicationType> getMyApplications() {
+		return applications;
 	}
 
-	public void setMyApplications(List<String> myApplications) {
-		this.myApplications = myApplications;
+	public void setMyApplications(List<ApplicationType> myApplications) {
+		this.applications = myApplications;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", userName=" + userName + ", email=" + email + ", password=" + password
+				+ ", profile=" + profile + ", signUpDate=" + signUpDate + ", applications=" + applications + "]";
 	}
 	
 }

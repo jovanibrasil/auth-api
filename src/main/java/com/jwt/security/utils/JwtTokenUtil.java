@@ -1,6 +1,5 @@
 package com.jwt.security.utils;
 
-import java.io.Console;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +7,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.jwt.utils.ApplicationType;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -46,14 +47,15 @@ public class JwtTokenUtil {
 	/*
 	 * Create a new token JWT.
 	 */
-	public String createToken(UserDetails userDetails, String applicationName) {
+	public String createToken(UserDetails userDetails, ApplicationType application) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
 		userDetails.getAuthorities().forEach(authority -> {
 			claims.put(CLAIM_KEY_ROLE, authority.getAuthority());
 		});
 		claims.put(CLAIM_KEY_CREATED, new Date());
-		claims.put(CLAIM_KEY_APPLICATION_NAME, applicationName);
+		claims.put(CLAIM_KEY_APPLICATION_NAME, application);	
+		
 		return createToken(claims);
 	}
 	
@@ -135,7 +137,6 @@ public class JwtTokenUtil {
 	 */
 	public boolean tokenIsValid(String token) {
 		Date expirationDate = this.getExpirationDate(token);
-		System.out.println(expirationDate);
 		if(expirationDate == null)
 			return false;
 		return !expirationDate.before(new Date());

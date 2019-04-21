@@ -3,7 +3,7 @@ stop:
 clean: stop
 	- docker rm auth-api
 build: clean
-	mvn clean package
+	mvn clean package -Pdev -Dmaven.test.skip=true
 	docker build --build-arg USERS_MYSQL_URL --build-arg USERS_MYSQL_USERNAME --build-arg USERS_MYSQL_PASSWORD --network net -t auth-api .
 run: clean
 	docker run -d -p 8083:8080 -e "SPRING_PROFILES_ACTIVE=dev" --name=auth-api --network net auth-api
@@ -15,3 +15,5 @@ compose-down:
 	docker-compose down -v 
 compose-up: compose-down
 	docker-compose up --no-recreate -d
+stats:
+	docker stats auth-api

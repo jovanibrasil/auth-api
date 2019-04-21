@@ -4,30 +4,40 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.validators.StringValidator;
+import com.jwt.utils.ApplicationType;
 
 public class UserDto {
 
+	private Long id;
 	@NotNull
-	@Email
+	@Email(message="Email must be a well-formed email address.")
 	private String email;
 	@NotNull
-	@Size(min=2, max=10)
+	@Size(min=2, max=10, message="Username length must be between 2 and 10.")
 	private String userName;
 	@NotNull
-	@Size(min=4, max=10)
+	@Size(min=4, max=10, message="Password length must be between 4 and 10.")
 	private String password;
-	
-	@StringValidator(acceptedValues={"NOTES_APP", "BLOG_APP"}, message="Invalid dataType")
-	private String application;
+	@NotNull
+	//@EnumListValidator(enumClass=ApplicationType.class)
+	private ApplicationType application;
 	
 	public UserDto() {}
 
-	public UserDto(String email, String userName, String password) {
+	public UserDto(Long id, String email, String userName, String password) {
 		super();
+		this.id = id;
 		this.email = email;
 		this.userName = userName;
 		this.password = password;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getEmail() {
@@ -53,13 +63,19 @@ public class UserDto {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	public String getApplication() {
+
+	public ApplicationType getApplication() {
 		return application;
 	}
 
-	public void setApplication(String application) {
+	public void setApplication(ApplicationType application) {
 		this.application = application;
+	}
+
+	@Override
+	public String toString() {
+		return "UserDto [id=" + id + ", email=" + email + ", userName=" + userName + ", password=" + password
+				+ ", application=" + application + "]";
 	}
 	
 }

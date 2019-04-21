@@ -48,7 +48,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 		String applicationName = jwtTokenUtil.getApplicationName(token);
 		if(userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			UserDetails userDetails = this.userDetailService.loadUserByUsername(userName);
-			Optional<User> user = this.userService.getUserByName(userName);
+			Optional<User> user = this.userService.findByUserName(userName);
 			
 			if(userDetails != null && jwtTokenUtil.tokenIsValid(token) && user.isPresent()) {
 				if(user.get().getMyApplications().contains(applicationName)) {

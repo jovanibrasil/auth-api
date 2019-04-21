@@ -31,6 +31,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private UserDetailsService userDetailsService;
 	
+	/*
+	 * Configures AuthenticationManager.
+	 * 
+	 * 
+	 */
 	@Autowired
 	public void configureAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
 		authenticationManagerBuilder.userDetailsService(this.userDetailsService).passwordEncoder(passwordEncoder());
@@ -60,7 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			.and()
 			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler) // set authentication error
 			.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // set session police stateless
-			.and().authorizeRequests().antMatchers("/auth/**").permitAll().anyRequest().authenticated();
+			.and().authorizeRequests().antMatchers("/auth/**", "/token/**").permitAll();
 		httpSecurity.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class); // set filter
 		httpSecurity.headers().cacheControl();
 	}

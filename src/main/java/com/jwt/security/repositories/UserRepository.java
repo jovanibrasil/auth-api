@@ -6,9 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jwt.security.entities.User;
 
-
-//@Transactional(readOnly=true)
+@Transactional(readOnly=true)
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
-	User findByUserName(String userName);
+	User findUserByUserName(String userName);
+	User findUserByEmail(String email);
+	User findUserById(Long id);
 }

@@ -1,8 +1,11 @@
 package com.jwt.security.dto;
 
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 
-import com.validators.StringValidator;
+import com.jwt.utils.ApplicationType;
+import com.validators.EnumListValidator;
 
 public class JwtAuthenticationDto {
 
@@ -12,8 +15,8 @@ public class JwtAuthenticationDto {
 	@NotNull
 	private String password;
 	
-	@StringValidator(acceptedValues={"NOTES_APP", "BLOG_APP"}, message="Invalid dataType")
-	private String application;
+	//@EnumListValidator(enumClass=ApplicationType.class)
+	private ApplicationType application;
 	
 	public JwtAuthenticationDto() {}
 	
@@ -35,10 +38,10 @@ public class JwtAuthenticationDto {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	public String getApplication() {
+	public ApplicationType getApplication() {
 		return application;
 	}
-	public void setApplication(String application) {
+	public void setApplication(ApplicationType application) {
 		this.application = application;
 	}
 	

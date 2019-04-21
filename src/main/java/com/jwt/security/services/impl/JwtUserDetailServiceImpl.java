@@ -21,7 +21,7 @@ public class JwtUserDetailServiceImpl implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		System.out.println("Procurando por "+username);
-		Optional<User> user = userService.getUserByName(username);
+		Optional<User> user = userService.findByUserName(username);
 		if(user.isPresent())
 			return JwtUserFactory.create(user.get());
 		throw new UsernameNotFoundException("User name not encontered");
