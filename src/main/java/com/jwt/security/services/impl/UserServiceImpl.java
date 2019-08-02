@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import com.jwt.integration.Integration;
 import com.jwt.security.entities.User;
 import com.jwt.security.enums.ProfileEnum;
 import com.jwt.security.repositories.UserRepository;
@@ -26,6 +27,9 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private Integration integrationService;
 	
 	@Override
 	public Optional<User> findByUserName(String userName) {
@@ -47,8 +51,7 @@ public class UserServiceImpl implements UserService {
 	}
 		
 	@Override
-	public void save(User user) throws UserServiceException {
-		
+	public User save(User user) throws UserServiceException {
 		// Validate if user name and email already exists
 		List<String> errors = validateUser(user);
 		if(!errors.isEmpty()) {
@@ -56,9 +59,9 @@ public class UserServiceImpl implements UserService {
 		}	
 		user.setSignUpDate(new Date());
 		user.setProfile(ProfileEnum.ROLE_USER);
-		
-		this.userRepository.save(user);
-		// TODO cria registro do usuário e se comunica com a aplicação alvo, para inicializar uma conta na aplicação
+		user = this.userRepository.save(user);
+		integrationService.createServiceUser(user);
+		return user;
 	}
 	
 	public User updateUser(User user) throws UserServiceException {

@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -42,10 +41,10 @@ public class UserController {
 	 * 
 	 */
 	@PostMapping
-	public ResponseEntity<Response<String>> createUser(@Valid @RequestBody UserDto userDto, BindingResult result, HttpServletRequest request){
+	public ResponseEntity<Response<UserDto>> createUser(@Valid @RequestBody UserDto userDto, BindingResult result, HttpServletRequest request){
 		
 		log.info("Creating user {}", userDto.getUserName());
-		Response<String> response = new Response<>();
+		Response<UserDto> response = new Response<>();
 		
 		if(result.hasErrors()) {
 			log.error("Validation error {}", result.getAllErrors());
@@ -54,7 +53,8 @@ public class UserController {
 		}
 		
 		try {
-			this.userService.save(DTOUtils.userDtoToUser(userDto));			
+			User user = this.userService.save(DTOUtils.userDtoToUser(userDto));			
+			response.setData(DTOUtils.userToUserDTO(user));
 			return ResponseEntity.ok(response);
 		} catch (UserServiceException e) {	
 			log.error("Save user error {}", e.getErrorMessages());

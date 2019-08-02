@@ -2,6 +2,8 @@ package com.jwt.security.services.impl;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,15 +17,20 @@ import com.jwt.security.utils.JwtUserFactory;
 @Service
 public class JwtUserDetailServiceImpl implements UserDetailsService {
 
+	private static final Logger log = LoggerFactory.getLogger(JwtUserDetailServiceImpl.class);
+	
 	@Autowired
 	private UserService userService;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		System.out.println("Procurando por "+username);
+		log.info("Searching for " + username);
 		Optional<User> user = userService.findByUserName(username);
-		if(user.isPresent())
+		if(user.isPresent()) {
+			log.info("The user was found.");
 			return JwtUserFactory.create(user.get());
+		}
+		log.error("No user was found.");
 		throw new UsernameNotFoundException("User name not encontered");
 	}
 

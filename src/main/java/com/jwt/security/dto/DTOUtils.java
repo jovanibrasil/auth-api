@@ -10,6 +10,7 @@ public class DTOUtils {
 	public static UserDto userToUserDTO(User user) {
 		UserDto userDTO = new UserDto();
 		userDTO.setUserName(user.getUserName());
+		userDTO.setId(user.getId());
 		userDTO.setEmail(user.getEmail());
 		userDTO.setPassword(null);
 		userDTO.setApplication(user.getMyApplications().get(0));
@@ -24,4 +25,6 @@ public class DTOUtils {
 		user.setMyApplications(Arrays.asList(userDTO.getApplication()));
 		return user;
 	}	
+	
+	
 }

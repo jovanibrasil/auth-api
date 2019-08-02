@@ -1,6 +1,5 @@
 package com.jwt.security.controllers;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import javax.naming.AuthenticationException;
@@ -56,8 +55,7 @@ public class TokensController {
 	
 	@Autowired
 	private UserDetailsService userDetailsService;
-	
-	
+		
 	/**
 	 * Create and returns a new token JWT.
 	 */
@@ -94,7 +92,7 @@ public class TokensController {
 			log.error("Authentication error {}");
 			response.addError("Authentication error. Invalid user name or password");
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);		
-		}	
+		}
 		
 		UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDto.getUserName());
 		String token = jwtTokenUtil.createToken(userDetails, authenticationDto.getApplication());
@@ -140,6 +138,9 @@ public class TokensController {
 		if(optToken.isPresent()) {
 			if(optToken.get().startsWith(BEARER_PREFIX)) {
 				optToken = Optional.of(optToken.get().substring(7));
+			}else {
+				log.error("Invalid token");
+				response.addError("Invalid token.");
 			}
 		}
 	
@@ -148,29 +149,32 @@ public class TokensController {
 			response.addError("The request do not contain a token.");
 		}else {
 			String token = optToken.get();
-			
 			if(!jwtTokenUtil.tokenIsValid(token)) {
 				log.error("The token in invalid or expired");
 				response.addError("The token is invalid or expired.");
 			}
-			
 			// Verify if user has register for the required application
-			Optional<User> optUser = userService.findByUserName(jwtTokenUtil.getUserNameFromToken(token));
+			String userName = jwtTokenUtil.getUserNameFromToken(token);
+			Optional<User> optUser = userService.findByUserName(userName);
 			if(optUser.isPresent()) {
 				ApplicationType applicationName = ApplicationType.valueOf(jwtTokenUtil.getApplicationName(token));
 				if(!optUser.get().getMyApplications().contains(applicationName)) {
 					log.error("Authentication error {} not registered for application {}.");
 					response.addError("Authentication error. User not registered for this application.");
 				}
+			}else {
+				log.error("User {} not found.", userName);
+				return ResponseEntity.badRequest().body(response);
 			}
 		}
 			
 		if(!response.getErrors().isEmpty()) {
 			return ResponseEntity.badRequest().body(response);
 		}
-
+		String userName = jwtTokenUtil.getUserNameFromToken(optToken.get());
+		log.info("Token ok from user {}", userName);
 		TempUser tempUser = new TempUser();
-		tempUser.setName(jwtTokenUtil.getUserNameFromToken(optToken.get()));
+		tempUser.setName(userName);
 		tempUser.setRole(ProfileEnum.valueOf(jwtTokenUtil.getAuthority(optToken.get())));
 		
 		response.setData(tempUser);

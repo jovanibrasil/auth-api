@@ -110,7 +110,6 @@ public class UserControllerTest {
 	
 	@Test
 	public void testDeleteInvalidUser() throws Exception {
-	
 		doThrow(new UserServiceException("The user does not exist.")).when(this.userService).deleteUser(Mockito.anyString());
 		mvc.perform(MockMvcRequestBuilders.delete("/user/java")
 			.contentType(MediaType.APPLICATION_JSON))
