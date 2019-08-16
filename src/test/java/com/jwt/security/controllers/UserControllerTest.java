@@ -26,6 +26,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jwt.security.dto.UserDto;
+import com.jwt.security.entities.Application;
+import com.jwt.security.entities.Registry;
 import com.jwt.security.entities.User;
 import com.jwt.security.enums.ProfileEnum;
 import com.jwt.security.services.UserService;
@@ -57,19 +59,22 @@ public class UserControllerTest {
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user.setSignUpDate(new Date());
-		user.setMyApplications(Arrays.asList(ApplicationType.BLOG_APP));
-		
+		user.setRegistries(Arrays.asList(
+				new Registry(new Application(ApplicationType.BLOG_APP), user)));
 		userDto = new UserDto();
 		userDto.setId(1L);
 		userDto.setEmail("test@gmail.com");
 		userDto.setUserName("test");
 		userDto.setPassword("password");
 		userDto.setApplication(ApplicationType.BLOG_APP);
+		
 	}
 	
 	@Test
 	public void testCreateUser() throws Exception {
 		BDDMockito.given(this.userService.findUserById(user.getId())).willReturn(Optional.of(user));
+		BDDMockito.given(this.userService.save(Mockito.any())).willReturn(user);
+		
 		mvc.perform(MockMvcRequestBuilders.post("/user")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
@@ -84,8 +89,8 @@ public class UserControllerTest {
 		updatedUser.setEmail("newtest@gmail.com");
 		updatedUser.setUserName("newtest");
 		updatedUser.setPassword("password");
-		updatedUser.setMyApplications(Arrays.asList(ApplicationType.BLOG_APP));
-		
+		user.setRegistries(Arrays.asList(
+				new Registry(new Application(ApplicationType.BLOG_APP), user)));
 		userDto.setEmail("newtest@gmail.com");
 		userDto.setUserName("newtest");
 		

@@ -1,11 +1,8 @@
 package com.jwt.security.dto;
 
-import java.util.List;
-
 import javax.validation.constraints.NotNull;
 
 import com.jwt.utils.ApplicationType;
-import com.validators.EnumListValidator;
 
 public class JwtAuthenticationDto {
 

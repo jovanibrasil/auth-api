@@ -1,11 +1,12 @@
 package com.jwt.security.repositories;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,49 +16,46 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.jwt.security.entities.Application;
+import com.jwt.security.entities.Registry;
 import com.jwt.security.entities.User;
 import com.jwt.security.enums.ProfileEnum;
-import com.jwt.security.services.impl.UserServiceException;
 import com.jwt.utils.ApplicationType;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 public class UserRepositoryTest {
 
 	@Autowired
-	UserRepository userRepository;
-	
-	User user;
+	private UserRepository userRepository;
+
+	@Autowired
+	private ApplicationRepository applicationRepository;
+
+	private User user;
 	
 	@Before
 	public void setUp() {
-		user = new User();
+		Application blog = new Application(ApplicationType.BLOG_APP);
+		applicationRepository.save(blog);
+		User user = new User();
 		user.setEmail("test@gmail.com");
 		user.setUserName("test");
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user.setSignUpDate(new Date());
-		user.setMyApplications(Arrays.asList(ApplicationType.BLOG_APP));
-		this.userRepository.save(user);	
-	}
-	
-	@After
-	public void tearDown() {
-		this.userRepository.deleteAll();
+		user.addApplication(blog);		
+		user = userRepository.save(user);
 	}
 	
 	@Test
 	public void testFindValidUserByName() {
 		User user = this.userRepository.findUserByUserName("test");
 		assertNotNull(user);
-	}
-	
-	@Test
-	public void testFindValidUserByNameVerifyApplications() {
-		User user = this.userRepository.findUserByUserName("test");
-		assertEquals(ApplicationType.BLOG_APP, user.getMyApplications().get(0));
 	}
 	
 	@Test
@@ -77,12 +75,48 @@ public class UserRepositoryTest {
 		User user = this.userRepository.findUserByEmail("test");
 		assertNull(user);
 	}
-	
+
 	@Test
 	public void testDeleteUser() {
-		this.userRepository.delete(this.user);
-		User user = this.userRepository.findUserByEmail("test");
-		assertNull(user);
+		User user = userRepository.findUserByUserName("test");
+		userRepository.delete(user);
+		Optional<User> u = userRepository.findById(user.getId());
+		assertEquals(false, u.isPresent());
 	}
 	
+	@Test
+	public void testSaveUser() {
+		Application blog = new Application(ApplicationType.BLOG_APP);
+		blog = applicationRepository.save(blog);
+		User u = new User();
+		u.setEmail("test@gmail.com");
+		u.setUserName("test");
+		u.setPassword("password");
+		u.setProfile(ProfileEnum.ROLE_USER);
+		u.setSignUpDate(new Date());
+		u.addApplication(blog);		
+		u = userRepository.save(u);
+		assertNotNull(u.getId());
+	}
+
+	@Test
+	public void testFindValidUserByNameVerifyApplications() {
+		user = this.userRepository.findUserByUserName("test");
+		Application app = user.getRegistries().get(0).getApplication();
+		assertEquals(ApplicationType.BLOG_APP, app.getApplication());
+	}
+	
+	@Test
+	public void testHasValidApplication() {
+		user = this.userRepository.findUserByEmail("test@gmail.com");
+		assertNotNull(user.getRegistries());
+		assertNotEquals(0, user.getRegistries().size());
+		Registry registry = user.getRegistries().get(0);
+		if(registry != null) {
+			assertNotNull(registry.getApplication());
+			assertNotNull(registry.getApplication().getId());
+			assertNotNull(registry.getUser());
+		}		
+	}
+
 }

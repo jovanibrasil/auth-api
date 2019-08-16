@@ -9,10 +9,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,10 +34,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jwt.integration.Integration;
 import com.jwt.security.dto.UserDto;
+import com.jwt.security.entities.Application;
+import com.jwt.security.entities.Registry;
 import com.jwt.security.entities.User;
 import com.jwt.security.enums.ProfileEnum;
+import com.jwt.security.repositories.UserRepository;
 import com.jwt.security.services.UserService;
+import com.jwt.security.services.impl.UserServiceImpl;
 import com.jwt.security.utils.JwtTokenUtil;
 import com.jwt.utils.ApplicationType;
 
@@ -42,11 +52,14 @@ import com.jwt.utils.ApplicationType;
 @ActiveProfiles("test")
 public class TokenControllerTest {
 
+	@Mock
+	private UserRepository userRepository;
+	
 	@Autowired
 	private MockMvc mvc;
 	
 	@MockBean
-	private UserService userService;
+	UserService userService;
 	
 	@MockBean
 	private JwtTokenUtil jwtTokenUtil;
@@ -56,6 +69,7 @@ public class TokenControllerTest {
 	
 	@MockBean
 	private UserDetailsService userDetailsService;
+	
 	
 	private User user;
 	private UserDto userDto;
@@ -69,20 +83,27 @@ public class TokenControllerTest {
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user.setSignUpDate(new Date());
-		user.setMyApplications(Arrays.asList(ApplicationType.BLOG_APP));
-		
+		user.setRegistries(Arrays.asList(
+				new Registry(new Application(ApplicationType.BLOG_APP), user)));
 		userDto = new UserDto();
 		userDto.setId(1L);
 		userDto.setEmail("test@gmail.com");
 		userDto.setUserName("test");
 		userDto.setPassword("password");
 		userDto.setApplication(ApplicationType.BLOG_APP);
+		
+	}
+	
+	@After
+	public void tearDown() {
+		this.userRepository.deleteAll();
 	}
 	
 	@Test
 	public void testTokenCreationForbiddenApplication() throws Exception {
+		user.setRegistries(Arrays.asList(
+				new Registry(new Application(ApplicationType.NOTES_APP), user)));
 		BDDMockito.given(this.userService.findByUserName("test")).willReturn(Optional.of(user));
-		user.setMyApplications(Arrays.asList(ApplicationType.NOTES_APP));
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
@@ -92,11 +113,11 @@ public class TokenControllerTest {
 	
 	@Test
 	public void testTokenCreation() throws Exception {
+		
 		BDDMockito.given(this.userService.findByUserName("test")).willReturn(Optional.of(user));
 		BDDMockito.given(this.authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken("test", "password")))
 		.willReturn(new AuthenticationMock());
-		
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))

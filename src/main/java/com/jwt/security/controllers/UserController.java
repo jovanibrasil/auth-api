@@ -53,8 +53,8 @@ public class UserController {
 		}
 		
 		try {
-			User user = this.userService.save(DTOUtils.userDtoToUser(userDto));			
-			response.setData(DTOUtils.userToUserDTO(user));
+			User user = this.userService.save(DTOUtils.userDtoToUser(userDto));	
+			response.setData(DTOUtils.userToUserDTO(user, userDto.getApplication()));
 			return ResponseEntity.ok(response);
 		} catch (UserServiceException e) {	
 			log.error("Save user error {}", e.getErrorMessages());
@@ -82,7 +82,7 @@ public class UserController {
 		
 		try {
 			User user = this.userService.updateUser(DTOUtils.userDtoToUser(userDto));
-			response.setData(DTOUtils.userToUserDTO(user));
+			response.setData(DTOUtils.userToUserDTO(user, userDto.getApplication()));
 			return ResponseEntity.ok(response);
 		} catch (UserServiceException e) {	
 			log.error("Update user error {}", e.getErrorMessages());

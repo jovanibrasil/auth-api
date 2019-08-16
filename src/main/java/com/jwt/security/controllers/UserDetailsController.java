@@ -12,9 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,23 +29,6 @@ import com.jwt.security.services.impl.UserServiceException;
 @RequestMapping("/userdetails")
 @CrossOrigin(origins = "*")
 public class UserDetailsController {
-
-	/**
-	 *  
-	 * adiciona testes unitários para algumas classes
-	 * muda a utilização de userrepository para userservice
-	 * adicionar metódo para adicionar error na classe Respose
-	 * separa operações de token em um controller
-	 * adiciona update de usuário. Pode ser feito o update de nome, email e senha
-	 * adiciona um update de detalhes de usuário
-	 * retorna UNPROCESSABLE_ENTITY (522) caso haja erro nos dados recebidos
-	 * return FORBIDDEN (403) caso não seja possível registrar um usuário
-	 * retorna UNAUTHORIZED (401) caso os dados de autenticação estejam errados
-	 * adiciona mensagens de validação para o user DTO
-	 * adciona validações da criação de um novo usuário
-	 * 
-	 * 
-	 */
 		
 	private static final Logger log = LoggerFactory.getLogger(UserDetailsController.class);
 	
@@ -90,10 +70,9 @@ public class UserDetailsController {
 		try {
 			this.userService.save(currentUser);
 		} catch (UserServiceException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		response.setData(DTOUtils.userToUserDTO(currentUser));
+		response.setData(DTOUtils.userToUserDTO(currentUser, userDto.getMyApplications().get(0)));
 		return ResponseEntity.ok(response);
 	}
 		

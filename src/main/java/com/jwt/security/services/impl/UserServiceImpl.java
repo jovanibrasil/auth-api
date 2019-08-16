@@ -102,8 +102,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void deleteUser(String userName) throws UserServiceException {
 		Optional<User> optUser = this.findByUserName(userName);
+		
 		if(optUser.isPresent()) {
 			this.userRepository.delete(optUser.get());
+			// remove the user for each registered application
+			integrationService.deleteServiceUser(optUser.get());
 		}else {
 			throw new UserServiceException("The user does not exist.");
 		}

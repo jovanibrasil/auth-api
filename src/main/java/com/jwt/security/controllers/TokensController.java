@@ -74,7 +74,7 @@ public class TokensController {
 		// Verify if user has register for the required application
 		Optional<User> optUser = userService.findByUserName(authenticationDto.getUserName());
 		if(optUser.isPresent()) {
-			if(!optUser.get().getMyApplications().contains(authenticationDto.getApplication())) {
+			if(!optUser.get().hasRegistry(authenticationDto.getApplication())) {
 				log.error("Authentication error. User not register for {}", authenticationDto.getApplication());
 				response.addError("Authentication error. User not registered for this application.");
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);		
@@ -158,7 +158,7 @@ public class TokensController {
 			Optional<User> optUser = userService.findByUserName(userName);
 			if(optUser.isPresent()) {
 				ApplicationType applicationName = ApplicationType.valueOf(jwtTokenUtil.getApplicationName(token));
-				if(!optUser.get().getMyApplications().contains(applicationName)) {
+				if(!optUser.get().hasRegistry(applicationName)) {
 					log.error("Authentication error {} not registered for application {}.");
 					response.addError("Authentication error. User not registered for this application.");
 				}

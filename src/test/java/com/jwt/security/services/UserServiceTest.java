@@ -1,7 +1,7 @@
 package com.jwt.security.services;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -14,16 +14,24 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.jwt.integration.Integration;
+import com.jwt.security.entities.Application;
+import com.jwt.security.entities.Registry;
 import com.jwt.security.entities.User;
 import com.jwt.security.enums.ProfileEnum;
+import com.jwt.security.repositories.ApplicationRepository;
 import com.jwt.security.repositories.UserRepository;
 import com.jwt.security.services.impl.UserServiceException;
+import com.jwt.security.services.impl.UserServiceImpl;
 import com.jwt.utils.ApplicationType;
 
 @RunWith(SpringRunner.class)
@@ -31,11 +39,17 @@ import com.jwt.utils.ApplicationType;
 @ActiveProfiles("test")
 public class UserServiceTest {
 	
-	@MockBean
+	@Mock
 	UserRepository userRepository;
 	
 	@Autowired
-	UserService userService;
+	ApplicationRepository applicationRepository;
+	
+	@InjectMocks
+	UserService userService = new UserServiceImpl();
+	
+	@Spy
+	Integration integrationService;
 	
 	@Rule
 	public ExpectedException expectedEx = ExpectedException.none();
@@ -49,12 +63,14 @@ public class UserServiceTest {
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user.setSignUpDate(new Date());
-		user.setMyApplications(Arrays.asList(ApplicationType.BLOG_APP));
+		
 		BDDMockito.given(userRepository.findUserByEmail("test@gmail.com")).willReturn(user);
 		BDDMockito.given(userRepository.findUserByEmail("test2@gmail.com")).willReturn(null);
 		BDDMockito.given(userRepository.findUserByUserName("test")).willReturn(user);
 		BDDMockito.given(userRepository.findUserByUserName("test2")).willReturn(null);
 		BDDMockito.given(userRepository.findUserById(1L)).willReturn(user);
+		
+		Mockito.doNothing().when(integrationService).createServiceUser(Mockito.any());
 	}
 	
 	@Test
@@ -83,14 +99,23 @@ public class UserServiceTest {
 	
 	@Test
 	public void testSave() throws UserServiceException {
+		
+		// Save application
+		Application application = new Application(ApplicationType.BLOG_APP);
+		applicationRepository.save(application);
+		
+		// Save user
 		User user = new User();
+		user.setId(0L);
 		user.setEmail("tes2t@gmail.com");
 		user.setUserName("test2");
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user.setSignUpDate(new Date());
-		user.setMyApplications(Arrays.asList(ApplicationType.BLOG_APP));
+		user.addApplication(application);
 		this.userService.save(user);
+		
+		assertNotNull(user.getId());
 	}
 	
 	@Test
@@ -103,7 +128,7 @@ public class UserServiceTest {
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user.setSignUpDate(new Date());
-		user.setMyApplications(Arrays.asList(ApplicationType.BLOG_APP));
+		user.setRegistries(Arrays.asList());
 		this.userService.save(user);
 	}
 	
@@ -117,7 +142,7 @@ public class UserServiceTest {
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user.setSignUpDate(new Date());
-		user.setMyApplications(Arrays.asList(ApplicationType.BLOG_APP));
+		user.setRegistries(Arrays.asList());
 		this.userService.save(user);
 	}
 

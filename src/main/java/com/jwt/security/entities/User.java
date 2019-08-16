@@ -2,11 +2,12 @@ package com.jwt.security.entities;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
-import javax.persistence.CollectionTable;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -14,18 +15,18 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.jwt.security.enums.ProfileEnum;
 import com.jwt.utils.ApplicationType;
 
-@Entity
+@Entity(name="User")
 @Table(name="users")
 public class User {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = 	GenerationType.IDENTITY)
 	private Long id;
 	
 	@Column(name="user_name", nullable=false)
@@ -40,15 +41,16 @@ public class User {
 	private ProfileEnum profile;
 	@Column(name="date", nullable=false)
 	private Date signUpDate;
-
-	@Column(name="application_name", nullable=false)
-	@ElementCollection(targetClass=ApplicationType.class, fetch = FetchType.EAGER)
-	@CollectionTable(name="applications", joinColumns = @JoinColumn(name = "id"))
-	private List<ApplicationType> applications;
-
-	public User() {
-		this.applications = new ArrayList<ApplicationType>();
-	}
+	
+	@OneToMany(
+	        mappedBy = "user",
+	        cascade = {CascadeType.ALL},
+	       	orphanRemoval = true,
+	       	fetch = FetchType.EAGER
+	    )
+	private List<Registry> registries = new ArrayList<Registry>();
+	
+	public User() {}
 
 	public String getEmail() {
 		return email;
@@ -91,12 +93,12 @@ public class User {
 		this.userName = userName;
 	}
 
-	public List<ApplicationType> getMyApplications() {
-		return applications;
+	public List<Registry> getRegistries() {
+		return registries;
 	}
 
-	public void setMyApplications(List<ApplicationType> myApplications) {
-		this.applications = myApplications;
+	public void setRegistries(List<Registry> myRegistries) {
+		this.registries = myRegistries;
 	}
 
 	public Long getId() {
@@ -107,10 +109,57 @@ public class User {
 		this.id = id;
 	}
 
+	public boolean hasRegistry(ApplicationType aplication) {
+		for (Registry reg : this.registries) {
+			if(reg.getApplication().getApplication().equals(aplication)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void addApplication(Application application) {
+		Registry registry = new Registry(application, this);
+		registries.add(registry);
+		application.getRegistries().add(registry);
+	}
+	
+	public void removeApplication(Application app) {
+        
+		for (Iterator<Registry> iterator = registries.iterator(); iterator.hasNext(); ) {
+            Registry reg = iterator.next();
+ 
+            if (reg.getUser().equals(this) &&
+                    reg.getApplication().equals(app)) {
+                iterator.remove();
+                reg.getApplication().getRegistries().remove(reg);
+                reg.setUser(null);
+                reg.setApplication(null);
+            }
+        }
+    }
+	
+	@Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id) && this.userName.equals(user.getUserName())
+        		&& this.email.equals(user.getEmail());
+    }
+ 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, userName, password);
+    }
+	
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", userName=" + userName + ", email=" + email + ", password=" + password
-				+ ", profile=" + profile + ", signUpDate=" + signUpDate + ", applications=" + applications + "]";
+		return "User [id=" + id + ", userName=" + userName + ", email=" + email
+				+ ", password=" + password + ", profile=" + profile 
+				+ ", signUpDate=" + signUpDate + ", registries=" 
+				+ registries.toString() + "]";
 	}
 	
 }
