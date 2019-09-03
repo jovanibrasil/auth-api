@@ -152,19 +152,23 @@ public class TokensController {
 			if(!jwtTokenUtil.tokenIsValid(token)) {
 				log.error("The token in invalid or expired");
 				response.addError("The token is invalid or expired.");
-			}
-			// Verify if user has register for the required application
-			String userName = jwtTokenUtil.getUserNameFromToken(token);
-			Optional<User> optUser = userService.findByUserName(userName);
-			if(optUser.isPresent()) {
-				ApplicationType applicationName = ApplicationType.valueOf(jwtTokenUtil.getApplicationName(token));
-				if(!optUser.get().hasRegistry(applicationName)) {
-					log.error("Authentication error {} not registered for application {}.");
-					response.addError("Authentication error. User not registered for this application.");
-				}
 			}else {
-				log.error("User {} not found.", userName);
-				return ResponseEntity.badRequest().body(response);
+				log.info("The token is valid");
+			
+				// Verify if user has register for the required application
+				String userName = jwtTokenUtil.getUserNameFromToken(token);
+				Optional<User> optUser = userService.findByUserName(userName);
+				if(optUser.isPresent()) {
+					ApplicationType applicationName = ApplicationType.valueOf(jwtTokenUtil.getApplicationName(token));
+					if(!applicationName.equals(ApplicationType.AUTH_APP) && !optUser.get().hasRegistry(applicationName)) {
+						log.error("Authentication error {} not registered for application {}.");
+						response.addError("Authentication error. User not registered for this application.");
+					}
+				}else {
+					log.error("User {} not found.", userName);
+					response.addError("User not found.");
+					return ResponseEntity.badRequest().body(response);
+				}
 			}
 		}
 			

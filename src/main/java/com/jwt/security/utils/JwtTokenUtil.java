@@ -137,8 +137,9 @@ public class JwtTokenUtil {
 	 */
 	public boolean tokenIsValid(String token) {
 		Date expirationDate = this.getExpirationDate(token);
-		if(expirationDate == null)
-			return false;
+		if(expirationDate == null) return false;
+		System.out.println("Expiration date: " + expirationDate);
+		System.out.println("Atual date: " + new Date());
 		return !expirationDate.before(new Date());
 	}
 	

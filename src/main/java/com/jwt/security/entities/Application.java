@@ -37,7 +37,7 @@ public class Application {
 	        mappedBy = "application",
 	        cascade = {CascadeType.ALL},
 	        orphanRemoval = true,
-	        fetch = FetchType.EAGER
+	        fetch = FetchType.LAZY
 	    )
 	private List<Registry> registries = new ArrayList<Registry>();
 	

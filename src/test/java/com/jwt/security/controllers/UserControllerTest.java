@@ -75,7 +75,7 @@ public class UserControllerTest {
 		BDDMockito.given(this.userService.findUserById(user.getId())).willReturn(Optional.of(user));
 		BDDMockito.given(this.userService.save(Mockito.any())).willReturn(user);
 		
-		mvc.perform(MockMvcRequestBuilders.post("/user")
+		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isOk())
@@ -96,7 +96,7 @@ public class UserControllerTest {
 		
 		BDDMockito.given(this.userService.updateUser(Mockito.any())).willReturn(updatedUser);
 		
-		mvc.perform(MockMvcRequestBuilders.put("/user")
+		mvc.perform(MockMvcRequestBuilders.put("/users")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isOk())
@@ -107,7 +107,7 @@ public class UserControllerTest {
 	
 	@Test
 	public void testDeleteUser() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.delete("/user/test")
+		mvc.perform(MockMvcRequestBuilders.delete("/users/test")
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.errors").isEmpty());
@@ -116,7 +116,7 @@ public class UserControllerTest {
 	@Test
 	public void testDeleteInvalidUser() throws Exception {
 		doThrow(new UserServiceException("The user does not exist.")).when(this.userService).deleteUser(Mockito.anyString());
-		mvc.perform(MockMvcRequestBuilders.delete("/user/java")
+		mvc.perform(MockMvcRequestBuilders.delete("/users/java")
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0]", equalTo("The user does not exist.")));

@@ -1,5 +1,7 @@
 package com.jwt.security.controllers;
 
+import java.util.Optional;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,12 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jwt.response.Response;
 import com.jwt.security.dto.DTOUtils;
 import com.jwt.security.dto.UserDto;
+import com.jwt.security.entities.Registry;
 import com.jwt.security.entities.User;
 import com.jwt.security.services.UserService;
 import com.jwt.security.services.impl.UserServiceException;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 @CrossOrigin(origins = "*")
 public class UserController {
 		
@@ -35,6 +39,31 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 		
+	
+	@GetMapping("/{userName}")
+	public ResponseEntity<Response<UserDto>> getUser(@PathVariable String userName) {
+		
+		Response<UserDto> response = new Response<UserDto>();
+		
+		Optional<User> optUser = userService.findByUserName(userName);
+		
+		if(!optUser.isPresent()) {
+			log.info("User {} not found!", userName);
+			return ResponseEntity.badRequest().body(null);
+		}
+		User user = optUser.get();
+		UserDto userDto = new UserDto();
+		userDto.setEmail(user.getEmail());
+		userDto.setUserName(user.getUserName());
+		for (Registry r : user.getRegistries()) {
+			log.info("Application: {}", r.getApplication().getApplication().name());
+		}
+		response.setData(userDto);
+		
+		return ResponseEntity.ok(response);
+		
+	}
+	
 	/**
 	 * 
 	 * Creates a new user for a specific application.
@@ -46,13 +75,12 @@ public class UserController {
 		log.info("Creating user {}", userDto.getUserName());
 		Response<UserDto> response = new Response<>();
 		
-		if(result.hasErrors()) {
-			log.error("Validation error {}", result.getAllErrors());
-			result.getAllErrors().forEach(err -> response.addError(err.getDefaultMessage()));
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
-		}
-		
 		try {
+			if(result.hasErrors()) {
+				log.error("Validation error {}", result.getAllErrors());
+				result.getAllErrors().forEach(err -> response.addError(err.getDefaultMessage()));
+				return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+			}
 			User user = this.userService.save(DTOUtils.userDtoToUser(userDto));	
 			response.setData(DTOUtils.userToUserDTO(user, userDto.getApplication()));
 			return ResponseEntity.ok(response);
@@ -109,7 +137,7 @@ public class UserController {
 		
 		try {
 			this.userService.deleteUser(userName);
-			return ResponseEntity.ok(response);
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
 		} catch (UserServiceException e) {
 			log.error("Delete user error {}", e.getErrorMessages());
 			e.getErrorMessages().forEach(err -> response.addError(err));

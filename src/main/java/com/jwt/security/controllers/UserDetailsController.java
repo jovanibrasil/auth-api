@@ -37,7 +37,6 @@ public class UserDetailsController {
 		
 	
 	/**
-	 * 
 	 * Accessible only for local services
 	 */
 	@PutMapping

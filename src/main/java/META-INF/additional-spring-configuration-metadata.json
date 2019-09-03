@@ -33,5 +33,25 @@
     "name": "urls.blog.createuser",
     "type": "java.lang.String",
     "description": "A description for 'urls.blog.createuser'"
+  },
+  {
+    "name": "jwt.expiration",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.expiration'"
+  },
+  {
+    "name": "jwt.expiration",
+    "type": "java.lang.String",
+    "description": "A description for 'jwt.expiration'"
+  },
+  {
+    "name": "urls.notes.deleteuser",
+    "type": "java.lang.String",
+    "description": "A description for 'urls.notes.deleteuser'"
+  },
+  {
+    "name": "urls.blog.deleteuser",
+    "type": "java.lang.String",
+    "description": "A description for 'urls.blog.deleteuser'"
   }
 ]}

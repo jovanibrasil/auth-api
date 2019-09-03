@@ -15,10 +15,10 @@ import com.jwt.security.services.UserService;
 import com.jwt.security.utils.JwtUserFactory;
 
 @Service
-public class JwtUserDetailServiceImpl implements UserDetailsService {
+public class UserDetailServiceImpl implements UserDetailsService {
 
-	private static final Logger log = LoggerFactory.getLogger(JwtUserDetailServiceImpl.class);
-	
+	private static final Logger log = LoggerFactory.getLogger(UserDetailServiceImpl.class);
+
 	@Autowired
 	private UserService userService;
 	
@@ -27,11 +27,11 @@ public class JwtUserDetailServiceImpl implements UserDetailsService {
 		log.info("Searching for " + username);
 		Optional<User> user = userService.findByUserName(username);
 		if(user.isPresent()) {
-			log.info("The user was found.");
+			log.info("The user {} was found.", username);
 			return JwtUserFactory.create(user.get());
 		}
-		log.error("No user was found.");
-		throw new UsernameNotFoundException("User name not encontered");
+		log.error("No user {} was found.", username);
+		throw new UsernameNotFoundException("User name not encontered.");
 	}
 
 }

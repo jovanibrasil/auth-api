@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.Optional;
@@ -107,7 +108,13 @@ public class UserRepositoryTest {
 	}
 	
 	@Test
-	public void testHasValidApplication() {
+	public void testHasSpecificApplication() {
+		user = this.userRepository.findUserByUserName("test");
+		assertTrue(user.hasRegistry(ApplicationType.BLOG_APP));	
+	}
+	
+	@Test
+	public void testHasValidApplications() {
 		user = this.userRepository.findUserByEmail("test@gmail.com");
 		assertNotNull(user.getRegistries());
 		assertNotEquals(0, user.getRegistries().size());

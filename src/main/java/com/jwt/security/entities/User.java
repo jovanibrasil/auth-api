@@ -18,6 +18,10 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jwt.security.configuration.JwtAuthenticationTokenFilter;
 import com.jwt.security.enums.ProfileEnum;
 import com.jwt.utils.ApplicationType;
 
@@ -25,6 +29,8 @@ import com.jwt.utils.ApplicationType;
 @Table(name="users")
 public class User {
 
+	private static final Logger log = LoggerFactory.getLogger(User.class);
+		
 	@Id
 	@GeneratedValue(strategy = 	GenerationType.IDENTITY)
 	private Long id;
@@ -110,7 +116,7 @@ public class User {
 	}
 
 	public boolean hasRegistry(ApplicationType aplication) {
-		for (Registry reg : this.registries) {
+		for (Registry reg : this.getRegistries()) {
 			if(reg.getApplication().getApplication().equals(aplication)) {
 				return true;
 			}
@@ -161,5 +167,6 @@ public class User {
 				+ ", signUpDate=" + signUpDate + ", registries=" 
 				+ registries.toString() + "]";
 	}
+
 	
 }

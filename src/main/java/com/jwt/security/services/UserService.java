@@ -7,9 +7,6 @@ import com.jwt.security.services.impl.UserServiceException;
 
 public interface UserService {
 
-	/*
-	 * Get user by email.
-	 */
 	Optional<User> findByUserName(String userName);
 	User save(User user) throws UserServiceException;
 	Optional<User> findUserByEmail(String email);

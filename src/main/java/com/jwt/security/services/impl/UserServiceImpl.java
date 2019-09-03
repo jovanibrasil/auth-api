@@ -60,8 +60,14 @@ public class UserServiceImpl implements UserService {
 		user.setSignUpDate(new Date());
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user = this.userRepository.save(user);
-		integrationService.createServiceUser(user);
-		return user;
+		
+		try {
+			integrationService.createServiceUser(user);
+			return user;
+		} catch (Exception e) {
+			log.info("Integration service error. {}", e.getMessage());
+			throw new UserServiceException("Integration service error. " + e.getMessage()); 
+		}
 	}
 	
 	public User updateUser(User user) throws UserServiceException {

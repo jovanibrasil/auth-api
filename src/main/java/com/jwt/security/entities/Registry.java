@@ -19,12 +19,12 @@ public class Registry {
 	@EmbeddedId
 	private RegistryId id; // primary key
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@MapsId("userId")
 	//@JoinColumn(name = "user_id", insertable = false, updatable = false)
 	private User user;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@MapsId("applicationId")
 	//@JoinColumn(name = "application_id", insertable = false, updatable = false)
 	private Application application;

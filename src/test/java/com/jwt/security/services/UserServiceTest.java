@@ -71,6 +71,7 @@ public class UserServiceTest {
 		BDDMockito.given(userRepository.findUserById(1L)).willReturn(user);
 		
 		Mockito.doNothing().when(integrationService).createServiceUser(Mockito.any());
+		Mockito.doNothing().when(integrationService).deleteServiceUser(Mockito.any());
 	}
 	
 	@Test

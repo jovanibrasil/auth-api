@@ -8,11 +8,8 @@ public class JwtAuthenticationDto {
 
 	@NotNull
 	private String userName;
-
 	@NotNull
 	private String password;
-	
-	//@EnumListValidator(enumClass=ApplicationType.class)
 	private ApplicationType application;
 	
 	public JwtAuthenticationDto() {}

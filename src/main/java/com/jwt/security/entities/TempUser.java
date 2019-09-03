@@ -26,5 +26,10 @@ public class TempUser {
 	public void setRole(ProfileEnum role) {
 		this.role = role;
 	}
+
+	@Override
+	public String toString() {
+		return "TempUser [name=" + name + ", role=" + role + "]";
+	}
 	
 }
