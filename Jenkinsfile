@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'jenkins-slave' }
+    agent { label 'aws-agent' }
     
     environment {
         USERS_MYSQL_URL = credentials('USERS_MYSQL_URL')
@@ -53,7 +53,7 @@ pipeline {
         stage("Remove temporary files"){
             steps {
                 echo 'cleaning ...'
-                echo 'rm ~/workspace/auth-app ~/workspace/auth-app@tmp -rf'
+                //echo 'rm ~/workspace/auth-app ~/workspace/auth-app@tmp -rf'
             }
         }
 

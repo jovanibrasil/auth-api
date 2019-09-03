@@ -25,9 +25,9 @@ import com.jwt.security.entities.User;
 import com.jwt.security.services.UserService;
 import com.jwt.security.services.impl.UserServiceException;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/userdetails")
-@CrossOrigin(origins = "*")
 public class UserDetailsController {
 		
 	private static final Logger log = LoggerFactory.getLogger(UserDetailsController.class);

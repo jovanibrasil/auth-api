@@ -109,7 +109,7 @@ public class UserControllerTest {
 	public void testDeleteUser() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.delete("/users/test")
 			.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
+			.andExpect(status().isNoContent())
 			.andExpect(jsonPath("$.errors").isEmpty());
 	}
 	

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,7 +16,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -40,8 +40,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 * 
 	 */
 	@Autowired
-	public void configureAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-		authenticationManagerBuilder.userDetailsService(this.userDetailsService).passwordEncoder(passwordEncoder());
+	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
+		authenticationManagerBuilder.authenticationProvider(authenticationProvider());
+	}
+	
+	/**
+	 * Configures the authentication provider
+	 * 
+	 * @return
+	 */
+	@Bean
+	DaoAuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+		provider.setPasswordEncoder(passwordEncoder());
+		provider.setUserDetailsService(userDetailsService);
+		return provider;
 	}
 	
 	/*
@@ -68,15 +81,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		
-		httpSecurity.csrf().disable() // disable csrf 
+		httpSecurity.csrf().disable() // disable CSRF default protection 
 			.cors()
+			.and() // session isn't necessary with JWT based authentication
+				.sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS) // then disable session
 			.and()
-			.addFilterBefore(authenticationTokenFilterBean(),  BasicAuthenticationFilter.class)
-			.addFilterBefore(exceptionHandlerFilterBean(), JwtAuthenticationTokenFilter.class)
-			.exceptionHandling().authenticationEntryPoint(unauthorizedHandler) // set authentication error
-			.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // set session police stateless
-			.and().authorizeRequests().antMatchers("/token/**", "/users/**").permitAll();
-		httpSecurity.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class); // set filter
+				.authorizeRequests()
+					.antMatchers("/token/**", "/users/**")
+					.permitAll()
+			.and()
+				.addFilterBefore(authenticationTokenFilterBean(), BasicAuthenticationFilter.class)
+				.addFilterBefore(exceptionHandlerFilterBean(), JwtAuthenticationTokenFilter.class)
+				.exceptionHandling()
+					.authenticationEntryPoint(unauthorizedHandler); // set authentication error
 		httpSecurity.headers().cacheControl();
 	}
 	

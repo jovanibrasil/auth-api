@@ -34,9 +34,9 @@ import com.jwt.security.services.UserService;
 import com.jwt.security.utils.JwtTokenUtil;
 import com.jwt.utils.ApplicationType;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/token")
-@CrossOrigin(origins = "*")
 public class TokensController {
 
 	private static final Logger log = LoggerFactory.getLogger(TokensController.class);
