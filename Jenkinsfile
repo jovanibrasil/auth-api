@@ -22,7 +22,7 @@ pipeline {
         stage("Build") {
             steps {
                 echo 'Cloning git ...'
-                git([url: 'https://github.com/jovanibrasil/auth-api.git', branch: 'master', credentialsId: '18a17f19-9870-4bcc-8c7b-75eec38a059a'])
+                git([url: 'https://github.com/jovanibrasil/auth-api.git', branch: 'master', credentialsId: '9bae9c61-0a29-483c-a07f-47273c351555'])
                 echo 'Installing dependencies ...'
                 sh 'mvn package'
                 echo 'Building ...'
