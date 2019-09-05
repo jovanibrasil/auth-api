@@ -29,7 +29,7 @@ import com.jwt.security.entities.User;
 import com.jwt.security.services.UserService;
 import com.jwt.security.services.impl.UserServiceException;
 
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/users")
 public class UserController {

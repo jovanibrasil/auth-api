@@ -34,7 +34,7 @@ import com.jwt.security.services.UserService;
 import com.jwt.security.utils.JwtTokenUtil;
 import com.jwt.utils.ApplicationType;
 
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/token")
 public class TokensController {
