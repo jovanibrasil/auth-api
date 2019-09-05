@@ -26,7 +26,7 @@ pipeline {
                 echo 'Installing dependencies ...'
                 sh 'mvn package'
                 echo 'Building ...'
-                sh 'docker build --build-arg USERS_MYSQL_URL --build-arg USERS_MYSQL_USERNAME --build-arg USERS_MYSQL_PASSWORD -t auth-api ~/workspace/auth-api'
+                sh 'docker build --build-arg ENVIRONMENT=prod --build-arg USERS_MYSQL_URL --build-arg USERS_MYSQL_USERNAME --build-arg USERS_MYSQL_PASSWORD -t auth-api ~/workspace/auth-api'
             }
         }
 
@@ -45,7 +45,8 @@ pipeline {
         stage("Deploy"){
             steps {
                 // sh 'docker stop auth-api'
-                // sh 'docker rm auth-api'                
+                // sh 'docker rm auth-api' 
+		sh 'make clean'               
                 sh 'docker run -p 8083:8080 -e "SPRING_PROFILES_ACTIVE=prod" --network net --name=auth-api -d auth-api'
             }
         }

@@ -4,7 +4,7 @@ clean: stop
 	- docker rm auth-api
 build: clean
 	mvn clean package -Pdev -Dmaven.test.skip=true
-	docker build --build-arg USERS_MYSQL_URL --build-arg USERS_MYSQL_USERNAME --build-arg USERS_MYSQL_PASSWORD --network net -t auth-api .
+	docker build --build-arg USERS_MYSQL_URL --build-arg USERS_MYSQL_USERNAME --build-arg USERS_MYSQL_PASSWORD --build-arg ENVIRONMENT=dev --network net -t auth-api .
 	chmod -R ugo+rw target/
 run: clean
 	docker run -d -p 8083:8080 -e "SPRING_PROFILES_ACTIVE=dev" --name=auth-api --network net auth-api
