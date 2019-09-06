@@ -58,5 +58,10 @@
     "name": "urls.blog.createuser",
     "type": "java.lang.String",
     "description": "A description for 'urls.blog.createuser'"
+  },
+  {
+    "name": "urls.blog.deleteuser",
+    "type": "java.lang.String",
+    "description": "A description for 'urls.blog.deleteuser'"
   }
 ]}
