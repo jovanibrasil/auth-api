@@ -47,7 +47,7 @@ pipeline {
                 // sh 'docker stop auth-api'
                 // sh 'docker rm auth-api' 
 				sh 'make clean'               
-                sh 'docker run -p 8083:8080 -m 512m --memory-swap 256m -e "SPRING_PROFILES_ACTIVE=prod" --network net --name=auth-api -d auth-api'
+                sh 'docker run -p 8083:8080 -m 512m --memory-swap 512m -e "SPRING_PROFILES_ACTIVE=prod" --network net --name=auth-api -d auth-api'
             }
         }
 
