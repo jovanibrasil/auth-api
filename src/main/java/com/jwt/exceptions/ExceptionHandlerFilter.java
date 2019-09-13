@@ -19,9 +19,6 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
 	private static final Logger log = LoggerFactory.getLogger(ExceptionHandlerFilter.class);
 	
-	
-	
-	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
