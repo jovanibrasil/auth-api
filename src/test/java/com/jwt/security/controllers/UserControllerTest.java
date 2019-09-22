@@ -25,13 +25,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jwt.exceptions.UserServiceException;
 import com.jwt.security.dto.UserDto;
 import com.jwt.security.entities.Application;
 import com.jwt.security.entities.Registry;
 import com.jwt.security.entities.User;
 import com.jwt.security.enums.ProfileEnum;
 import com.jwt.security.services.UserService;
-import com.jwt.security.services.impl.UserServiceException;
 import com.jwt.utils.ApplicationType;
 
 
@@ -104,7 +104,7 @@ public class UserControllerTest {
 			.andExpect(jsonPath("$.data.userName", equalTo("newtest")))
 			.andExpect(jsonPath("$.data.email", equalTo("newtest@gmail.com")));
 	}
-	
+		
 	@Test
 	public void testDeleteUser() throws Exception {
 		mvc.perform(MockMvcRequestBuilders.delete("/users/test")

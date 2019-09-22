@@ -12,11 +12,19 @@ services:
     environment:
       - "SPRING_PROFILES_ACTIVE=dev"
     depends_on:
-      - mysql-database     
+      - mysql-database
+      - email-api  
   mysql-database:
     image: mysql-database
     container_name: mysql-database
     ports:
       - 3306:3306
+    networks:
+      - net
+  email-api:
+    image: email-api
+    container_name: email-api
+    ports:
+      - 8084:8080
     networks:
       - net

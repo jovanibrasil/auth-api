@@ -23,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.jwt.exceptions.UserServiceException;
 import com.jwt.integration.Integration;
 import com.jwt.security.entities.Application;
 import com.jwt.security.entities.Registry;
@@ -30,7 +31,6 @@ import com.jwt.security.entities.User;
 import com.jwt.security.enums.ProfileEnum;
 import com.jwt.security.repositories.ApplicationRepository;
 import com.jwt.security.repositories.UserRepository;
-import com.jwt.security.services.impl.UserServiceException;
 import com.jwt.security.services.impl.UserServiceImpl;
 import com.jwt.utils.ApplicationType;
 

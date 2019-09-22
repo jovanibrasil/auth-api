@@ -33,6 +33,7 @@ import com.jwt.security.enums.ProfileEnum;
 import com.jwt.security.services.UserService;
 import com.jwt.security.utils.JwtTokenUtil;
 import com.jwt.utils.ApplicationType;
+import com.jwt.utils.PasswordUtils;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -62,7 +63,7 @@ public class TokensController {
 	@PostMapping("/create")
 	public ResponseEntity<Response<TokenDto>> createTokenJwt(@Valid @RequestBody JwtAuthenticationDto authenticationDto, 
 			BindingResult result) throws AuthenticationException {
-		
+		log.info("Creating JWT token ...");
 		Response<TokenDto> response = new Response<>();
 		// Verify form validation
 		if(result.hasErrors()) {
@@ -84,7 +85,8 @@ public class TokensController {
 		// Does user authentication 
 		log.info("Generating token {}", authenticationDto.getUserName());
 		org.springframework.security.core.Authentication auth = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(authenticationDto.getUserName(), authenticationDto.getPassword()));
+				new UsernamePasswordAuthenticationToken(authenticationDto.getUserName(),
+						authenticationDto.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		
 		// Verify authentication result

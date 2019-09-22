@@ -35,6 +35,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jwt.integration.Integration;
+import com.jwt.security.dto.JwtAuthenticationDto;
 import com.jwt.security.dto.UserDto;
 import com.jwt.security.entities.Application;
 import com.jwt.security.entities.Registry;
@@ -86,7 +87,7 @@ public class TokenControllerTest {
 		user.setRegistries(Arrays.asList(
 				new Registry(new Application(ApplicationType.BLOG_APP), user)));
 		userDto = new UserDto();
-		userDto.setId(1L);
+		//userDto.setId(1L);
 		userDto.setEmail("test@gmail.com");
 		userDto.setUserName("test");
 		userDto.setPassword("password");
@@ -113,14 +114,17 @@ public class TokenControllerTest {
 	
 	@Test
 	public void testTokenCreation() throws Exception {
-		
+		JwtAuthenticationDto tokenDTO = new JwtAuthenticationDto();
+		tokenDTO.setUserName(user.getUserName());
+		tokenDTO.setPassword(user.getPassword());
+		tokenDTO.setApplication(ApplicationType.BLOG_APP);
 		BDDMockito.given(this.userService.findByUserName("test")).willReturn(Optional.of(user));
 		BDDMockito.given(this.authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken("test", "password")))
 		.willReturn(new AuthenticationMock());
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userDto)))
+			.content(asJsonString(tokenDTO)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.errors").isEmpty());
 	}

@@ -57,7 +57,7 @@ public class User {
 	private List<Registry> registries = new ArrayList<Registry>();
 	
 	public User() {}
-
+	
 	public String getEmail() {
 		return email;
 	}

@@ -20,6 +20,13 @@ public class JwtAuthenticationDto {
 		this.password = password;
 	}
 	
+	public JwtAuthenticationDto(@NotNull String userName, @NotNull String password, ApplicationType application) {
+		super();
+		this.userName = userName;
+		this.password = password;
+		this.application = application;
+	}
+
 	public String getUserName() {
 		return this.userName;
 	}

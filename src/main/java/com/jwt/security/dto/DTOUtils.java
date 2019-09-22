@@ -24,7 +24,7 @@ public class DTOUtils {
 		User user = new User();
 		user.setUserName(userDTO.getUserName());
 		user.setEmail(userDTO.getEmail());
-		user.setPassword(PasswordUtils.generateHash(userDTO.getPassword()));
+		user.setPassword(userDTO.getPassword());
 		user.setRegistries(Arrays.asList(new Registry(new Application(userDTO.getApplication()), user)));
 		return user;
 	}	

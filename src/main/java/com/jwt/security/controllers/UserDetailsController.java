@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jwt.exceptions.UserServiceException;
 import com.jwt.response.Response;
 import com.jwt.security.dto.DTOUtils;
 import com.jwt.security.dto.UserDetailsDTO;
 import com.jwt.security.dto.UserDto;
 import com.jwt.security.entities.User;
 import com.jwt.security.services.UserService;
-import com.jwt.security.services.impl.UserServiceException;
 
 @CrossOrigin(origins = "*")
 @RestController

@@ -1,5 +1,6 @@
 package com.jwt.security.utils;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +9,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.jwt.security.entities.Application;
+import com.jwt.security.entities.Registry;
+import com.jwt.security.entities.User;
 import com.jwt.utils.ApplicationType;
+import com.jwt.utils.PasswordUtils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -26,13 +31,22 @@ public class JwtTokenUtil {
 	static final String CLAIM_KEY_USERNAME = "sub";
 	static final String CLAIM_KEY_ROLE = "role";
 	static final String CLAIM_KEY_CREATED = "created";
+	static final String CLAIM_KEY_EMAIL = "email";
 	static final String CLAIM_KEY_APPLICATION_NAME = "appname";
+	static final String CLAIM_KEY_PASSWORD = "password";
 	
 	// Get data from application.properties
 	@Value("${jwt.secret}")
 	private String secret;
 	@Value("${jwt.expiration}")
 	private Long expiration;
+	
+	public JwtTokenUtil(String secret, Long expiration) {
+		this.secret = secret;
+		this.expiration = expiration;
+	}
+	
+	public JwtTokenUtil() {}
 	
 	/*
 	 * Create a new token JWT.
@@ -42,6 +56,16 @@ public class JwtTokenUtil {
 		Date expirationDate = new Date(System.currentTimeMillis() + expiration * 1000);
 		// Generate a new token
 		return Jwts.builder().setClaims(claims).setExpiration(expirationDate).signWith(SignatureAlgorithm.HS256, secret).compact();
+	}
+	
+	public String createRegistrationToken(User user, ApplicationType application) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put(CLAIM_KEY_USERNAME, user.getUserName());
+		claims.put(CLAIM_KEY_CREATED, new Date());
+		claims.put(CLAIM_KEY_EMAIL, user.getEmail());
+		claims.put(CLAIM_KEY_APPLICATION_NAME, application);	
+		claims.put(CLAIM_KEY_PASSWORD, PasswordUtils.generateHash(user.getPassword()));
+		return Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS256, secret).compact();
 	}
 	
 	/*
@@ -57,6 +81,24 @@ public class JwtTokenUtil {
 		claims.put(CLAIM_KEY_APPLICATION_NAME, application);	
 		
 		return createToken(claims);
+	}
+	
+	public User getUserFromToken(String token) {
+		try {
+			Claims claims = this.getClaimsFromToken(token);
+			User user = new User();
+			user.setUserName(claims.getSubject());
+			user.setEmail((String)claims.get(CLAIM_KEY_EMAIL));
+			user.setSignUpDate(new Date((Long)claims.get(CLAIM_KEY_CREATED)));
+			user.setPassword((String)claims.get(CLAIM_KEY_PASSWORD));
+			String applicationName = (String)claims.get(CLAIM_KEY_APPLICATION_NAME);
+			user.setRegistries(Arrays.asList(new Registry(new Application(
+					ApplicationType.valueOf(applicationName)), user)));
+			return user;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	/*

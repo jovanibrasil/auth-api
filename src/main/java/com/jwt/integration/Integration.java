@@ -32,6 +32,9 @@ public class Integration {
 
 	@Value("${urls.notes.deleteuser}")
 	private String deleteNotesUser;
+	
+	@Value("${urls.email.server.url}")
+	private String emailServerUrl;
 
 	@Autowired
 	private Token token;
@@ -91,6 +94,41 @@ public class Integration {
 		} catch (Exception e) {
 			log.info(e.getMessage());
 			throw new MicroServiceIntegrationException("It was not posssible to delete the user.", e);
+		}
+	}
+	
+	public void sendEmail(EmailMessage emailMessage) {
+		log.info("Send remote server ...");
+		try {
+			RestTemplate restTemplate = new RestTemplate();
+			HttpHeaders headers = new HttpHeaders();
+			String finalToken = "Bearer " + token.getToken();
+			headers.add("Authorization", finalToken);
+			headers.setContentType(MediaType.APPLICATION_JSON);
+
+			JSONObject request = new JSONObject();
+			request.put("text", emailMessage.getText());
+			request.put("textType", emailMessage.getTextType());
+			request.put("to", emailMessage.getTo());
+			request.put("from", emailMessage.getFrom());
+			request.put("title", emailMessage.getTitle());
+			HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
+
+			log.info("Connecting with service ... {}", emailServerUrl);
+			// send request and parse result
+			ResponseEntity<String> loginResponse = restTemplate.exchange(emailServerUrl, 
+					HttpMethod.POST, entity, String.class);
+
+			if (!loginResponse.getStatusCode().equals(HttpStatus.OK)) {
+				log.info("A resposta do servidor foi um valor inesperado.");
+				//log.info("It was not possible to create the user. Service integration error");
+				throw new MicroServiceIntegrationException(
+						"It was not possible to send the email. Status code: " + loginResponse.getStatusCode(), null);
+			}
+			log.info("The email was successfully sended by the remote service.");
+		} catch (Exception e) {
+			log.info("It was not posssible to send the email via remote server.");
+			throw new MicroServiceIntegrationException("It was not posssible to send the email via remote server.", e);
 		}
 	}
 

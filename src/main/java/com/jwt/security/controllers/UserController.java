@@ -1,13 +1,17 @@
 package com.jwt.security.controllers;
 
+import java.net.URI;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -19,15 +23,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.jwt.exceptions.InvalidUserDataException;
+import com.jwt.exceptions.UserServiceException;
+import com.jwt.integration.EmailMessage;
+import com.jwt.integration.Integration;
 import com.jwt.response.Response;
 import com.jwt.security.dto.DTOUtils;
+import com.jwt.security.dto.TokenDto;
 import com.jwt.security.dto.UserDto;
 import com.jwt.security.entities.Registry;
 import com.jwt.security.entities.User;
 import com.jwt.security.services.UserService;
-import com.jwt.security.services.impl.UserServiceException;
+import com.jwt.security.utils.JwtTokenUtil;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -39,6 +50,14 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 		
+	@Autowired
+	private JwtTokenUtil jwtTokenUtil;
+	
+	@Autowired
+	private Integration integration;
+	
+	@Value("${urls.notes.userconfirmationview}")
+	private String userConfirmationViewUrl;
 	
 	@GetMapping("/{userName}")
 	public ResponseEntity<Response<UserDto>> getUser(@PathVariable String userName) {
@@ -64,32 +83,76 @@ public class UserController {
 		
 	}
 	
+	@PostMapping("/confirmation")
+	public ResponseEntity<Response<?>> confirmUserCreation(@Valid @NotBlank
+			@RequestParam String token){
+		Response<?> response = new Response<>();
+		try {
+			// Get user informations from token
+			User user = jwtTokenUtil.getUserFromToken(token);
+			user = this.userService.save(user);
+			
+			// Return the resource location
+			URI location = ServletUriComponentsBuilder
+					.fromCurrentRequest()
+					.path("/{id}")
+					.buildAndExpand(user.getId())
+					.toUri();
+			HttpHeaders headers = new HttpHeaders();
+			headers.add(HttpHeaders.CONTENT_LOCATION, location.toString());
+			return ResponseEntity.status(HttpStatus.CREATED)
+					.headers(headers).body(response);
+			
+		} catch (UserServiceException e) {
+			response.addError("User confirmation error. " + e.getMessage());
+			return ResponseEntity.badRequest().body(response);
+		}
+	}
+	
 	/**
 	 * 
 	 * Creates a new user for a specific application.
 	 * 
 	 */
 	@PostMapping
-	public ResponseEntity<Response<UserDto>> createUser(@Valid @RequestBody UserDto userDto, BindingResult result, HttpServletRequest request){
+	public ResponseEntity<Response<?>> createUser(@Valid @RequestBody UserDto userDto, BindingResult result, HttpServletRequest request){
 		
 		log.info("Creating user {}", userDto.getUserName());
-		Response<UserDto> response = new Response<>();
+		Response<TokenDto> response = new Response<>();
 		
 		try {
-			if(result.hasErrors()) {
-				log.error("Validation error {}", result.getAllErrors());
-				result.getAllErrors().forEach(err -> response.addError(err.getDefaultMessage()));
-				return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
-			}
-			User user = this.userService.save(DTOUtils.userDtoToUser(userDto));	
-			response.setData(DTOUtils.userToUserDTO(user, userDto.getApplication()));
-			return ResponseEntity.ok(response);
-		} catch (UserServiceException e) {	
-			log.error("Save user error {}", e.getErrorMessages());
-			e.getErrorMessages().forEach(err -> response.addError(err));
+			
+//			if(!this.userService.findByUserName(userDto.getUserName()).isPresent()) {
+//				throw new InvalidUserDataException("This username already exists.");
+//			}
+//			if(!this.userService.findUserByEmail(userDto.getEmail()).isPresent()) {
+//				throw new InvalidUserDataException("This email already exists.");
+//			}
+			
+			// Validate user data
+			// generate a token with all user information
+			User user = DTOUtils.userDtoToUser(userDto);
+			//response.setData(DTOUtils.userToUserDTO(user, userDto.getApplication()));
+			String token = jwtTokenUtil.createRegistrationToken(user, userDto.getApplication());
+			// Send back the generated token by email
+			//response.setData(new TokenDto(token));
+			
+			EmailMessage em = new EmailMessage();
+			String url = userConfirmationViewUrl + "?token=" + token;
+			em.setText("Please, click the confirmation link to confirm your email and sign "
+					+ "into your NOTES account. " + url);
+			em.setFrom("noreply@notes.jovanibrasil.com");
+			em.setTo(user.getEmail());
+			em.setTextType("text/plain");
+			em.setTitle("NOTES - Email Confirmation");
+			integration.sendEmail(em);
+						
+			return ResponseEntity.ok(response);			
+		} catch (Exception e) {//UserServiceException e) {	
+//			log.error("Save user error {}", e.getErrorMessages());
+//			e.getErrorMessages().forEach(err -> response.addError(err));
 			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
 		}
-		
 	}
 
 	/**
