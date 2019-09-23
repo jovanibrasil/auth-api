@@ -14,10 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +31,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jwt.integration.Integration;
 import com.jwt.security.dto.JwtAuthenticationDto;
 import com.jwt.security.dto.UserDto;
 import com.jwt.security.entities.Application;
@@ -43,7 +39,6 @@ import com.jwt.security.entities.User;
 import com.jwt.security.enums.ProfileEnum;
 import com.jwt.security.repositories.UserRepository;
 import com.jwt.security.services.UserService;
-import com.jwt.security.services.impl.UserServiceImpl;
 import com.jwt.security.utils.JwtTokenUtil;
 import com.jwt.utils.ApplicationType;
 
@@ -144,45 +139,25 @@ public class TokenControllerTest {
 		private static final long serialVersionUID = 6373211614082998724L;
 
 		@Override
-		public String getName() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+		public String getName() { return null; }
 
 		@Override
-		public Collection<? extends GrantedAuthority> getAuthorities() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+		public Collection<? extends GrantedAuthority> getAuthorities() { return null; }
 
 		@Override
-		public Object getCredentials() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+		public Object getCredentials() { return null; }
 
 		@Override
-		public Object getDetails() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+		public Object getDetails() { return null; }
 
 		@Override
-		public Object getPrincipal() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+		public Object getPrincipal() { return null; }
 
 		@Override
-		public boolean isAuthenticated() {
-			// TODO Auto-generated method stub
-			return true;
-		}
+		public boolean isAuthenticated() { return true; }
 
 		@Override
-		public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-			// TODO Auto-generated method stub
-		}
+		public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {}
 	}
 
 

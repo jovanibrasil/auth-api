@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.jwt.exceptions.InvalidUserDataException;
 import com.jwt.exceptions.UserServiceException;
 import com.jwt.integration.EmailMessage;
 import com.jwt.integration.Integration;
@@ -84,8 +82,7 @@ public class UserController {
 	}
 	
 	@PostMapping("/confirmation")
-	public ResponseEntity<Response<?>> confirmUserCreation(@Valid @NotBlank
-			@RequestParam String token){
+	public ResponseEntity<Response<?>> confirmUserCreation(@Valid @NotBlank @RequestParam String token){
 		Response<?> response = new Response<>();
 		try {
 			// Get user informations from token
@@ -115,28 +112,17 @@ public class UserController {
 	 * 
 	 */
 	@PostMapping
-	public ResponseEntity<Response<?>> createUser(@Valid @RequestBody UserDto userDto, BindingResult result, HttpServletRequest request){
+	public ResponseEntity<Response<?>> createUser(@Valid @RequestBody UserDto userDto, HttpServletRequest request){
 		
 		log.info("Creating user {}", userDto.getUserName());
 		Response<TokenDto> response = new Response<>();
 		
 		try {
-			
-//			if(!this.userService.findByUserName(userDto.getUserName()).isPresent()) {
-//				throw new InvalidUserDataException("This username already exists.");
-//			}
-//			if(!this.userService.findUserByEmail(userDto.getEmail()).isPresent()) {
-//				throw new InvalidUserDataException("This email already exists.");
-//			}
-			
-			// Validate user data
 			// generate a token with all user information
 			User user = DTOUtils.userDtoToUser(userDto);
 			//response.setData(DTOUtils.userToUserDTO(user, userDto.getApplication()));
 			String token = jwtTokenUtil.createRegistrationToken(user, userDto.getApplication());
 			// Send back the generated token by email
-			//response.setData(new TokenDto(token));
-			
 			EmailMessage em = new EmailMessage();
 			String url = userConfirmationViewUrl + "?token=" + token;
 			em.setText("Please, click the confirmation link to confirm your email and sign "
@@ -160,16 +146,10 @@ public class UserController {
 	 * 
 	 */
 	@PutMapping
-	public ResponseEntity<Response<UserDto>> updateUser(@Valid @RequestBody UserDto userDto, BindingResult result, HttpServletRequest request){
+	public ResponseEntity<Response<UserDto>> updateUser(@Valid @RequestBody UserDto userDto, HttpServletRequest request){
 		
 		log.info("Update user {}", userDto.getUserName());
 		Response<UserDto> response = new Response<>();
-		
-		if(result.hasErrors()) {
-			log.error("Validation error {}", result.getAllErrors());
-			result.getAllErrors().forEach(err -> response.addError(err.getDefaultMessage()));
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
-		}
 		
 		try {
 			User user = this.userService.updateUser(DTOUtils.userDtoToUser(userDto));

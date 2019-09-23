@@ -8,9 +8,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,17 +38,10 @@ public class UserDetailsController {
 	 * Accessible only for local services
 	 */
 	@PutMapping
-	public ResponseEntity<Response<UserDto>> updateUserDetails(@Valid @RequestBody UserDetailsDTO userDto, BindingResult result, HttpServletRequest request){
+	public ResponseEntity<Response<UserDto>> updateUserDetails(@Valid @RequestBody UserDetailsDTO userDto, HttpServletRequest request){
 		
 		log.info("Update user");
 		Response<UserDto> response = new Response<>();
-		
-		if(result.hasErrors()) {
-			log.error("Validation error {}", result.getAllErrors());
-			result.getAllErrors().forEach(err -> response.addError(err.getDefaultMessage()));
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
-		}
-		
 		Optional<User> optUser = this.userService.findByUserName(userDto.getUserName());
 		
 		if(!optUser.isPresent()) {
@@ -61,11 +52,6 @@ public class UserDetailsController {
 		
 		User currentUser = optUser.get();
 		
-		if(result.hasErrors()) {
-			log.error("Validation error {}", result.getAllErrors());
-			result.getAllErrors().forEach(err -> response.addError(err.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
 		try {
 			this.userService.save(currentUser);
 		} catch (UserServiceException e) {

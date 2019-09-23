@@ -2,6 +2,7 @@ package com.jwt.security.controllers;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -13,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,6 +28,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jwt.exceptions.UserServiceException;
+import com.jwt.integration.Integration;
 import com.jwt.security.dto.UserDto;
 import com.jwt.security.entities.Application;
 import com.jwt.security.entities.Registry;
@@ -33,6 +36,9 @@ import com.jwt.security.entities.User;
 import com.jwt.security.enums.ProfileEnum;
 import com.jwt.security.services.UserService;
 import com.jwt.utils.ApplicationType;
+import com.validators.UserEmailValidator;
+import com.validators.UserEmailValidatorImpl;
+import com.validators.UserNameValidatorImpl;
 
 
 @RunWith(SpringRunner.class)
@@ -72,14 +78,42 @@ public class UserControllerTest {
 	
 	@Test
 	public void testCreateUser() throws Exception {
-		BDDMockito.given(this.userService.findUserById(user.getId())).willReturn(Optional.of(user));
+		BDDMockito.given(userService.findByUserName(Mockito.any()))
+		.willReturn(Optional.empty());
 		BDDMockito.given(this.userService.save(Mockito.any())).willReturn(user);
+		
+		Integration integration = mock(Integration.class);
+		BDDMockito.doNothing().when(integration)
+			.sendEmail(BDDMockito.any());
 		
 		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.errors").isEmpty());
+	}
+	
+	@Test
+	public void testCreateUserUserNameAlreadyExists() throws Exception {
+		BDDMockito.given(userService.findByUserName(Mockito.any()))
+		.willReturn(Optional.of(user));
+		mvc.perform(MockMvcRequestBuilders.post("/users")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(userDto)))
+			.andExpect(status().isUnprocessableEntity())
+			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("This user name already exists.")));
+	}
+	
+	@Test
+	public void testCreateUserEmailAlreadyExists() throws Exception {
+		BDDMockito.given(userService.findUserByEmail(Mockito.any()))
+			.willReturn(Optional.of(user));
+			
+		mvc.perform(MockMvcRequestBuilders.post("/users")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(userDto)))
+			.andExpect(status().isUnprocessableEntity())
+			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("This email already exists.")));
 	}
 	
 	@Test

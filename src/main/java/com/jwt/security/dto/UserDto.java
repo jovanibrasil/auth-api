@@ -1,21 +1,19 @@
 package com.jwt.security.dto;
 
-import java.util.List;
-
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.jwt.utils.ApplicationType;
+import com.validators.UserEmailValidator;
+import com.validators.UserNameValidator;
 
 public class UserDto {
 
 	private Long id;
-	@NotNull
-	@Email(message="Email must be a well-formed email address.")
+
+	@UserEmailValidator
 	private String email;
-	@NotNull
-	@Size(min=2, max=10, message="Username length must be between 2 and 10.")
+	@UserNameValidator
 	private String userName;
 	@NotNull
 	@Size(min=4, max=10, message="Password length must be between 4 and 10.")

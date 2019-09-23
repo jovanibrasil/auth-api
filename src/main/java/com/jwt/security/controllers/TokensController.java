@@ -16,7 +16,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +32,6 @@ import com.jwt.security.enums.ProfileEnum;
 import com.jwt.security.services.UserService;
 import com.jwt.security.utils.JwtTokenUtil;
 import com.jwt.utils.ApplicationType;
-import com.jwt.utils.PasswordUtils;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -61,16 +59,9 @@ public class TokensController {
 	 * Create and returns a new token JWT.
 	 */
 	@PostMapping("/create")
-	public ResponseEntity<Response<TokenDto>> createTokenJwt(@Valid @RequestBody JwtAuthenticationDto authenticationDto, 
-			BindingResult result) throws AuthenticationException {
+	public ResponseEntity<Response<TokenDto>> createTokenJwt(@Valid @RequestBody JwtAuthenticationDto authenticationDto) throws AuthenticationException {
 		log.info("Creating JWT token ...");
 		Response<TokenDto> response = new Response<>();
-		// Verify form validation
-		if(result.hasErrors()) {
-			log.error("Validation error {}", result.getAllErrors());
-			result.getAllErrors().forEach(err -> response.addError(err.getDefaultMessage()));
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
-		}
 		
 		// Verify if user has register for the required application
 		Optional<User> optUser = userService.findByUserName(authenticationDto.getUserName());
