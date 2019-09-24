@@ -31,16 +31,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jwt.security.dto.JwtAuthenticationDto;
-import com.jwt.security.dto.UserDto;
-import com.jwt.security.entities.Application;
-import com.jwt.security.entities.Registry;
-import com.jwt.security.entities.User;
-import com.jwt.security.enums.ProfileEnum;
-import com.jwt.security.repositories.UserRepository;
-import com.jwt.security.services.UserService;
-import com.jwt.security.utils.JwtTokenUtil;
-import com.jwt.utils.ApplicationType;
+import com.security.jwt.dto.JwtAuthenticationDto;
+import com.security.jwt.dto.UserDto;
+import com.security.jwt.entities.Application;
+import com.security.jwt.entities.Registry;
+import com.security.jwt.entities.User;
+import com.security.jwt.enums.ProfileEnum;
+import com.security.jwt.repositories.UserRepository;
+import com.security.jwt.security.utils.JwtTokenUtil;
+import com.security.jwt.services.UserService;
+import com.security.jwt.utils.ApplicationType;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

@@ -1,0 +1,105 @@
+package com.security.recaptcha;
+
+import java.net.URI;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
+
+
+@Service
+public class CaptchaServiceImpl implements CaptchaService {
+
+	private static final Logger log = LoggerFactory.getLogger(CaptchaServiceImpl.class);
+	
+	@Autowired
+	private CaptchaSettings captchaSettings;
+
+	@Autowired
+	private RestOperations restTemplate;
+
+	private static Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
+
+	@Autowired
+	private RecaptchaAttemptService reCaptchaAttemptService;
+
+	@Autowired
+	private HttpServletRequest httpServletRequest;
+
+	@Override
+	public void processResponse(String response) throws InvalidRecaptchaException, ReCaptchaInvalidException {
+		log.info("Attempting to validate response {}", response);
+		if (!responseSanityCheck(response))
+			throw new InvalidRecaptchaException("Response contains invalid characters");
+
+		if (reCaptchaAttemptService.isBlocked(getClientIP()))
+			throw new InvalidRecaptchaException("Client exceeded maximum number of failed attempts");
+
+		URI verifyUri = URI.create(
+				String.format("https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s",
+						getReCaptchaSecret(), response, getClientIP()));
+
+		ResponseEntity<GoogleResponse> googleResponse = restTemplate.getForEntity(verifyUri, GoogleResponse.class);
+
+		if (!googleResponse.hasBody())
+			throw new ReCaptchaInvalidException("reCaptcha was not successfully validated");
+		if (!googleResponse.getBody().isSuccess()) {
+			if (googleResponse.getBody().hasClientError()) {
+				reCaptchaAttemptService.recaptchaFailed(getClientIP());
+			}
+			throw new ReCaptchaInvalidException("reCaptcha was not successfully validated");
+		}
+		reCaptchaAttemptService.recaptchaSucceeded(getClientIP());
+	}
+
+	@Override
+	public String getReCaptchaSite() {
+		return captchaSettings.getSite();
+	}
+
+	@Override
+	public String getReCaptchaSecret() {
+		return captchaSettings.getSecret();
+	}
+
+	/**
+	 * Returns the client IP.
+	 * 
+	 * @return
+	 */
+	private String getClientIP() {
+		// Get X-Forwarded-For value. The X-Forwarded-For header has the originating IP address.
+		final String xfHeader = httpServletRequest.getHeader("X-Forwarded-For");
+		// If X-Forwarded-For is invalid, get the IP from package. If client is behind some proxy
+		// then the IP will be the proxy IP.
+		if (xfHeader == null) return httpServletRequest.getRemoteAddr();
+		return xfHeader.split(",")[0];
+	}
+
+	/**
+	 * 
+	 * Check if response is neither null or length 0 and if matches with the
+	 * RESPONSE_PATTERN.
+	 * 
+	 * @param response
+	 * @return
+	 */
+	private boolean responseSanityCheck(String response) {
+		return StringUtils.hasLength(response) && RESPONSE_PATTERN.matcher(response).matches();
+	}
+	
+	@Bean
+	public RestTemplate restTemplate() {
+	    return new RestTemplate();
+	}
+
+}

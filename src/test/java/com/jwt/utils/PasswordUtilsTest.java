@@ -5,6 +5,8 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
+import com.security.jwt.utils.PasswordUtils;
+
 public class PasswordUtilsTest {
 
 	/*

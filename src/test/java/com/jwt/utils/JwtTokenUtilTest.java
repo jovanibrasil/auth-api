@@ -6,8 +6,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import com.jwt.security.entities.User;
-import com.jwt.security.utils.JwtTokenUtil;
+import com.security.jwt.entities.User;
+import com.security.jwt.security.utils.JwtTokenUtil;
+import com.security.jwt.utils.ApplicationType;
+import com.security.jwt.utils.PasswordUtils;
 
 public class JwtTokenUtilTest {
 	

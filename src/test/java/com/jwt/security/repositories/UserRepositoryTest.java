@@ -18,11 +18,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.jwt.security.entities.Application;
-import com.jwt.security.entities.Registry;
-import com.jwt.security.entities.User;
-import com.jwt.security.enums.ProfileEnum;
-import com.jwt.utils.ApplicationType;
+import com.security.jwt.entities.Application;
+import com.security.jwt.entities.Registry;
+import com.security.jwt.entities.User;
+import com.security.jwt.enums.ProfileEnum;
+import com.security.jwt.repositories.ApplicationRepository;
+import com.security.jwt.repositories.UserRepository;
+import com.security.jwt.utils.ApplicationType;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

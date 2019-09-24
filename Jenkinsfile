@@ -6,6 +6,8 @@ pipeline {
         USERS_MYSQL_CREDENTIALS = credentials('USERS_MYSQL_CREDENTIALS')
         USERS_MYSQL_USERNAME = "${env.USERS_MYSQL_CREDENTIALS_USR}"
         USERS_MYSQL_PASSWORD = "${env.USERS_MYSQL_CREDENTIALS_PSW}"
+        RECAPTCHA_KEY_SITE =  credentials('RECAPTCHA_KEY_SITE')
+        RECAPTCHA_KEY_SECRET = credentials('RECAPTCHA_KEY_SECRET') 
     }
     
     stages {
@@ -26,7 +28,7 @@ pipeline {
                 echo 'Installing dependencies ...'
                 sh 'mvn package'
                 echo 'Building ...'
-                sh 'docker build --build-arg ENVIRONMENT=prod --build-arg USERS_MYSQL_URL --build-arg USERS_MYSQL_USERNAME --build-arg USERS_MYSQL_PASSWORD -t auth-api ~/workspace/auth-api'
+                sh 'docker build --build-arg RECAPTCHA_KEY_SITE --build-arg RECAPTCHA_KEY_SECRET --build-arg ENVIRONMENT=prod --build-arg USERS_MYSQL_URL --build-arg USERS_MYSQL_USERNAME --build-arg USERS_MYSQL_PASSWORD -t auth-api ~/workspace/auth-api'
             }
         }
 

@@ -27,18 +27,18 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jwt.exceptions.UserServiceException;
-import com.jwt.integration.Integration;
-import com.jwt.security.dto.UserDto;
-import com.jwt.security.entities.Application;
-import com.jwt.security.entities.Registry;
-import com.jwt.security.entities.User;
-import com.jwt.security.enums.ProfileEnum;
-import com.jwt.security.services.UserService;
-import com.jwt.utils.ApplicationType;
-import com.validators.UserEmailValidator;
-import com.validators.UserEmailValidatorImpl;
-import com.validators.UserNameValidatorImpl;
+import com.security.jwt.dto.UserDto;
+import com.security.jwt.entities.Application;
+import com.security.jwt.entities.Registry;
+import com.security.jwt.entities.User;
+import com.security.jwt.enums.ProfileEnum;
+import com.security.jwt.exceptions.UserServiceException;
+import com.security.jwt.integration.Integration;
+import com.security.jwt.services.UserService;
+import com.security.jwt.utils.ApplicationType;
+import com.security.validators.UserEmailValidator;
+import com.security.validators.UserEmailValidatorImpl;
+import com.security.validators.UserNameValidatorImpl;
 
 
 @RunWith(SpringRunner.class)
