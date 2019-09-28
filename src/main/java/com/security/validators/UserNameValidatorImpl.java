@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.security.jwt.services.UserService;
 
-public class UserNameValidatorImpl implements ConstraintValidator<UserNameValidator, String> {
+public class UserNameValidatorImpl implements ConstraintValidator<CustomNameValidator, String> {
 	
 	private UserService userService;
 	

@@ -6,7 +6,6 @@ import com.security.jwt.entities.Application;
 import com.security.jwt.entities.Registry;
 import com.security.jwt.entities.User;
 import com.security.jwt.utils.ApplicationType;
-import com.security.jwt.utils.PasswordUtils;
 
 public class DTOUtils {
 

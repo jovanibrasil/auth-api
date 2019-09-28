@@ -36,7 +36,7 @@ import com.security.jwt.exceptions.UserServiceException;
 import com.security.jwt.integration.Integration;
 import com.security.jwt.services.UserService;
 import com.security.jwt.utils.ApplicationType;
-import com.security.validators.UserEmailValidator;
+import com.security.validators.CustomEmailValidator;
 import com.security.validators.UserEmailValidatorImpl;
 import com.security.validators.UserNameValidatorImpl;
 

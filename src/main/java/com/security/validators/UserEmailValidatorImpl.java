@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.security.jwt.services.UserService;
 
-public class UserEmailValidatorImpl implements ConstraintValidator<UserEmailValidator, String> {
+public class UserEmailValidatorImpl implements ConstraintValidator<CustomEmailValidator, String> {
 
 	private UserService userService;
 	

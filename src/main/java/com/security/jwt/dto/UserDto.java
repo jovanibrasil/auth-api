@@ -4,16 +4,16 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.security.jwt.utils.ApplicationType;
-import com.security.validators.UserEmailValidator;
-import com.security.validators.UserNameValidator;
+import com.security.validators.CustomEmailValidator;
+import com.security.validators.CustomNameValidator;
 
 public class UserDto {
 
 	private Long id;
 
-	@UserEmailValidator
+	@CustomEmailValidator
 	private String email;
-	@UserNameValidator
+	@CustomNameValidator
 	private String userName;
 	@NotNull
 	@Size(min=4, max=10, message="Password length must be between 4 and 10.")
