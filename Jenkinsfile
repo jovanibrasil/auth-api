@@ -25,10 +25,8 @@ pipeline {
             steps {
                 echo 'Cloning git ...'
                 git([url: 'https://github.com/jovanibrasil/auth-api.git', branch: 'master', credentialsId: '9bae9c61-0a29-483c-a07f-47273c351555'])
-                echo 'Installing dependencies ...'
-                sh 'mvn package'
                 echo 'Building ...'
-                sh 'docker build --build-arg RECAPTCHA_KEY_SITE --build-arg RECAPTCHA_KEY_SECRET --build-arg ENVIRONMENT=prod --build-arg USERS_MYSQL_URL --build-arg USERS_MYSQL_USERNAME --build-arg USERS_MYSQL_PASSWORD -t auth-api ~/workspace/auth-api'
+                sh 'make build RECAPTCHA_KEY_SITE=RECAPTCHA_KEY_SITE RECAPTCHA_KEY_SECRET=RECAPTCHA_KEY_SECRET PROFILE=prod USERS_MYSQL_URL=USERS_MYSQL_URL USERS_MYSQL_USERNAME=USERS_MYSQL_USERNAME USERS_MYSQL_PASSWORD=USERS_MYSQL_PASSWORD'
             }
         }
 
@@ -46,10 +44,9 @@ pipeline {
 
         stage("Deploy"){
             steps {
-                // sh 'docker stop auth-api'
-                // sh 'docker rm auth-api' 
+            	echo 'Deploying auth API'
 				sh 'make clean'               
-                sh 'docker run -p 8083:8080 -m 512m --memory-swap 512m -e "SPRING_PROFILES_ACTIVE=prod" --network net --name=auth-api -d auth-api'
+                sh 'make run PROFILE=prod'
             }
         }
 
