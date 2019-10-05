@@ -13,7 +13,7 @@ build: clean
 		--network net -t auth-api .
 	chmod -R ugo+rw target/
 run: clean
-	docker run -d -p 8083:8080 -m 128m --memory-swap 256m \
+	docker run -d -p 8083:8080 -m 192m --memory-swap 256m \
 		-e "SPRING_PROFILES_ACTIVE=${PROFILE}" --name=auth-api \
 		--network net auth-api
 start: stop
