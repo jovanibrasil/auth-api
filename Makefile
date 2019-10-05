@@ -4,9 +4,12 @@ clean: stop
 	- docker rm auth-api
 build: clean
 	mvn clean package -P${PROFILE} -Dmaven.test.skip=true
-	docker build --build-arg USERS_MYSQL_URL --build-arg USERS_MYSQL_USERNAME \
-		--build-arg USERS_MYSQL_PASSWORD --build-arg RECAPTCHA_KEY_SITE \
-		--build-arg RECAPTCHA_KEY_SECRET --build-arg ENVIRONMENT=${PROFILE} \
+	docker build --build-arg USERS_MYSQL_URL=${USERS_MYSQL_URL} \
+		--build-arg USERS_MYSQL_USERNAME=${USERS_MYSQL_USERNAME} \
+		--build-arg USERS_MYSQL_PASSWORD=${USERS_MYSQL_PASSWORD} \
+		--build-arg RECAPTCHA_KEY_SITE=${RECAPTCHA_KEY_SITE} \
+		--build-arg RECAPTCHA_KEY_SECRET=${RECAPTCHA_KEY_SECRET} \
+		--build-arg ENVIRONMENT=${PROFILE} \
 		--network net -t auth-api .
 	chmod -R ugo+rw target/
 run: clean
