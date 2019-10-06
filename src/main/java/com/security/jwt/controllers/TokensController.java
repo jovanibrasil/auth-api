@@ -71,8 +71,8 @@ public class TokensController {
 	public ResponseEntity<Response<TokenDto>> createTokenJwt(@Valid @RequestBody JwtAuthenticationDto authenticationDto,
 			HttpServletRequest request) throws AuthenticationException, InvalidRecaptchaException, ReCaptchaInvalidException {
 		
-		String recaptchaResponse = request.getParameter("recaptchaResponseToken");
-		captchaService.processResponse(recaptchaResponse);
+		//String recaptchaResponse = request.getParameter("recaptchaResponseToken");
+		//captchaService.processResponse(recaptchaResponse);
 		
 		log.info("Creating JWT token ...");
 		Response<TokenDto> response = new Response<>();
