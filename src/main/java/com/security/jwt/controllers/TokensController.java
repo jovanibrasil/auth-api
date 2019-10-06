@@ -100,7 +100,7 @@ public class TokensController {
 			response.addError("Authentication error. Invalid user name or password");
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);		
 		}
-		
+		log.info("Creating token for {}", authenticationDto.getUserName());
 		UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDto.getUserName());
 		String token = jwtTokenUtil.createToken(userDetails, authenticationDto.getApplication());
 		response.setData(new TokenDto(token));

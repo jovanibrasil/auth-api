@@ -38,27 +38,40 @@ public class CaptchaServiceImpl implements CaptchaService {
 	@Override
 	public void processResponse(String response) throws InvalidRecaptchaException, ReCaptchaInvalidException {
 		log.info("Attempting to validate response {}", response);
-		if (!responseSanityCheck(response))
+		if (!responseSanityCheck(response)) {
+			log.info("Response contains invalid characters");
 			throw new InvalidRecaptchaException("Response contains invalid characters");
-
-		if (reCaptchaAttemptService.isBlocked(getClientIP()))
+		}
+			
+		if (reCaptchaAttemptService.isBlocked(getClientIP())) {
+			log.info("Client exceeded maximum number of failed attempts");
 			throw new InvalidRecaptchaException("Client exceeded maximum number of failed attempts");
-
-		URI verifyUri = URI.create(
-				String.format("https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s",
-						getReCaptchaSecret(), response, getClientIP()));
-
-		ResponseEntity<GoogleResponse> googleResponse = restTemplate.getForEntity(verifyUri, GoogleResponse.class);
-
-		if (!googleResponse.hasBody())
+		}
+			
+		try {
+			log.info("Validating reCaptcha ...");
+			URI verifyUri = URI.create(
+					String.format("https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s",
+							getReCaptchaSecret(), response, getClientIP()));
+			ResponseEntity<GoogleResponse> googleResponse = restTemplate.getForEntity(verifyUri, GoogleResponse.class);
+			
+		if (googleResponse.hasBody()) {
+			log.info("Entity response with empty body.");
 			throw new ReCaptchaInvalidException("reCaptcha was not successfully validated");
+		}
 		if (!googleResponse.getBody().isSuccess()) {
 			if (googleResponse.getBody().hasClientError()) {
 				reCaptchaAttemptService.recaptchaFailed(getClientIP());
 			}
+			log.info("Validation fail.");
 			throw new ReCaptchaInvalidException("reCaptcha was not successfully validated");
 		}
 		reCaptchaAttemptService.recaptchaSucceeded(getClientIP());
+		
+		} catch (Exception e) {
+			log.info("Recaptcha error. {}", e.getMessage());
+		}
+		
 	}
 
 	@Override
