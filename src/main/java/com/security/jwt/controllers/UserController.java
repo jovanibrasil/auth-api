@@ -89,10 +89,12 @@ public class UserController {
 	
 	@PostMapping("/confirmation")
 	public ResponseEntity<Response<?>> confirmUserCreation(@Valid @NotBlank @RequestParam String token){
+		log.info("User confirmation");
 		Response<?> response = new Response<>();
 		try {
 			// Get user informations from token
 			User user = jwtTokenUtil.getUserFromToken(token);
+			log.info("Saving user: [Name: {} Email: {}]", user.getUserName(), user.getEmail());
 			user = this.userService.save(user);
 			
 			// Return the resource location
@@ -107,6 +109,7 @@ public class UserController {
 					.headers(headers).body(response);
 			
 		} catch (UserServiceException e) {
+			log.info("User confirmation error. " + e.getMessage());
 			response.addError("User confirmation error. " + e.getMessage());
 			return ResponseEntity.badRequest().body(response);
 		}

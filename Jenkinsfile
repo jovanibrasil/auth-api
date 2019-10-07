@@ -21,22 +21,21 @@ pipeline {
             }
         }
 
-        stage("Build") {
+        stage("Clone from git") {
             steps {
                 echo 'Cloning git ...'
                 git([url: 'https://github.com/jovanibrasil/auth-api.git', branch: 'master', credentialsId: '9bae9c61-0a29-483c-a07f-47273c351555'])
-                echo 'Building ...'
-                sh 'make build RECAPTCHA_KEY_SITE=${RECAPTCHA_KEY_SITE} RECAPTCHA_KEY_SECRET=${RECAPTCHA_KEY_SECRET} PROFILE=prod USERS_MYSQL_URL=${USERS_MYSQL_URL} USERS_MYSQL_USERNAME=${USERS_MYSQL_USERNAME} USERS_MYSQL_PASSWORD=${USERS_MYSQL_PASSWORD}'
             }
         }
 
         stage("Test"){
             steps {
-                echo 'Todo'
+            	echo 'Running unit tests ...'
+                sh 'make run-tests'
             }
         }
 
-        stage("Registry image"){
+		stage("Registry image"){
             steps {
                 echo 'TODO'
             }
@@ -44,6 +43,8 @@ pipeline {
 
         stage("Deploy"){
             steps {
+            	echo 'Building ...'
+                sh 'make build RECAPTCHA_KEY_SITE=${RECAPTCHA_KEY_SITE} RECAPTCHA_KEY_SECRET=${RECAPTCHA_KEY_SECRET} PROFILE=prod USERS_MYSQL_URL=${USERS_MYSQL_URL} USERS_MYSQL_USERNAME=${USERS_MYSQL_USERNAME} USERS_MYSQL_PASSWORD=${USERS_MYSQL_PASSWORD}'            
             	echo 'Deploying auth API'
 				sh 'make clean'               
                 sh 'make run PROFILE=prod'

@@ -1,4 +1,4 @@
-package com.jwt.utils;
+package com.security.jwt.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

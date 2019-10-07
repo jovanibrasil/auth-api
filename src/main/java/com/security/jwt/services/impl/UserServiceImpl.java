@@ -46,8 +46,14 @@ public class UserServiceImpl implements UserService {
 	 */
 	public List<String> validateUser(User user){
 		List<String> errors = new ArrayList<>();
-		this.findByUserName(user.getUserName()).ifPresent(x -> errors.add("This username already exists."));
-		this.findUserByEmail(user.getEmail()).ifPresent(x -> errors.add("This email already exists."));
+		this.findByUserName(user.getUserName()).ifPresent(x -> {
+			log.info("The username {} already exists.", x.getUserName());
+			errors.add("This username already exists.");
+		});
+		this.findUserByEmail(user.getEmail()).ifPresent(x -> {
+			log.info("The email {} already exists.", x.getEmail());
+			errors.add("This email already exists.");
+		});
 		return errors;
 	}
 		

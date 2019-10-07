@@ -1,4 +1,4 @@
-package com.jwt.security.controllers;
+package com.security.jwt.controllers;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;

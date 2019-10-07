@@ -1,4 +1,4 @@
-package com.jwt.security.repositories;
+package com.security.jwt.repositories;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
