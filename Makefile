@@ -1,3 +1,7 @@
+ifndef PROFILE
+override PROFILE = dev
+endif
+
 run-tests:
 	mvn clean test -Ptest
 

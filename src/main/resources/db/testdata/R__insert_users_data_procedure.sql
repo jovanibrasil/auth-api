@@ -6,7 +6,7 @@ BEGIN
 		VALUES ("user", "user@email.com", "$2a$10$qTtL1uiEaE1rI648DK5vV.Jadtc2KZHHctcoPf.SeHETV5RhfvIS2", "ROLE_USER", NOW());
 		
         INSERT INTO `usersdb`.`users` (`user_name`, `email`, `password`, `profile`, `date`)
-		VALUES ("admin", "admin@email.com", "$2a$10$qTtL1uiEaE1rI648DK5vV.Jadtc2KZHHctcoPf.SeHETV5RhfvIS2", "ROLE_ADMIN", NOW());
+		VALUES ("jovanibrasil", "jovanibrasil@gmail.com", "$2a$10$qTtL1uiEaE1rI648DK5vV.Jadtc2KZHHctcoPf.SeHETV5RhfvIS2", "ROLE_ADMIN", NOW());
 
 		INSERT INTO `usersdb`.`applications` (`application_type`)
 		VALUES ("NOTES_APP");
