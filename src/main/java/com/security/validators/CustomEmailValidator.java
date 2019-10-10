@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 @Target( { ElementType.FIELD })
 @NotBlank(message = "Email must not be null or blank.")
 @Email(message="Email must be a well-formed email address.")
-@Size(max = 50, message = "Email length must be lower than 50 characters.")
+@Size(max = 30, message = "Email length must be lower than 30 characters.")
 @Constraint(validatedBy = UserEmailValidatorImpl.class)
 public @interface CustomEmailValidator {
 	String message() default "Email is not valid.";

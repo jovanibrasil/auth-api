@@ -16,7 +16,7 @@ public class UserDto {
 	@CustomNameValidator
 	private String userName;
 	@NotNull
-	@Size(min=4, max=10, message="Password length must be between 4 and 10.")
+	@Size(min=4, max=12, message="Password length must be between 4 and 12.")
 	private String password;
 	@NotNull
 	//@EnumListValidator(enumClass=ApplicationType.class)

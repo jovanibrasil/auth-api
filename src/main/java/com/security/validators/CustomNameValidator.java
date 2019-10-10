@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 @Constraint(validatedBy = UserNameValidatorImpl.class)
 @Target( { ElementType.FIELD })
 @NotBlank(message = "Username must not be null or blank.")
-@Size(min=2, max=10, message="Username length must be between 2 and 10.")
+@Size(min=2, max=12, message="Username length must be between 2 and 12.")
 public @interface CustomNameValidator {
 	String message() default "Username is not valid.";
 	Class<?>[] groups() default {};
