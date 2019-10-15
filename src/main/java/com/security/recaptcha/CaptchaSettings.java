@@ -1,14 +1,21 @@
 package com.security.recaptcha;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import com.security.AuthDataSourceProperties;
+
 @Component
-@ConfigurationProperties(prefix = "google.recaptcha.key")
+@EnableConfigurationProperties(AuthDataSourceProperties.class)
 public class CaptchaSettings {
 
 	private String site;
     private String secret;
+    
+    public CaptchaSettings(AuthDataSourceProperties configuration) {
+    	this.site = configuration.getRecaptchakeysite();
+    	this.secret = configuration.getRecaptchakeysecret();
+    }
 	
     public String getSite() {
 		return site;
