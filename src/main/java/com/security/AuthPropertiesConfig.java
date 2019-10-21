@@ -13,14 +13,16 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 @Profile("prod")
 @Configuration
 @EnableConfigurationProperties(AuthDataSourceProperties.class)
-public class DataSourceConfig {
+public class AuthPropertiesConfig {
 
-	private static final Logger log = LoggerFactory.getLogger(DataSourceConfig.class);
+	private static final Logger log = LoggerFactory.getLogger(AuthPropertiesConfig.class);
 	
 	private final AuthDataSourceProperties configuration;
 
-	public DataSourceConfig(AuthDataSourceProperties configuration) {
+	public AuthPropertiesConfig(AuthDataSourceProperties configuration) {
 		this.configuration = configuration;
+		log.info("Setting jwt secret ...");
+		System.setProperty("jwt.secret", configuration.getJwtsecretkey());
 	}
 
 	@Bean

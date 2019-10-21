@@ -12,6 +12,7 @@ public class AuthDataSourceProperties {
 	private String password;
 	private String recaptchakeysite;
 	private String recaptchakeysecret;
+	private String jwtsecretkey;
 
 	public String getUsername() {
 		return username;
@@ -53,4 +54,11 @@ public class AuthDataSourceProperties {
 		this.recaptchakeysecret = recaptchakeysecret;
 	}
 
+	public String getJwtsecretkey() {
+		return jwtsecretkey;
+	}
+
+	public void setJwtsecretkey(String jwtsecretkey) {
+		this.jwtsecretkey = jwtsecretkey;
+	}	
 }

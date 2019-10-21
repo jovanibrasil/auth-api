@@ -88,7 +88,7 @@ public class TokensController {
 		}
 		
 		// Does user authentication 
-		log.info("Generating token {}", authenticationDto.getUserName());
+		log.info("Authenticating {} ...", authenticationDto.getUserName());
 		org.springframework.security.core.Authentication auth = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(authenticationDto.getUserName(),
 						authenticationDto.getPassword()));
@@ -103,6 +103,7 @@ public class TokensController {
 		log.info("Creating token for {}", authenticationDto.getUserName());
 		UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDto.getUserName());
 		String token = jwtTokenUtil.createToken(userDetails, authenticationDto.getApplication());
+		log.info("Token successfully generated for {}.", authenticationDto.getUserName());
 		response.setData(new TokenDto(token));
 		return ResponseEntity.ok(response);
 	}
