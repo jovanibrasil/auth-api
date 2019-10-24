@@ -140,6 +140,7 @@ public class UserController {
 			// Send back the generated token by email
 			EmailMessage em = new EmailMessage();
 			String url = userConfirmationViewUrl + "?token=" + token;
+			em.setTitle("Confirmation Email");
 			em.setText("Please, click the confirmation link to confirm your email and sign "
 					+ "into your NOTES account. " + url);
 			em.setFrom("noreply@notes.jovanibrasil.com");
