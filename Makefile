@@ -11,18 +11,13 @@ clean: stop
 	- docker rm auth-api
 build: clean
 	mvn clean package -P${PROFILE} -Dmaven.test.skip=true
-	docker build --build-arg USERS_MYSQL_URL=${USERS_MYSQL_URL} \
-		--build-arg USERS_MYSQL_USERNAME=${USERS_MYSQL_USERNAME} \
-		--build-arg USERS_MYSQL_PASSWORD=${USERS_MYSQL_PASSWORD} \
-		--build-arg RECAPTCHA_KEY_SITE=${RECAPTCHA_KEY_SITE} \
-		--build-arg RECAPTCHA_KEY_SECRET=${RECAPTCHA_KEY_SECRET} \
-		--build-arg ENVIRONMENT=${PROFILE} \
-		--network net -t auth-api .
+	FILE_NAME=blog-api\#\#$(shell find target/*.war -type f | grep -Eo '[0-9]+)
+	docker build  --build-arg ENVIRONMENT=dev --build-arg FILE_NAME -t auth-api .
 	chmod -R ugo+rw target/
 run: clean
 	docker run -d -p 8083:8080 -m 192m --memory-swap 256m \
-		-e "SPRING_PROFILES_ACTIVE=${PROFILE}" --name=auth-api \
-		--network net auth-api
+		-e "SPRING_PROFILES_ACTIVE=${PROFILE}" -e "VAULT_TOKEN=${VAULT_TOKEN}" \
+		--name=auth-api --network net auth-api
 start: stop
 	docker start auth-api
 logs:
