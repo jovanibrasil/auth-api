@@ -1,14 +1,18 @@
 package com.security.jwt.dto;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import com.security.jwt.utils.ApplicationType;
 
 public class JwtAuthenticationDto {
 
-	@NotNull
+	@Size(min = 2, max = 12, message="Username length must be between 2 and 12.")
+	@NotBlank(message = "Username must not be null or blank.")
 	private String userName;
-	@NotNull
+	@NotBlank(message = "Password must not be null or blank.")
+	@Size(min=4, max=12, message="Password length must be between 4 and 12.")
 	private String password;
 	private ApplicationType application;
 	
