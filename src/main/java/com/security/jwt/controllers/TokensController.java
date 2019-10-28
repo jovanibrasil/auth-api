@@ -9,7 +9,6 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +27,8 @@ import com.security.jwt.dto.TokenDto;
 import com.security.jwt.entities.TempUser;
 import com.security.jwt.entities.User;
 import com.security.jwt.enums.ProfileEnum;
+import com.security.jwt.exceptions.ForbiddenUserException;
+import com.security.jwt.exceptions.UnauthorizedUserException;
 import com.security.jwt.response.Response;
 import com.security.jwt.security.utils.JwtTokenUtil;
 import com.security.jwt.services.UserService;
@@ -74,36 +75,33 @@ public class TokensController {
 		//String recaptchaResponse = request.getParameter("recaptchaResponseToken");
 		//captchaService.processResponse(recaptchaResponse);
 		
-		log.info("Creating JWT token ...");
-		Response<TokenDto> response = new Response<>();
-		
 		// Verify if user has register for the required application
 		Optional<User> optUser = userService.findByUserName(authenticationDto.getUserName());
 		if(optUser.isPresent()) {
 			if(!optUser.get().hasRegistry(authenticationDto.getApplication())) {
 				log.error("Authentication error. User not register for {}", authenticationDto.getApplication());
-				response.addError("Authentication error. User not registered for this application.");
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);		
+				throw new ForbiddenUserException("Authentication error. User not registered for this application.");
 			}
+		}else {
+			throw new UnauthorizedUserException("Authentication error. Invalid username or password.");
 		}
 		
 		// Does user authentication 
 		log.info("Authenticating {} ...", authenticationDto.getUserName());
 		org.springframework.security.core.Authentication auth = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(authenticationDto.getUserName(),
-						authenticationDto.getPassword()));
+				new UsernamePasswordAuthenticationToken(authenticationDto.getUserName(), authenticationDto.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		
 		// Verify authentication result
 		if(!auth.isAuthenticated()) {
 			log.error("Authentication error {}");
-			response.addError("Authentication error. Invalid user name or password");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);		
+			throw new UnauthorizedUserException("Authentication error. Invalid user name or password");		
 		}
 		log.info("Creating token for {}", authenticationDto.getUserName());
 		UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDto.getUserName());
 		String token = jwtTokenUtil.createToken(userDetails, authenticationDto.getApplication());
 		log.info("Token successfully generated for {}.", authenticationDto.getUserName());
+		Response<TokenDto> response = new Response<>();
 		response.setData(new TokenDto(token));
 		return ResponseEntity.ok(response);
 	}
