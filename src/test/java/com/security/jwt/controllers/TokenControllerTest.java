@@ -1,12 +1,14 @@
 package com.security.jwt.controllers;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.*;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.After;
@@ -66,6 +68,11 @@ public class TokenControllerTest {
 	@MockBean
 	private UserDetailsService userDetailsService;
 	
+	private List<String> passwordBlankErrors = Arrays.asList("Password length must be between 4 and 12.", 
+			"Password must not be blank or null.");
+	
+	private List<String> userNameBlankErrors = Arrays.asList("Username length must be between 2 and 12.", 
+			"Username must not be blank or null.");
 	
 	private User user;
 	private UserDto userDto;
@@ -82,7 +89,6 @@ public class TokenControllerTest {
 		user.setRegistries(Arrays.asList(
 				new Registry(new Application(ApplicationType.BLOG_APP), user)));
 		userDto = new UserDto();
-		//userDto.setId(1L);
 		userDto.setEmail("test@gmail.com");
 		userDto.setUserName("test");
 		userDto.setPassword("password");
@@ -95,18 +101,11 @@ public class TokenControllerTest {
 		this.userRepository.deleteAll();
 	}
 	
-	@Test
-	public void testTokenCreationForbiddenApplication() throws Exception {
-		user.setRegistries(Arrays.asList(
-				new Registry(new Application(ApplicationType.NOTES_APP), user)));
-		BDDMockito.given(this.userService.findByUserName("test")).willReturn(Optional.of(user));
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userDto)))
-			.andExpect(status().is(403))
-			.andExpect(jsonPath("$.errors[0]", equalTo("Authentication error. User not registered for this application.")));
-	}
-	
+	/**
+	 * Test token creation with a valid user information.
+	 * 
+	 * @throws Exception
+	 */
 	@Test
 	public void testTokenCreation() throws Exception {
 		JwtAuthenticationDto tokenDTO = new JwtAuthenticationDto();
@@ -124,6 +123,157 @@ public class TokenControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty());
 	}
 	
+	/**
+	 * Test token creation passing a invalid password for a registered user.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testTokenCreationInvalidPassword() throws Exception {
+		JwtAuthenticationDto tokenDTO = new JwtAuthenticationDto();
+		tokenDTO.setUserName(user.getUserName());
+		tokenDTO.setPassword("kkkk");
+		tokenDTO.setApplication(ApplicationType.BLOG_APP);
+		BDDMockito.given(this.userService.findByUserName(user.getUserName())).willReturn(Optional.of(user));
+		BDDMockito.given(this.authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(tokenDTO.getUserName(), tokenDTO.getPassword())))
+		.willReturn(new AuthenticationMock(false));
+		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(tokenDTO)))
+			.andExpect(status().isUnauthorized())
+			.andExpect(jsonPath("$.errors[0].message", 
+					equalTo("Authentication error. Invalid user name or password")));
+	}
+	
+	/**
+	 * Test token creation passing a invalid username for a registered user.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testTokenCreationInvalidUsername() throws Exception {
+		JwtAuthenticationDto tokenDTO = new JwtAuthenticationDto();
+		tokenDTO.setUserName("kkk");
+		tokenDTO.setPassword(user.getPassword());
+		tokenDTO.setApplication(ApplicationType.BLOG_APP);
+		BDDMockito.given(this.userService.findByUserName(tokenDTO.getUserName())).willReturn(Optional.empty());
+		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(tokenDTO)))
+			.andExpect(status().isUnauthorized())
+			.andExpect(jsonPath("$.errors[0].message", 
+					equalTo("Authentication error. Invalid username or password.")));
+	}
+	
+	/**
+	 * Test token creation for a user that are not registered for the application. 
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testTokenCreationForbiddenApplication() throws Exception {
+		user.setRegistries(Arrays.asList(
+				new Registry(new Application(ApplicationType.NOTES_APP), user)));
+		BDDMockito.given(this.userService.findByUserName("test")).willReturn(Optional.of(user));
+		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(userDto)))
+			.andExpect(status().isForbidden())
+			.andExpect(jsonPath("$.errors[0].message", 
+					equalTo("Authentication error. User not registered for this application.")));
+	}
+	
+	/**
+	 * Test token creation with null user name.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testTokenCreationNullUserName() throws Exception {
+		userDto.setUserName(null);
+		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(userDto)))
+			.andExpect(status().isUnprocessableEntity())
+			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Username must not be blank or null.")));
+	}
+	
+	/**
+	 * Test token creation with blank user name.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testTokenCreationBlankUserName() throws Exception {
+		userDto.setUserName(" ");
+		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(userDto)))
+			.andExpect(status().isUnprocessableEntity())
+			.andExpect(jsonPath("$.errors[0].errors[0].message", isIn(userNameBlankErrors)));
+	}
+	
+	/**
+	 * Test token creation with a longer user name.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testTokenCreationLongUserName() throws Exception {
+		userDto.setUserName("aaaaaaaaaaaaa");
+		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(userDto)))
+			.andExpect(status().isUnprocessableEntity())
+			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Username length must be between 2 and 12.")));
+	}
+	
+	/**
+	 * Test token creation with null password.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testTokenCreationNullPassword() throws Exception {
+		userDto.setPassword(null);
+		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(userDto)))
+			.andExpect(status().isUnprocessableEntity())
+			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Password must not be blank or null.")));
+	}
+	
+	/**
+	 * Test token creation with blank password.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testTokenCreationBlankPassword() throws Exception {
+		userDto.setPassword(" ");
+		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(userDto)))
+			.andExpect(status().isUnprocessableEntity())
+			.andExpect(jsonPath("$.errors[0].errors[0].message", isIn(passwordBlankErrors)));
+	}
+	
+	/**
+	 * Test token creation with a longer password.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testTokenCreationLongPassword() throws Exception {
+		userDto.setPassword("ppppppppppppp");
+		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(userDto)))
+			.andExpect(status().isUnprocessableEntity())
+			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Password length must be between 4 and 12.")));
+	}
+	
 	public static String asJsonString(final Object obj) {
 	    try {
 	        final ObjectMapper mapper = new ObjectMapper();
@@ -138,6 +288,16 @@ public class TokenControllerTest {
 
 		private static final long serialVersionUID = 6373211614082998724L;
 
+		private boolean isAuthenticated;
+		
+		public AuthenticationMock() {
+			this.isAuthenticated = true;
+		}
+		
+		public AuthenticationMock(boolean isAuthenticated) {
+			this.isAuthenticated = isAuthenticated;
+		}
+		
 		@Override
 		public String getName() { return null; }
 
@@ -154,7 +314,7 @@ public class TokenControllerTest {
 		public Object getPrincipal() { return null; }
 
 		@Override
-		public boolean isAuthenticated() { return true; }
+		public boolean isAuthenticated() { return isAuthenticated; }
 
 		@Override
 		public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {}

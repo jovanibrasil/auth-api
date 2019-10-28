@@ -24,7 +24,7 @@ public class JwtTokenUtilTest {
 		u.setEmail("teste@gmail.com");
 		u.setPassword(PasswordUtils.generateHash("123456"));
 		String token = jwtTokenUtil
-				 .createRegistrationToken(u, ApplicationType.NOTES_APP);
+				 .createRegistrationToken(u.getEmail(), ApplicationType.NOTES_APP);
 		assertNotNull(token);
 	}
 	
@@ -40,7 +40,7 @@ public class JwtTokenUtilTest {
 		u.setPassword("123456");
 		
 		String token = jwtTokenUtil
-				 .createRegistrationToken(u, ApplicationType.NOTES_APP);
+				 .createRegistrationToken(u.getEmail(), ApplicationType.NOTES_APP);
 		
 		User tokenUser = jwtTokenUtil.getUserFromToken(token);
 		
