@@ -5,6 +5,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -58,13 +61,11 @@ public class JwtTokenUtil {
 		return Jwts.builder().setClaims(claims).setExpiration(expirationDate).signWith(SignatureAlgorithm.HS256, secret).compact();
 	}
 	
-	public String createRegistrationToken(User user, ApplicationType application) {
+	public String createRegistrationToken(String email, ApplicationType application) {
 		Map<String, Object> claims = new HashMap<>();
-		claims.put(CLAIM_KEY_USERNAME, user.getUserName());
 		claims.put(CLAIM_KEY_CREATED, new Date());
-		claims.put(CLAIM_KEY_EMAIL, user.getEmail());
+		claims.put(CLAIM_KEY_EMAIL, email);
 		claims.put(CLAIM_KEY_APPLICATION_NAME, application);	
-		claims.put(CLAIM_KEY_PASSWORD, PasswordUtils.generateHash(user.getPassword()));
 		return Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS256, secret).compact();
 	}
 	
@@ -152,6 +153,19 @@ public class JwtTokenUtil {
 		try {
 			Claims claims = this.getClaimsFromToken(token);
 			Object obj = claims.get(CLAIM_KEY_APPLICATION_NAME);
+			if(obj == null) {
+				return "";
+			}
+			return (String) obj; 
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public String getEmailFromToken(@Valid @NotBlank String token) {
+		try {
+			Claims claims = this.getClaimsFromToken(token);
+			Object obj = claims.get(CLAIM_KEY_EMAIL);
 			if(obj == null) {
 				return "";
 			}

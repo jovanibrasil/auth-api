@@ -21,7 +21,6 @@ import javax.persistence.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.security.jwt.configurations.JwtAuthenticationTokenFilter;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.utils.ApplicationType;
 
@@ -58,6 +57,13 @@ public class User {
 	
 	public User() {}
 	
+	public User(String userName, String email, String password) {
+		super();
+		this.userName = userName;
+		this.email = email;
+		this.password = password;
+	}
+
 	public String getEmail() {
 		return email;
 	}
