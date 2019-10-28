@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.FIELD })
-@NotBlank(message = "Email must not be null or blank.")
+@NotBlank(message = "Email must not be blank or null.")
 @Email(message="Email must be a well-formed email address.")
 @Size(max = 30, message = "Email length must be lower than 30 characters.")
 @Constraint(validatedBy = UserEmailValidatorImpl.class)
