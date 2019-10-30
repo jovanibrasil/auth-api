@@ -156,7 +156,7 @@ public class UserControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Username length must be between 2 and 12.")));
+			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Username must not be blank or null.")));
 	}
 	
 	/**
@@ -180,15 +180,11 @@ public class UserControllerTest {
 		userRegDTO.setUserName("teste");
 		userRegDTO.setToken(jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP));
 		
-		List<String> errors = Arrays.asList("Password length must be between 4 and 12.", 
-				"Password must not be blank or null.");
-		
 		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[1].message", isIn(errors)))
-			.andExpect(jsonPath("$.errors[0].errors[0].message", isIn(errors)));
+			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Password must not be blank or null.")));
 	}
 	
 	/**
@@ -216,7 +212,7 @@ public class UserControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Username must not be null.")));
+			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Username must not be blank or null.")));
 	}
 	
 	/**

@@ -10,8 +10,8 @@ public class RegistrationUserDTO {
 	@CustomNameValidator
 	private String userName;
 	
-	@Size(min=4, max=12, message="Password length must be between 4 and 12.")
 	@NotBlank(message = "Password must not be blank or null.")
+	@Size(min=4, max=12, message="Password length must be between 4 and 12.")
 	private String password;
 
 	@NotBlank(message = "Token must not be blank or null.")
