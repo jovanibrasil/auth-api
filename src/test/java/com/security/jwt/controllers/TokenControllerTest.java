@@ -33,8 +33,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.security.jwt.dto.JwtAuthenticationDto;
-import com.security.jwt.dto.UserDto;
+import com.security.jwt.dto.JwtAuthenticationDTO;
+import com.security.jwt.dto.UserDTO;
 import com.security.jwt.entities.Application;
 import com.security.jwt.entities.Registry;
 import com.security.jwt.entities.User;
@@ -75,7 +75,7 @@ public class TokenControllerTest {
 			"Username must not be blank or null.");
 	
 	private User user;
-	private UserDto userDto;
+	private UserDTO userDto;
 	
 	@Before
 	public void setUp() {
@@ -88,7 +88,7 @@ public class TokenControllerTest {
 		user.setSignUpDate(new Date());
 		user.setRegistries(Arrays.asList(
 				new Registry(new Application(ApplicationType.BLOG_APP), user)));
-		userDto = new UserDto();
+		userDto = new UserDTO();
 		userDto.setEmail("test@gmail.com");
 		userDto.setUserName("test");
 		userDto.setPassword("password");
@@ -108,7 +108,7 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testTokenCreation() throws Exception {
-		JwtAuthenticationDto tokenDTO = new JwtAuthenticationDto();
+		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
 		tokenDTO.setUserName(user.getUserName());
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
@@ -130,7 +130,7 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testTokenCreationInvalidPassword() throws Exception {
-		JwtAuthenticationDto tokenDTO = new JwtAuthenticationDto();
+		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
 		tokenDTO.setUserName(user.getUserName());
 		tokenDTO.setPassword("kkkk");
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
@@ -153,7 +153,7 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testTokenCreationInvalidUsername() throws Exception {
-		JwtAuthenticationDto tokenDTO = new JwtAuthenticationDto();
+		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
 		tokenDTO.setUserName("kkk");
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);

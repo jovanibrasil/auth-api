@@ -19,8 +19,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.security.jwt.entities.User;
-import com.security.jwt.exceptions.ForbiddenUserException;
-import com.security.jwt.exceptions.UnauthorizedUserException;
+import com.security.jwt.exceptions.implementations.ForbiddenUserException;
+import com.security.jwt.exceptions.implementations.UnauthorizedUserException;
 import com.security.jwt.security.utils.JwtTokenUtil;
 import com.security.jwt.services.UserService;
 import com.security.jwt.utils.ApplicationType;

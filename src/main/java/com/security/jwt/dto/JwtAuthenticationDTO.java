@@ -5,7 +5,7 @@ import javax.validation.constraints.Size;
 
 import com.security.jwt.utils.ApplicationType;
 
-public class JwtAuthenticationDto {
+public class JwtAuthenticationDTO {
 
 	@Size(min = 2, max = 12, message="Username length must be between 2 and 12.")
 	@NotBlank(message = "Username must not be blank or null.")
@@ -16,15 +16,15 @@ public class JwtAuthenticationDto {
 	
 	private ApplicationType application;
 	
-	public JwtAuthenticationDto() {}
+	public JwtAuthenticationDTO() {}
 	
-	public JwtAuthenticationDto(String userName, String password) {
+	public JwtAuthenticationDTO(String userName, String password) {
 		super();
 		this.userName = userName;
 		this.password = password;
 	}
 	
-	public JwtAuthenticationDto(String userName, String password, ApplicationType application) {
+	public JwtAuthenticationDTO(String userName, String password, ApplicationType application) {
 		super();
 		this.userName = userName;
 		this.password = password;

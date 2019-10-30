@@ -1,4 +1,4 @@
-package com.security.jwt.exceptions;
+package com.security.jwt.exceptions.handlers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.security.jwt.exceptions.implementations.ForbiddenUserException;
+import com.security.jwt.exceptions.implementations.UnauthorizedUserException;
 import com.security.jwt.response.Response;
 
 public class ExceptionHandlerFilter extends OncePerRequestFilter {

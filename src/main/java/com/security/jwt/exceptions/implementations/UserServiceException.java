@@ -1,4 +1,4 @@
-package com.security.jwt.exceptions;
+package com.security.jwt.exceptions.implementations;
 
 import java.util.Arrays;
 import java.util.List;

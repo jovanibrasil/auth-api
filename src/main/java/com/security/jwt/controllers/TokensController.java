@@ -22,14 +22,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.security.jwt.dto.JwtAuthenticationDto;
-import com.security.jwt.dto.TokenDto;
+import com.security.jwt.dto.JwtAuthenticationDTO;
+import com.security.jwt.dto.TokenDTO;
 import com.security.jwt.entities.TempUser;
 import com.security.jwt.entities.User;
 import com.security.jwt.enums.ProfileEnum;
-import com.security.jwt.exceptions.ForbiddenUserException;
-import com.security.jwt.exceptions.InvalidTokenException;
-import com.security.jwt.exceptions.UnauthorizedUserException;
+import com.security.jwt.exceptions.implementations.ForbiddenUserException;
+import com.security.jwt.exceptions.implementations.InvalidTokenException;
+import com.security.jwt.exceptions.implementations.UnauthorizedUserException;
 import com.security.jwt.response.Response;
 import com.security.jwt.security.utils.JwtTokenUtil;
 import com.security.jwt.services.UserService;
@@ -74,7 +74,7 @@ public class TokensController {
 	 * @throws ReCaptchaInvalidException
 	 */
 	@PostMapping("/create")
-	public ResponseEntity<Response<TokenDto>> createTokenJwt(@Valid @RequestBody JwtAuthenticationDto authenticationDto,
+	public ResponseEntity<Response<TokenDTO>> createTokenJwt(@Valid @RequestBody JwtAuthenticationDTO authenticationDto,
 			HttpServletRequest request) throws AuthenticationException, InvalidRecaptchaException, ReCaptchaInvalidException {
 		
 		//String recaptchaResponse = request.getParameter("recaptchaResponseToken");
@@ -106,16 +106,16 @@ public class TokensController {
 		UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDto.getUserName());
 		String token = jwtTokenUtil.createToken(userDetails, authenticationDto.getApplication());
 		log.info("Token successfully generated for {}.", authenticationDto.getUserName());
-		Response<TokenDto> response = new Response<>();
-		response.setData(new TokenDto(token));
+		Response<TokenDTO> response = new Response<>();
+		response.setData(new TokenDTO(token));
 		return ResponseEntity.ok(response);
 	}
 	
 	@GetMapping(value="/refresh")
-	public ResponseEntity<Response<TokenDto>> refreshTokenJwt(HttpServletRequest request){
+	public ResponseEntity<Response<TokenDTO>> refreshTokenJwt(HttpServletRequest request){
 		
 		log.info("Refreshing JWT token");
-		Response<TokenDto> response = new Response<>();
+		Response<TokenDTO> response = new Response<>();
 		
 		try {
 			Optional<String> token = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
@@ -135,7 +135,7 @@ public class TokensController {
 				return ResponseEntity.badRequest().body(response);
 				
 			String refreshedToken = jwtTokenUtil.refreshToken(token.get());
-			response.setData(new TokenDto(refreshedToken));
+			response.setData(new TokenDTO(refreshedToken));
 			
 			return ResponseEntity.ok(response);
 			

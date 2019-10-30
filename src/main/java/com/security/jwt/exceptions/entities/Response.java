@@ -1,4 +1,4 @@
-package com.security.jwt.exceptions;
+package com.security.jwt.exceptions.entities;
 
 import java.util.ArrayList;
 import java.util.List;

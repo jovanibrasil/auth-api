@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import com.security.jwt.exceptions.InvalidTokenException;
+import com.security.jwt.exceptions.implementations.InvalidTokenException;
 import com.security.jwt.utils.ApplicationType;
 
 import io.jsonwebtoken.Claims;

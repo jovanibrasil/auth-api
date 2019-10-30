@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.security.jwt.entities.User;
-import com.security.jwt.exceptions.MicroServiceIntegrationException;
+import com.security.jwt.exceptions.implementations.MicroServiceIntegrationException;
 import com.security.jwt.utils.ApplicationType;
 
 @Service

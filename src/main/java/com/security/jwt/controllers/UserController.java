@@ -28,14 +28,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.security.jwt.dto.ConfirmUserDTO;
 import com.security.jwt.dto.DTOUtils;
 import com.security.jwt.dto.RegistrationUserDTO;
-import com.security.jwt.dto.TokenDto;
-import com.security.jwt.dto.UserDto;
+import com.security.jwt.dto.TokenDTO;
+import com.security.jwt.dto.UserDTO;
 import com.security.jwt.entities.Application;
 import com.security.jwt.entities.Registry;
 import com.security.jwt.entities.User;
-import com.security.jwt.exceptions.InvalidTokenException;
-import com.security.jwt.exceptions.MicroServiceIntegrationException;
-import com.security.jwt.exceptions.UserServiceException;
+import com.security.jwt.exceptions.implementations.InvalidTokenException;
+import com.security.jwt.exceptions.implementations.MicroServiceIntegrationException;
+import com.security.jwt.exceptions.implementations.UserServiceException;
 import com.security.jwt.integration.EmailMessage;
 import com.security.jwt.integration.Integration;
 import com.security.jwt.response.Response;
@@ -77,7 +77,7 @@ public class UserController {
 	 * @return
 	 */
 	@GetMapping("/{userName}")
-	public ResponseEntity<Response<UserDto>> getUser(@PathVariable String userName) {
+	public ResponseEntity<Response<UserDTO>> getUser(@PathVariable String userName) {
 		
 		Optional<User> optUser = userService.findByUserName(userName);
 		
@@ -87,11 +87,11 @@ public class UserController {
 		}
 		
 		User user = optUser.get();
-		UserDto userDto = new UserDto();
+		UserDTO userDto = new UserDTO();
 		userDto.setEmail(user.getEmail());
 		userDto.setUserName(user.getUserName());
 		
-		Response<UserDto> response = new Response<UserDto>();
+		Response<UserDTO> response = new Response<UserDTO>();
 		response.setData(userDto);
 		return ResponseEntity.ok(response);
 		
@@ -173,7 +173,7 @@ public class UserController {
 		captchaService.processResponse(recaptchaResponse);
 		
 		log.info("Creating confirmation token for the email {}", userDto.getEmail());
-		Response<TokenDto> response = new Response<>();
+		Response<TokenDTO> response = new Response<>();
 		
 		try {
 			// generate a token with basic user information
@@ -204,10 +204,10 @@ public class UserController {
 	 * 
 	 */
 	@PutMapping
-	public ResponseEntity<Response<UserDto>> updateUser(@Valid @RequestBody UserDto userDto, HttpServletRequest request){
+	public ResponseEntity<Response<UserDTO>> updateUser(@Valid @RequestBody UserDTO userDto, HttpServletRequest request){
 		
 		log.info("Update user {}", userDto.getUserName());
-		Response<UserDto> response = new Response<>();
+		Response<UserDTO> response = new Response<>();
 		
 		try {
 			User user = this.userService.updateUser(DTOUtils.userDtoToUser(userDto));

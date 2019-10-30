@@ -9,8 +9,8 @@ import com.security.jwt.utils.ApplicationType;
 
 public class DTOUtils {
 
-	public static UserDto userToUserDTO(User user, ApplicationType applicationType) {
-		UserDto userDTO = new UserDto();
+	public static UserDTO userToUserDTO(User user, ApplicationType applicationType) {
+		UserDTO userDTO = new UserDTO();
 		userDTO.setUserName(user.getUserName());
 		userDTO.setId(user.getId());
 		userDTO.setEmail(user.getEmail());
@@ -19,7 +19,7 @@ public class DTOUtils {
 		return userDTO;
 	}
 
-	public static User userDtoToUser(UserDto userDTO) {
+	public static User userDtoToUser(UserDTO userDTO) {
 		User user = new User();
 		user.setUserName(userDTO.getUserName());
 		user.setEmail(userDTO.getEmail());

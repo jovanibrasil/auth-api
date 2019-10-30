@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.security.jwt.dto.DTOUtils;
 import com.security.jwt.dto.UserDetailsDTO;
-import com.security.jwt.dto.UserDto;
+import com.security.jwt.dto.UserDTO;
 import com.security.jwt.entities.User;
-import com.security.jwt.exceptions.UserServiceException;
+import com.security.jwt.exceptions.implementations.UserServiceException;
 import com.security.jwt.response.Response;
 import com.security.jwt.services.UserService;
 
@@ -37,11 +37,11 @@ public class UserDetailsController {
 	 * Accessible only for local services
 	 */
 	@PutMapping
-	public ResponseEntity<Response<UserDto>> updateUserDetails(@Valid @RequestBody UserDetailsDTO userDto, 
+	public ResponseEntity<Response<UserDTO>> updateUserDetails(@Valid @RequestBody UserDetailsDTO userDto, 
 			HttpServletRequest request){
 		
 		log.info("Update user");
-		Response<UserDto> response = new Response<>();
+		Response<UserDTO> response = new Response<>();
 		Optional<User> optUser = this.userService.findByUserName(userDto.getUserName());
 		
 		if(!optUser.isPresent()) {

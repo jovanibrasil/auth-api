@@ -1,4 +1,4 @@
-package com.security.jwt.exceptions;
+package com.security.jwt.exceptions.handlers;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,6 +11,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import com.security.jwt.exceptions.entities.ErrorDetail;
+import com.security.jwt.exceptions.entities.Response;
+import com.security.jwt.exceptions.entities.ValidationError;
+import com.security.jwt.exceptions.implementations.ForbiddenUserException;
+import com.security.jwt.exceptions.implementations.UnauthorizedUserException;
 
 
 @ControllerAdvice

@@ -7,7 +7,7 @@ import com.security.jwt.utils.ApplicationType;
 import com.security.validators.CustomEmailValidator;
 import com.security.validators.CustomNameValidator;
 
-public class UserDto {
+public class UserDTO {
 
 	private Long id;
 
@@ -22,9 +22,9 @@ public class UserDto {
 	//@EnumListValidator(enumClass=ApplicationType.class)
 	private ApplicationType application;
 	
-	public UserDto() {}
+	public UserDTO() {}
 
-	public UserDto(Long id, String email, String userName, String password) {
+	public UserDTO(Long id, String email, String userName, String password) {
 		super();
 		this.id = id;
 		this.email = email;

@@ -30,12 +30,12 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.jwt.dto.ConfirmUserDTO;
 import com.security.jwt.dto.RegistrationUserDTO;
-import com.security.jwt.dto.UserDto;
+import com.security.jwt.dto.UserDTO;
 import com.security.jwt.entities.Application;
 import com.security.jwt.entities.Registry;
 import com.security.jwt.entities.User;
 import com.security.jwt.enums.ProfileEnum;
-import com.security.jwt.exceptions.UserServiceException;
+import com.security.jwt.exceptions.implementations.UserServiceException;
 import com.security.jwt.integration.Integration;
 import com.security.jwt.security.utils.JwtTokenUtil;
 import com.security.jwt.services.UserService;
@@ -58,7 +58,7 @@ public class UserControllerTest {
 	private UserService userService;
 	
 	private User user;
-	private UserDto userDto;
+	private UserDTO userDto;
 	
 	@Before
 	public void setUp() {
@@ -71,7 +71,7 @@ public class UserControllerTest {
 		user.setSignUpDate(new Date());
 		user.setRegistries(Arrays.asList(
 				new Registry(new Application(ApplicationType.BLOG_APP), user)));
-		userDto = new UserDto();
+		userDto = new UserDTO();
 		userDto.setId(1L);
 		userDto.setEmail("test@gmail.com");
 		userDto.setUserName("test");

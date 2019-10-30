@@ -27,7 +27,7 @@ import com.security.jwt.entities.Application;
 import com.security.jwt.entities.Registry;
 import com.security.jwt.entities.User;
 import com.security.jwt.enums.ProfileEnum;
-import com.security.jwt.exceptions.UserServiceException;
+import com.security.jwt.exceptions.implementations.UserServiceException;
 import com.security.jwt.integration.Integration;
 import com.security.jwt.repositories.ApplicationRepository;
 import com.security.jwt.repositories.UserRepository;

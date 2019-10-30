@@ -1,4 +1,4 @@
-package com.security.jwt.exceptions;
+package com.security.jwt.exceptions.implementations;
 
 public class InvalidTokenException extends Exception {
 
