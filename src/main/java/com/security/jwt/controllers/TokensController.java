@@ -28,6 +28,7 @@ import com.security.jwt.entities.TempUser;
 import com.security.jwt.entities.User;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.exceptions.ForbiddenUserException;
+import com.security.jwt.exceptions.InvalidTokenException;
 import com.security.jwt.exceptions.UnauthorizedUserException;
 import com.security.jwt.response.Response;
 import com.security.jwt.security.utils.JwtTokenUtil;
@@ -65,8 +66,12 @@ public class TokensController {
 	/**
 	 * Create and returns a new token JWT.
 	 * 
-	 * @throws ReCaptchaInvalidException 
-	 * @throws InvalidRecaptchaException 
+	 * @param authenticationDto
+	 * @param request
+	 * @return
+	 * @throws AuthenticationException
+	 * @throws InvalidRecaptchaException
+	 * @throws ReCaptchaInvalidException
 	 */
 	@PostMapping("/create")
 	public ResponseEntity<Response<TokenDto>> createTokenJwt(@Valid @RequestBody JwtAuthenticationDto authenticationDto,
@@ -110,85 +115,102 @@ public class TokensController {
 	public ResponseEntity<Response<TokenDto>> refreshTokenJwt(HttpServletRequest request){
 		
 		log.info("Refreshing JWT token");
-		
 		Response<TokenDto> response = new Response<>();
-		Optional<String> token = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
 		
-		if(token.isPresent() && token.get().startsWith(BEARER_PREFIX))
-			token = Optional.of(token.get().substring(7));
-
-		if(!token.isPresent())
-			response.addError("The request do not contain a token.");
-		else if(!jwtTokenUtil.tokenIsValid(token.get()))
-			response.addError("The token is invalid or expired.");
-		
-		if(!response.getErrors().isEmpty())
-			return ResponseEntity.badRequest().body(response);
+		try {
+			Optional<String> token = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
 			
-		String refreshedToken = jwtTokenUtil.refreshToken(token.get());
-		response.setData(new TokenDto(refreshedToken));
-		
-		return ResponseEntity.ok(response);
+			if(token.isPresent()) {
+				if(token.get().startsWith(BEARER_PREFIX)) {
+					token = Optional.of(token.get().substring(7));
+				}
+				if(!jwtTokenUtil.tokenIsValid(token.get())) {
+					response.addError("The token is invalid or expired.");
+				}
+			}else {
+				response.addError("The request do not contain a token.");
+			}
+			
+			if(!response.getErrors().isEmpty())
+				return ResponseEntity.badRequest().body(response);
+				
+			String refreshedToken = jwtTokenUtil.refreshToken(token.get());
+			response.setData(new TokenDto(refreshedToken));
+			
+			return ResponseEntity.ok(response);
+			
+		} catch (InvalidTokenException e) {
+			response.addError("Invalid token." + e.getMessage());
+			return ResponseEntity.badRequest().body(response);
+		}
 	}
 	
 	/**
 	 * Return a list of errors if the token has problems. Otherwise, returns an empty
 	 * list of errors.
+	 * 
+	 * @param request
+	 * @return
 	 */
 	@GetMapping(value="/check")
 	public ResponseEntity<Response<TempUser>> checkToken(HttpServletRequest request){
 		log.info("Cheking JWT token");
 		Response<TempUser> response = new Response<>();
 		
-		Optional<String> optToken = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
-		if(optToken.isPresent()) {
-			if(optToken.get().startsWith(BEARER_PREFIX)) {
-				optToken = Optional.of(optToken.get().substring(7));
-			}else {
-				log.error("Invalid token");
-				response.addError("Invalid token.");
-			}
-		}
-	
-		if(!optToken.isPresent()) {
-			log.error("The request do not contain a token");
-			response.addError("The request do not contain a token.");
-		}else {
-			String token = optToken.get();
-			if(!jwtTokenUtil.tokenIsValid(token)) {
-				log.error("The token in invalid or expired");
-				response.addError("The token is invalid or expired.");
-			}else {
-				log.info("The token is valid");
-			
-				// Verify if user has register for the required application
-				String userName = jwtTokenUtil.getUserNameFromToken(token);
-				Optional<User> optUser = userService.findByUserName(userName);
-				if(optUser.isPresent()) {
-					ApplicationType applicationName = ApplicationType.valueOf(jwtTokenUtil.getApplicationName(token));
-					if(!applicationName.equals(ApplicationType.AUTH_APP) && !optUser.get().hasRegistry(applicationName)) {
-						log.error("Authentication error {} not registered for application {}.");
-						response.addError("Authentication error. User not registered for this application.");
-					}
+		try {
+			Optional<String> optToken = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
+			if(optToken.isPresent()) {
+				if(optToken.get().startsWith(BEARER_PREFIX)) {
+					optToken = Optional.of(optToken.get().substring(7));
 				}else {
-					log.error("User {} not found.", userName);
-					response.addError("User not found.");
-					return ResponseEntity.badRequest().body(response);
+					log.error("Invalid token");
+					response.addError("Invalid token.");
 				}
 			}
-		}
+		
+			if(!optToken.isPresent()) {
+				log.error("The request do not contain a token");
+				response.addError("The request do not contain a token.");
+			}else {
+				String token = optToken.get();
+				if(!jwtTokenUtil.tokenIsValid(token)) {
+					log.error("The token in invalid or expired");
+					response.addError("The token is invalid or expired.");
+				}else {
+					log.info("The token is valid");
+				
+					// Verify if user has register for the required application
+					String userName = jwtTokenUtil.getUserNameFromToken(token);
+					Optional<User> optUser = userService.findByUserName(userName);
+					if(optUser.isPresent()) {
+						ApplicationType applicationName = ApplicationType.valueOf(jwtTokenUtil.getApplicationName(token));
+						if(!applicationName.equals(ApplicationType.AUTH_APP) && !optUser.get().hasRegistry(applicationName)) {
+							log.error("Authentication error {} not registered for application {}.");
+							response.addError("Authentication error. User not registered for this application.");
+						}
+					}else {
+						log.error("User {} not found.", userName);
+						response.addError("User not found.");
+						return ResponseEntity.badRequest().body(response);
+					}
+				}
+			}
+				
+			if(!response.getErrors().isEmpty()) {
+				return ResponseEntity.badRequest().body(response);
+			}
+			String userName = jwtTokenUtil.getUserNameFromToken(optToken.get());
+			log.info("Token ok from user {}", userName);
+			TempUser tempUser = new TempUser();
+			tempUser.setName(userName);
+			tempUser.setRole(ProfileEnum.valueOf(jwtTokenUtil.getAuthority(optToken.get())));
 			
-		if(!response.getErrors().isEmpty()) {
+			response.setData(tempUser);
+			return ResponseEntity.ok(response);
+		} catch (InvalidTokenException e) {
+			response.addError("Invalid token." + e.getMessage());
 			return ResponseEntity.badRequest().body(response);
 		}
-		String userName = jwtTokenUtil.getUserNameFromToken(optToken.get());
-		log.info("Token ok from user {}", userName);
-		TempUser tempUser = new TempUser();
-		tempUser.setName(userName);
-		tempUser.setRole(ProfileEnum.valueOf(jwtTokenUtil.getAuthority(optToken.get())));
-		
-		response.setData(tempUser);
-		return ResponseEntity.ok(response);
 
 	}
 	

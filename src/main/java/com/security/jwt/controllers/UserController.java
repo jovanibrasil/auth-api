@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +33,8 @@ import com.security.jwt.dto.UserDto;
 import com.security.jwt.entities.Application;
 import com.security.jwt.entities.Registry;
 import com.security.jwt.entities.User;
+import com.security.jwt.exceptions.InvalidTokenException;
+import com.security.jwt.exceptions.MicroServiceIntegrationException;
 import com.security.jwt.exceptions.UserServiceException;
 import com.security.jwt.integration.EmailMessage;
 import com.security.jwt.integration.Integration;
@@ -69,32 +69,36 @@ public class UserController {
 	@Value("${urls.notes.userconfirmationview}")
 	private String userConfirmationViewUrl;
 	
+	
+	/**
+	 * Returns the user with the specified name.
+	 * 
+	 * @param userName
+	 * @return
+	 */
 	@GetMapping("/{userName}")
 	public ResponseEntity<Response<UserDto>> getUser(@PathVariable String userName) {
-		
-		Response<UserDto> response = new Response<UserDto>();
 		
 		Optional<User> optUser = userService.findByUserName(userName);
 		
 		if(!optUser.isPresent()) {
 			log.info("User {} not found!", userName);
-			return ResponseEntity.badRequest().body(null);
+			return ResponseEntity.notFound().build();
 		}
+		
 		User user = optUser.get();
 		UserDto userDto = new UserDto();
 		userDto.setEmail(user.getEmail());
 		userDto.setUserName(user.getUserName());
-		for (Registry r : user.getRegistries()) {
-			log.info("Application: {}", r.getApplication().getApplication().name());
-		}
-		response.setData(userDto);
 		
+		Response<UserDto> response = new Response<UserDto>();
+		response.setData(userDto);
 		return ResponseEntity.ok(response);
 		
 	}
 	
 	/**
-	 * Creates the user.
+	 * Creates an user.
 	 * 
 	 * @param token contains the user email and application name
 	 * @param userDto contains password and user name.
@@ -105,14 +109,21 @@ public class UserController {
 		log.info("User registration");
 		Response<?> response = new Response<>();
 		try {
+			
 			// Get user informations from token
 			String email = jwtTokenUtil.getEmailFromToken(userDto.getToken());
 			String applicationName = jwtTokenUtil.getApplicationName(userDto.getToken());
 			
-			// TODO if user information are wrong, return error
+			if(this.userService.findUserByEmail(email).isPresent()) {
+				response.addError("This email already exists.");
+				return ResponseEntity.badRequest().body(response);
+			}
+			
+			// Create an user instance and save it
 			User user = new User(userDto.getUserName(), email, PasswordUtils.generateHash(userDto.getPassword()));
 			Application application = new Application(ApplicationType.valueOf(applicationName));
 			user.setRegistries(Arrays.asList(new Registry(application, user)));
+			
 			log.info("Saving user: [Name: {} Email: {} Application: {}]", 
 					user.getUserName(), user.getEmail(), applicationName);
 			user = this.userService.save(user);
@@ -128,10 +139,18 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.CREATED)
 					.headers(headers).body(response);
 			
+		} catch (MicroServiceIntegrationException e) { 
+			log.info("The required application server is not responding. {}",  e.getMessage());
+			response.addError("The required application server is not responding.");
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+		} catch (InvalidTokenException e) {
+			log.info("Invalid token. {}",  e.getMessage());
+			response.addError("Invalid token. " + e.getMessage());
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
 		} catch (UserServiceException e) {
-			log.info("User confirmation error. " + e.getMessage());
-			response.addError("User confirmation error. " + e.getMessage());
-			return ResponseEntity.badRequest().body(response);
+			log.info("It was not possible to save the user. {}",  e.getMessage());
+			response.addError("It was not possible to save the user.");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
 	
@@ -171,11 +190,12 @@ public class UserController {
 			em.setTitle("NOTES - Email Confirmation");
 			integration.sendEmail(em);
 						
-			return ResponseEntity.ok(response);			
-		} catch (Exception e) {//UserServiceException e) {	
-//			log.error("Save user error {}", e.getErrorMessages());
-//			e.getErrorMessages().forEach(err -> response.addError(err));
-			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+			return ResponseEntity.ok(response);	
+			
+		} catch (MicroServiceIntegrationException e) { 
+			log.info("The required application server is not responding. {}",  e.getMessage());
+			response.addError("The required application server is not responding.");
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
 		}
 	}
 
@@ -204,7 +224,7 @@ public class UserController {
 	/**
 	 * Deletes an user by name.
 	 * 
-	 * This endpoint is accessible only for local services. Please, see the security configuration.
+	 * This endpoint is accessible only for services. Please, see the security configuration.
 	 * 
 	 * @param userName is the name of the user that you want to delete.
 	 * @return ...

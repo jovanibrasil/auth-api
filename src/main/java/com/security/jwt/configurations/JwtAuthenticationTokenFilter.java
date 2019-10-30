@@ -47,48 +47,54 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
 		String token = request.getHeader(AUTH_HEADER);
 		if (token != null) {
-		
-			if (!token.startsWith(BEARER_PREFIX)) throw new UnauthorizedUserException("Invalid token. Missing Bearer field.");
 
-			token = token.substring(7);
-			
-			if (jwtTokenUtil.tokenIsValid(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
-			
-				String userName = jwtTokenUtil.getUserNameFromToken(token);
-				String applicationName = jwtTokenUtil.getApplicationName(token);
-				if(userName == null || applicationName == null) 
-					throw new UnauthorizedUserException("Invalid token information. "
-							+ "Username: " + userName + " ApplicationName: " + applicationName);
-				
-				log.info("Verifying token with user name {} and application name {}.", userName, applicationName);
-				UserDetails userDetails = this.userDetailService.loadUserByUsername(userName);
-				Optional<User> optUser = this.userService.findByUserName(userName);
+			try {
+				if (!token.startsWith(BEARER_PREFIX))
+					throw new UnauthorizedUserException("Invalid token. Missing Bearer field.");
 
-				if (userDetails == null || !optUser.isPresent()) {
-					log.info("Invalid token information.");
-					throw new UnauthorizedUserException("Invalid token information.");			
-				}
-			
-				try {
-					// Verify authorization
-					User user = optUser.get();
-					if (!user.hasRegistry(ApplicationType.valueOf(applicationName))) {
-						String message = String.format("Forbidden. The user %s doesn't have authorization "
-								+ "to access %s", user.getUserName(), applicationName);
-						log.info(message);
-						throw new ForbiddenUserException(message);
+				token = token.substring(7);
+
+				if (jwtTokenUtil.tokenIsValid(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+					String userName = jwtTokenUtil.getUserNameFromToken(token);
+					String applicationName = jwtTokenUtil.getApplicationName(token);
+					if (userName == null || applicationName == null)
+						throw new UnauthorizedUserException("Invalid token information. " + "Username: " + userName
+								+ " ApplicationName: " + applicationName);
+
+					log.info("Verifying token with user name {} and application name {}.", userName, applicationName);
+					UserDetails userDetails = this.userDetailService.loadUserByUsername(userName);
+					Optional<User> optUser = this.userService.findByUserName(userName);
+
+					if (userDetails == null || !optUser.isPresent()) {
+						log.info("Invalid token information.");
+						throw new UnauthorizedUserException("Invalid token information.");
 					}
-					// Authentication process
-					UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-							userDetails, null, userDetails.getAuthorities());
-					auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-					SecurityContextHolder.getContext().setAuthentication(auth);
-				} catch (Exception e) {
-					log.info("Error. {}", e.getMessage());
-					throw e;
+
+					try {
+						// Verify authorization
+						User user = optUser.get();
+						if (!user.hasRegistry(ApplicationType.valueOf(applicationName))) {
+							String message = String.format(
+									"Forbidden. The user %s doesn't have authorization " + "to access %s",
+									user.getUserName(), applicationName);
+							log.info(message);
+							throw new ForbiddenUserException(message);
+						}
+						// Authentication process
+						UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails,
+								null, userDetails.getAuthorities());
+						auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+						SecurityContextHolder.getContext().setAuthentication(auth);
+					} catch (Exception e) {
+						log.info("Error. {}", e.getMessage());
+						throw e;
+					}
+
 				}
-			
-			} 
+			} catch (Exception e) {
+				throw new UnauthorizedUserException("Invalid token. Missing Bearer field.");
+			}
 
 		}
 

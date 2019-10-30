@@ -33,12 +33,12 @@ public class UserDetailsController {
 	@Autowired
 	private UserService userService;
 		
-	
 	/**
 	 * Accessible only for local services
 	 */
 	@PutMapping
-	public ResponseEntity<Response<UserDto>> updateUserDetails(@Valid @RequestBody UserDetailsDTO userDto, HttpServletRequest request){
+	public ResponseEntity<Response<UserDto>> updateUserDetails(@Valid @RequestBody UserDetailsDTO userDto, 
+			HttpServletRequest request){
 		
 		log.info("Update user");
 		Response<UserDto> response = new Response<>();

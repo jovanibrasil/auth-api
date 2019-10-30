@@ -1,6 +1,5 @@
 package com.security.jwt.security.utils;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,15 +11,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import com.security.jwt.entities.Application;
-import com.security.jwt.entities.Registry;
-import com.security.jwt.entities.User;
+import com.security.jwt.exceptions.InvalidTokenException;
 import com.security.jwt.utils.ApplicationType;
-import com.security.jwt.utils.PasswordUtils;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 
 /*
  * Set of method used to manipulate JWT tokens.
@@ -51,26 +51,29 @@ public class JwtTokenUtil {
 	
 	public JwtTokenUtil() {}
 	
-	/*
-	 * Create a new token JWT.
+	/**
+	 * Creates a new token JWT.
+	 * 
+	 * @param claims
+	 * @return
 	 */
-	private String createToken(Map<String, Object> claims) {
+	private String buildToken(Map<String, Object> claims) {
 		// Define the expiration date
 		Date expirationDate = new Date(System.currentTimeMillis() + expiration * 1000);
 		// Generate a new token
-		return Jwts.builder().setClaims(claims).setExpiration(expirationDate).signWith(SignatureAlgorithm.HS256, secret).compact();
+		return Jwts.builder()
+				.setClaims(claims)
+				.setExpiration(expirationDate)
+				.signWith(SignatureAlgorithm.HS256, secret)
+				.compact();
 	}
 	
-	public String createRegistrationToken(String email, ApplicationType application) {
-		Map<String, Object> claims = new HashMap<>();
-		claims.put(CLAIM_KEY_CREATED, new Date());
-		claims.put(CLAIM_KEY_EMAIL, email);
-		claims.put(CLAIM_KEY_APPLICATION_NAME, application);	
-		return Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.HS256, secret).compact();
-	}
-	
-	/*
-	 * Create a new token JWT.
+	/**
+	 * Creates a new token JWT with username, roles, creation date and application name.
+	 * 
+	 * @param userDetails
+	 * @param application
+	 * @return
 	 */
 	public String createToken(UserDetails userDetails, ApplicationType application) {
 		Map<String, Object> claims = new HashMap<>();
@@ -81,122 +84,159 @@ public class JwtTokenUtil {
 		claims.put(CLAIM_KEY_CREATED, new Date());
 		claims.put(CLAIM_KEY_APPLICATION_NAME, application);	
 		
-		return createToken(claims);
+		return buildToken(claims);
+	}
+
+	/**
+	 * Creates a new token JWT with user email, creation date and application name. 
+	 * 
+	 * @param email
+	 * @param application
+	 * @return
+	 */
+	public String createRegistrationToken(String email, ApplicationType application) {
+		Map<String, Object> claims = new HashMap<>();
+		claims.put(CLAIM_KEY_CREATED, new Date());
+		claims.put(CLAIM_KEY_EMAIL, email);
+		claims.put(CLAIM_KEY_APPLICATION_NAME, application);	
+		return Jwts.builder()
+				.setClaims(claims)
+				.signWith(SignatureAlgorithm.HS256, secret)
+				.compact();
 	}
 	
-	public User getUserFromToken(String token) {
+	/**
+	 * 
+	 * Retrieves informations from the token JWT.
+	 * 
+	 * @param token
+	 * @return
+	 * @throws InvalidTokenException
+	 */
+	public Claims getClaimsFromToken(String token) throws InvalidTokenException {
 		try {
-			Claims claims = this.getClaimsFromToken(token);
-			User user = new User();
-			user.setUserName(claims.getSubject());
-			user.setEmail((String)claims.get(CLAIM_KEY_EMAIL));
-			user.setSignUpDate(new Date((Long)claims.get(CLAIM_KEY_CREATED)));
-			user.setPassword((String)claims.get(CLAIM_KEY_PASSWORD));
-			String applicationName = (String)claims.get(CLAIM_KEY_APPLICATION_NAME);
-			user.setRegistries(Arrays.asList(new Registry(new Application(
-					ApplicationType.valueOf(applicationName)), user)));
-			return user;
+			return Jwts.parser()
+					.setSigningKey(secret)
+					.parseClaimsJws(token)
+					.getBody();
+		} catch (UnsupportedJwtException e) {
+			throw new InvalidTokenException("the token format is not supported.");
+		} catch (MalformedJwtException e) {
+			throw new InvalidTokenException("The token was not correctly constructed.");
+		} catch (SignatureException e) {
+			throw new InvalidTokenException("Calculating a signature or verifying an existing signature of a JWT failed");
+		} catch (ExpiredJwtException e) {
+			throw new InvalidTokenException("The token is expired.");
 		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+			throw new InvalidTokenException("Unexpected error while processing the token.");
 		}
 	}
 	
-	/*
-	 * Get user name from the token JWT.
+	/**
+	 * Retrieves the user name from the token JWT.
+	 * 
+	 * @param token
+	 * @return
+	 * @throws InvalidTokenException
 	 */
-	public String getUserNameFromToken(String token) {
+	public String getUserNameFromToken(String token) throws InvalidTokenException {
 		try {
 			Claims claims = this.getClaimsFromToken(token);
-			return claims.getSubject();
+			return claims.getSubject();	
+		} catch (InvalidTokenException e) {
+			throw e;
 		} catch (Exception e) {
-			return null;
+			throw new InvalidTokenException("Error getting user name from the token.");
 		}
 	}
 	
-	/*
-	 * Get user name from the token JWT.
+	/**
+	 * Retrieves user authority from the token JWT.
+	 * 
+	 * @param token
+	 * @return
+	 * @throws InvalidTokenException
 	 */
-	public String getAuthority(String token) {
+	public String getAuthority(String token) throws InvalidTokenException {
 		try {
 			Claims claims = this.getClaimsFromToken(token);
 			return claims.get(CLAIM_KEY_ROLE).toString();
+		} catch (InvalidTokenException e) {
+			throw e;
 		} catch (Exception e) {
-			return null;
+			throw new InvalidTokenException("Error getting user authority from the token.");
 		}
 	}
 	
-	/*
-	 * Extract informations from the token JWT.
+	/**
+	 * Retrieves expiration date from the token JWT.
+	 * 
+	 * @param token
+	 * @return
+	 * @throws InvalidTokenException
 	 */
-	public Claims getClaimsFromToken(String token){
-		try {
-			return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
-		} catch (Exception e) {
-			return null;
-		}
+	public Date getExpirationDate(String token) throws InvalidTokenException {
+		Claims claims = this.getClaimsFromToken(token);
+		if(claims == null) throw new InvalidTokenException("Expiration date is null.");
+		return claims.getExpiration();
 	}
 	
-	/*
-	 * Get expiration date from the token JWT.
+	/**
+	 * Retrieves application name from the token JWT.
+	 * 
+	 * @param token
+	 * @return
+	 * @throws InvalidTokenException
 	 */
-	public Date getExpirationDate(String token) {
-		try {
-			Claims claims = this.getClaimsFromToken(token);
-			return claims.getExpiration();
-		} catch (Exception e) {
-			return null;
-		}
+	public String getApplicationName(String token) throws InvalidTokenException {
+		Claims claims = this.getClaimsFromToken(token);
+		Object obj = claims.get(CLAIM_KEY_APPLICATION_NAME);
+		if(obj == null) throw new InvalidTokenException("Application name is null");
+		return (String) obj; 
 	}
 	
-	public String getApplicationName(String token) {
-		try {
-			Claims claims = this.getClaimsFromToken(token);
-			Object obj = claims.get(CLAIM_KEY_APPLICATION_NAME);
-			if(obj == null) {
-				return "";
-			}
-			return (String) obj; 
-		} catch (Exception e) {
-			return null;
-		}
-	}
-	
-	public String getEmailFromToken(@Valid @NotBlank String token) {
-		try {
-			Claims claims = this.getClaimsFromToken(token);
-			Object obj = claims.get(CLAIM_KEY_EMAIL);
-			if(obj == null) {
-				return "";
-			}
-			return (String) obj; 
-		} catch (Exception e) {
-			return null;
-		}
-	}
-	
-	/*
-	 * Create a new token JWT.
+	/**
+	 * Retrieves email from the token JWT.
+	 * 
+	 * @param token
+	 * @return
+	 * @throws InvalidTokenException
 	 */
-	public String refreshToken(String token) {
-		try {
-			Claims claims = this.getClaimsFromToken(token);
-			claims.put(CLAIM_KEY_CREATED, new Date());
-			return createToken(claims);
-		} catch (Exception e) {
-			return null;
-		}
+	public String getEmailFromToken(String token) throws InvalidTokenException {
+		Claims claims = this.getClaimsFromToken(token);
+		Object obj = claims.get(CLAIM_KEY_EMAIL);
+		if(obj == null) throw new InvalidTokenException("Email is null.");
+		return (String) obj;
 	}
 	
-	/*
-	 * Verify if a token JWT is valid.
+	/**
+	 * Creates a new token JWT.
+	 * 
+	 * @param token
+	 * @return
+	 * @throws InvalidTokenException
 	 */
-	public boolean tokenIsValid(String token) {
-		Date expirationDate = this.getExpirationDate(token);
-		if(expirationDate == null) return false;
-		System.out.println("Expiration date: " + expirationDate);
-		System.out.println("Atual date: " + new Date());
-		return !expirationDate.before(new Date());
+	public String refreshToken(String token) throws InvalidTokenException {
+		Claims claims = this.getClaimsFromToken(token);
+		claims.put(CLAIM_KEY_CREATED, new Date());
+		return buildToken(claims);
+	}
+	
+	/**
+	 * Verifies if a token JWT is valid.
+	 * 
+	 * @param token
+	 * @return
+	 * @throws InvalidTokenException
+	 */
+	public boolean tokenIsValid(String token) throws InvalidTokenException {
+		try {
+			Date expirationDate = this.getExpirationDate(token);
+			if(expirationDate == null) return false;
+			return new Date().before(expirationDate);
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	
 }
