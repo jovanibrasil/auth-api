@@ -9,15 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.security.jwt.services.UserService;
 
-public class UserNameValidatorImpl implements ConstraintValidator<CustomNameValidator, String> {
+public class CustomNameValidatorImpl implements ConstraintValidator<CustomNameValidator, String> {
 	
-	private static final Logger log = LoggerFactory.getLogger(UserNameValidatorImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(CustomNameValidatorImpl.class);
 	
 	private UserService userService;
 	private StringValidations strVals;
 	
 	@Autowired
-	public UserNameValidatorImpl(UserService userService, StringValidations strVals) {
+	public CustomNameValidatorImpl(UserService userService, StringValidations strVals) {
 		this.userService = userService;
 		this.strVals = strVals;
 	}

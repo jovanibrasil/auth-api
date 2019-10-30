@@ -10,15 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.security.jwt.services.UserService;
 
-public class UserEmailValidatorImpl implements ConstraintValidator<CustomEmailValidator, String> {
+public class CustomEmailValidatorImpl implements ConstraintValidator<CustomEmailValidator, String> {
 
-	private static final Logger log = LoggerFactory.getLogger(UserEmailValidatorImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(CustomEmailValidatorImpl.class);
 	
 	private UserService userService;
 	private StringValidations strVals;
 	
 	@Autowired
-	public UserEmailValidatorImpl(UserService userService, StringValidations strVals) {
+	public CustomEmailValidatorImpl(UserService userService, StringValidations strVals) {
 		this.userService = userService;
 		this.strVals = strVals;
 	}

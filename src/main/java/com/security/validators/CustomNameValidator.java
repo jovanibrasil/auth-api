@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 
 @Retention(RetentionPolicy.RUNTIME) // the annotation will be available at runtime by means of reflection
 @Target( { ElementType.FIELD })
-@Constraint(validatedBy = UserNameValidatorImpl.class)
+@Constraint(validatedBy = CustomNameValidatorImpl.class)
 public @interface CustomNameValidator {
 	String message() default "Username is not valid.";
 	Class<?>[] groups() default {};

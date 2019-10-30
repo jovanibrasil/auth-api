@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.FIELD })
-@Constraint(validatedBy = UserEmailValidatorImpl.class)
+@Constraint(validatedBy = CustomEmailValidatorImpl.class)
 public @interface CustomEmailValidator {
 	String message() default "Email is not valid.";
 	Class<?>[] groups() default {};
