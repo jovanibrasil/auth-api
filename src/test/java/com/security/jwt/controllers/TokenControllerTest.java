@@ -147,6 +147,29 @@ public class TokenControllerTest {
 	}
 	
 	/**
+	 * Test token creation passing a invalid application.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testTokenCreationInvalidApplication() throws Exception {
+		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
+		tokenDTO.setUserName(user.getUserName());
+		tokenDTO.setPassword("kkkk");
+		tokenDTO.setApplication(null);
+		BDDMockito.given(this.userService.findByUserName(user.getUserName())).willReturn(Optional.of(user));
+		BDDMockito.given(this.authenticationManager.authenticate(
+				new UsernamePasswordAuthenticationToken(tokenDTO.getUserName(), tokenDTO.getPassword())))
+		.willReturn(new AuthenticationMock());
+		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(tokenDTO)))
+			.andExpect(status().isUnprocessableEntity())
+			.andExpect(jsonPath("$.errors[0].errors[0].message", 
+					equalTo("Application cannot be null.")));
+	}
+	
+	/**
 	 * Test token creation passing a invalid username for a registered user.
 	 * 
 	 * @throws Exception

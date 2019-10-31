@@ -6,6 +6,7 @@ import javax.validation.constraints.Size;
 import com.security.jwt.utils.ApplicationType;
 import com.security.validators.CustomEmailValidator;
 import com.security.validators.CustomNameValidator;
+import com.security.validators.EnumValidator;
 
 public class UserDTO {
 
@@ -18,8 +19,7 @@ public class UserDTO {
 	@NotNull
 	@Size(min=4, max=12, message="Password length must be between 4 and 12.")
 	private String password;
-	@NotNull
-	//@EnumListValidator(enumClass=ApplicationType.class)
+	@EnumValidator(enumClass=ApplicationType.class)
 	private ApplicationType application;
 	
 	public UserDTO() {}

@@ -1,17 +1,14 @@
 package com.security.jwt.dto;
 
-import javax.validation.constraints.NotNull;
-
 import com.security.jwt.utils.ApplicationType;
 import com.security.validators.CustomEmailValidator;
+import com.security.validators.EnumValidator;
 
 public class ConfirmUserDTO {
 	
 	@CustomEmailValidator
 	private String email;
-	
-	@NotNull
-	//@EnumListValidator(enumClass=ApplicationType.class)
+	@EnumValidator(enumClass=ApplicationType.class)
 	private ApplicationType application;
 	
 	public ConfirmUserDTO() {}

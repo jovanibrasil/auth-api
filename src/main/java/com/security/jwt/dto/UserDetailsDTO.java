@@ -14,7 +14,7 @@ public class UserDetailsDTO {
 	@NotBlank(message="Username must not be blank or null.")
 	private String userName;
 	
-	@NonNull @EnumListValidator(enumClass=ApplicationType.class)
+	@EnumListValidator(enumClass=ApplicationType.class)
 	private List<ApplicationType> applications;
 
 	public UserDetailsDTO(String application, List<ApplicationType> applications) {

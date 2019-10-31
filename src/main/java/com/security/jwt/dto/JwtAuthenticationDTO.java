@@ -3,7 +3,10 @@ package com.security.jwt.dto;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import org.springframework.lang.NonNull;
+
 import com.security.jwt.utils.ApplicationType;
+import com.security.validators.EnumValidator;
 
 public class JwtAuthenticationDTO {
 
@@ -13,7 +16,7 @@ public class JwtAuthenticationDTO {
 	@NotBlank(message = "Password must not be blank or null.")
 	@Size(min=4, max=12, message="Password length must be between 4 and 12.")
 	private String password;
-	
+	@EnumValidator(enumClass=ApplicationType.class)
 	private ApplicationType application;
 	
 	public JwtAuthenticationDTO() {}
