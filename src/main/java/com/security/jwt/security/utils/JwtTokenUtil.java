@@ -1,11 +1,9 @@
-package com.security.jwt.security.utils;
+	package com.security.jwt.security.utils;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -115,16 +113,16 @@ public class JwtTokenUtil {
 	 */
 	public Claims getClaimsFromToken(String token) throws InvalidTokenException {
 		try {
-			return Jwts.parser()
-					.setSigningKey(secret)
-					.parseClaimsJws(token)
+			return Jwts.parser() 			// Gets a JWT parser instance
+					.setSigningKey(secret)  // Sets the sign key used to verify the JWS signature
+					.parseClaimsJws(token)  // Parses JWS token. Throws an exception if the token aren't a JWS token. 
 					.getBody();
 		} catch (UnsupportedJwtException e) {
-			throw new InvalidTokenException("the token format is not supported.");
+			throw new InvalidTokenException("the token format is not supported. The token is not a JWS token. " + e.getMessage());
 		} catch (MalformedJwtException e) {
 			throw new InvalidTokenException("The token was not correctly constructed.");
 		} catch (SignatureException e) {
-			throw new InvalidTokenException("Calculating a signature or verifying an existing signature of a JWT failed");
+			throw new InvalidTokenException("Calculating a signature or verifying an existing signature of a JWS failed");
 		} catch (ExpiredJwtException e) {
 			throw new InvalidTokenException("The token is expired.");
 		} catch (Exception e) {
