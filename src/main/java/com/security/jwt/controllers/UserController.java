@@ -2,6 +2,7 @@ package com.security.jwt.controllers;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,9 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -29,7 +35,8 @@ import com.security.jwt.dto.ConfirmUserDTO;
 import com.security.jwt.dto.DTOUtils;
 import com.security.jwt.dto.RegistrationUserDTO;
 import com.security.jwt.dto.TokenDTO;
-import com.security.jwt.dto.UserDTO;
+import com.security.jwt.dto.UpdateUserDTO;
+import com.security.jwt.dto.CreateUserDTO;
 import com.security.jwt.entities.Application;
 import com.security.jwt.entities.Registry;
 import com.security.jwt.entities.User;
@@ -69,6 +76,11 @@ public class UserController {
 	@Value("${urls.notes.userconfirmationview}")
 	private String userConfirmationViewUrl;
 	
+	@Autowired
+	private MessageSource messageSource;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
 	
 	/**
 	 * Returns the user with the specified name.
@@ -77,7 +89,7 @@ public class UserController {
 	 * @return
 	 */
 	@GetMapping("/{userName}")
-	public ResponseEntity<Response<UserDTO>> getUser(@PathVariable String userName) {
+	public ResponseEntity<Response<CreateUserDTO>> getUser(@PathVariable String userName) {
 		
 		Optional<User> optUser = userService.findByUserName(userName);
 		
@@ -87,11 +99,11 @@ public class UserController {
 		}
 		
 		User user = optUser.get();
-		UserDTO userDto = new UserDTO();
+		CreateUserDTO userDto = new CreateUserDTO();
 		userDto.setEmail(user.getEmail());
 		userDto.setUserName(user.getUserName());
 		
-		Response<UserDTO> response = new Response<UserDTO>();
+		Response<CreateUserDTO> response = new Response<CreateUserDTO>();
 		response.setData(userDto);
 		return ResponseEntity.ok(response);
 		
@@ -103,19 +115,26 @@ public class UserController {
 	 * @param token contains the user email and application name
 	 * @param userDto contains password and user name.
 	 * @return
+	 * @throws ReCaptchaInvalidException 
+	 * @throws InvalidRecaptchaException 
 	 */
 	@PostMapping
-	public ResponseEntity<Response<?>> createUser(@Valid @RequestBody RegistrationUserDTO userDto){
+	public ResponseEntity<Response<?>> createUser(@Valid @RequestBody RegistrationUserDTO userDto, HttpServletRequest request,
+			@RequestHeader(name="Accept-Language", required = false) Locale locale) throws InvalidRecaptchaException, ReCaptchaInvalidException{
+		
+		String recaptchaResponse = request.getParameter("recaptchaResponseToken");
+		captchaService.processResponse(recaptchaResponse);
+		
 		log.info("User registration");
+		
 		Response<?> response = new Response<>();
-		try {
-			
+		try {			
 			// Get user informations from token
 			String email = jwtTokenUtil.getEmailFromToken(userDto.getToken());
 			String applicationName = jwtTokenUtil.getApplicationName(userDto.getToken());
 			
 			if(this.userService.findUserByEmail(email).isPresent()) {
-				response.addError("This email already exists.");
+				response.addError(messageSource.getMessage("email.already.exists", null, locale));
 				return ResponseEntity.badRequest().body(response);
 			}
 			
@@ -141,11 +160,11 @@ public class UserController {
 			
 		} catch (MicroServiceIntegrationException e) { 
 			log.info("The required application server is not responding. {}",  e.getMessage());
-			response.addError("The required application server is not responding.");
+			response.addError(messageSource.getMessage("appserver.not.responding", null, locale));
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
 		} catch (InvalidTokenException e) {
-			log.info("Invalid token. {}",  e.getMessage());
-			response.addError("Invalid token. " + e.getMessage());
+			log.info(messageSource.getMessage("invalid.token", null, locale) + e.getMessage());
+			response.addError(messageSource.getMessage("invalid.token", null, locale) + e.getMessage());
 			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
 		} catch (UserServiceException e) {
 			log.info("It was not possible to save the user. {}",  e.getMessage());
@@ -156,7 +175,7 @@ public class UserController {
 	
 	/**
 	 * 
-	 * Generates a email verification with a token. The token contains user information like email and 
+	 * Generates an email verification with a token. The token contains user information like email and 
 	 * application name. The email must be unique.
 	 * 
 	 * @param userDto contains email and application name
@@ -167,7 +186,7 @@ public class UserController {
 	 */
 	@PostMapping("/confirmation")
 	public ResponseEntity<Response<?>> confirmUserEmail(@Valid @RequestBody ConfirmUserDTO userDto, 
-			HttpServletRequest request) throws InvalidRecaptchaException, ReCaptchaInvalidException {
+			HttpServletRequest request, @RequestHeader(name="Accept-Language", required = false) Locale locale) throws InvalidRecaptchaException, ReCaptchaInvalidException {
 		
 		String recaptchaResponse = request.getParameter("recaptchaResponseToken");
 		captchaService.processResponse(recaptchaResponse);
@@ -194,25 +213,37 @@ public class UserController {
 			
 		} catch (MicroServiceIntegrationException e) { 
 			log.info("The required application server is not responding. {}",  e.getMessage());
-			response.addError("The required application server is not responding.");
+			response.addError(messageSource.getMessage("appserver.not.responding", null, locale));
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
 		}
 	}
 
 	/**
-	 * Updates a specified user.
+	 * Updates a specified user. For now, only the pass
 	 * 
 	 */
 	@PutMapping
-	public ResponseEntity<Response<UserDTO>> updateUser(@Valid @RequestBody UserDTO userDto, HttpServletRequest request){
+	public ResponseEntity<Response<?>> updateUser(@Valid @RequestBody UpdateUserDTO userDto){
 		
-		log.info("Update user {}", userDto.getUserName());
-		Response<UserDTO> response = new Response<>();
+		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+		log.info("Updating user {}", userName);
 		
+		Response<?> response = new Response<>();
 		try {
-			User user = this.userService.updateUser(DTOUtils.userDtoToUser(userDto));
-			response.setData(DTOUtils.userToUserDTO(user, userDto.getApplication()));
-			return ResponseEntity.ok(response);
+			Optional<User> optUser = this.userService.findByUserName(userName);
+			
+			if(optUser.isPresent()) {
+				User user = optUser.get();
+				// Verify if the presented actual password is correct
+				org.springframework.security.core.Authentication auth = authenticationManager.authenticate(
+						new UsernamePasswordAuthenticationToken(userName, userDto.getActualPassword()));
+				if(auth.isAuthenticated()) {
+					user.setPassword(userDto.getNewPassword());
+					user = this.userService.updateUser(user);
+					return ResponseEntity.ok(response);		
+				}
+			}
+			return ResponseEntity.badRequest().body(response);
 		} catch (UserServiceException e) {	
 			log.error("Update user error {}", e.getErrorMessages());
 			e.getErrorMessages().forEach(err -> response.addError(err));
@@ -234,8 +265,8 @@ public class UserController {
 	public ResponseEntity<Response<String>> deleteUser(@PathVariable("username") String userName){
 		
 		log.info("Delete user {}", userName);
-		Response<String> response = new Response<>();
 		
+		Response<String> response = new Response<>();
 		try {
 			this.userService.deleteUser(userName);
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);

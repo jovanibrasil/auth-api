@@ -8,7 +8,7 @@ import com.security.validators.CustomEmailValidator;
 import com.security.validators.CustomNameValidator;
 import com.security.validators.EnumValidator;
 
-public class UserDTO {
+public class CreateUserDTO {
 
 	private Long id;
 
@@ -22,9 +22,9 @@ public class UserDTO {
 	@EnumValidator(enumClass=ApplicationType.class)
 	private ApplicationType application;
 	
-	public UserDTO() {}
+	public CreateUserDTO() {}
 
-	public UserDTO(Long id, String email, String userName, String password) {
+	public CreateUserDTO(Long id, String email, String userName, String password) {
 		super();
 		this.id = id;
 		this.email = email;

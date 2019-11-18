@@ -1,5 +1,6 @@
 package com.security.jwt.controllers;
 
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.naming.AuthenticationException;
@@ -9,6 +10,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -63,8 +66,11 @@ public class TokensController {
 	@Autowired
 	private CaptchaService captchaService;
 	
+	@Autowired
+	private MessageSource messageSource;
+	
 	/**
-	 * Create and returns a new token JWT.
+	 * Creates and returns a new token JWT.
 	 * 
 	 * @param authenticationDto
 	 * @param request
@@ -75,20 +81,22 @@ public class TokensController {
 	 */
 	@PostMapping("/create")
 	public ResponseEntity<Response<TokenDTO>> createTokenJwt(@Valid @RequestBody JwtAuthenticationDTO authenticationDto,
-			HttpServletRequest request) throws AuthenticationException, InvalidRecaptchaException, ReCaptchaInvalidException {
+			HttpServletRequest request, @RequestHeader(name="Accept-Language", required = false) Locale locale) 
+					throws AuthenticationException, InvalidRecaptchaException, ReCaptchaInvalidException {
 		
+		log.info("User {} is requesting a JWT token.", authenticationDto.getUserName());
 		//String recaptchaResponse = request.getParameter("recaptchaResponseToken");
 		//captchaService.processResponse(recaptchaResponse);
 		
-		// Verify if user has register for the required application
+		// Verify if user has registry for the required application
 		Optional<User> optUser = userService.findByUserName(authenticationDto.getUserName());
 		if(optUser.isPresent()) {
 			if(!optUser.get().hasRegistry(authenticationDto.getApplication())) {
 				log.error("Authentication error. User not register for {}", authenticationDto.getApplication());
-				throw new ForbiddenUserException("Authentication error. User not registered for this application.");
+				throw new ForbiddenUserException(messageSource.getMessage("user.not.register.for.application", null, locale));
 			}
 		}else {
-			throw new UnauthorizedUserException("Authentication error. Invalid username or password.");
+			throw new UnauthorizedUserException(messageSource.getMessage("invalid.input", null, locale));
 		}
 		
 		// Does user authentication 
@@ -100,7 +108,7 @@ public class TokensController {
 		// Verify authentication result
 		if(!auth.isAuthenticated()) {
 			log.error("Authentication error {}");
-			throw new UnauthorizedUserException("Authentication error. Invalid user name or password");		
+			throw new UnauthorizedUserException(messageSource.getMessage("invalid.input", null, locale));		
 		}
 		log.info("Creating token for {}", authenticationDto.getUserName());
 		UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDto.getUserName());
@@ -112,11 +120,12 @@ public class TokensController {
 	}
 	
 	@GetMapping(value="/refresh")
-	public ResponseEntity<Response<TokenDTO>> refreshTokenJwt(HttpServletRequest request){
+	public ResponseEntity<Response<TokenDTO>> refreshTokenJwt(HttpServletRequest request, 
+			@RequestHeader(name="Accept-Language", required = false) Locale locale){
 		
 		log.info("Refreshing JWT token");
-		Response<TokenDTO> response = new Response<>();
 		
+		Response<TokenDTO> response = new Response<>();
 		try {
 			Optional<String> token = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
 			
@@ -125,10 +134,10 @@ public class TokensController {
 					token = Optional.of(token.get().substring(7));
 				}
 				if(!jwtTokenUtil.tokenIsValid(token.get())) {
-					response.addError("The token is invalid or expired.");
+					response.addError(messageSource.getMessage("invalid.or.expired.token", null, locale));
 				}
 			}else {
-				response.addError("The request do not contain a token.");
+				response.addError(messageSource.getMessage("request.without.token", null, locale));
 			}
 			
 			if(!response.getErrors().isEmpty())
@@ -140,7 +149,7 @@ public class TokensController {
 			return ResponseEntity.ok(response);
 			
 		} catch (InvalidTokenException e) {
-			response.addError("Invalid token." + e.getMessage());
+			response.addError(messageSource.getMessage("invalid.token", null, locale) + e.getMessage());
 			return ResponseEntity.badRequest().body(response);
 		}
 	}
@@ -153,10 +162,12 @@ public class TokensController {
 	 * @return
 	 */
 	@GetMapping(value="/check")
-	public ResponseEntity<Response<TempUser>> checkToken(HttpServletRequest request){
-		log.info("Cheking JWT token");
-		Response<TempUser> response = new Response<>();
+	public ResponseEntity<Response<TempUser>> checkToken(HttpServletRequest request, 
+			@RequestHeader(name="Accept-Language", required = false) Locale locale){
 		
+		log.info("Cheking JWT token");
+		
+		Response<TempUser> response = new Response<>();
 		try {
 			Optional<String> optToken = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
 			if(optToken.isPresent()) {
@@ -164,21 +175,19 @@ public class TokensController {
 					optToken = Optional.of(optToken.get().substring(7));
 				}else {
 					log.error("Invalid token");
-					response.addError("Invalid token.");
+					response.addError(messageSource.getMessage("invalid.token", null, locale));
 				}
 			}
 		
 			if(!optToken.isPresent()) {
 				log.error("The request do not contain a token");
-				response.addError("The request do not contain a token.");
+				response.addError(messageSource.getMessage("request.without.token", null, locale));
 			}else {
 				String token = optToken.get();
 				if(!jwtTokenUtil.tokenIsValid(token)) {
 					log.error("The token in invalid or expired");
-					response.addError("The token is invalid or expired.");
+					response.addError(messageSource.getMessage("invalid.or.expired.token", null, locale));
 				}else {
-					log.info("The token is valid");
-				
 					// Verify if user has register for the required application
 					String userName = jwtTokenUtil.getUserNameFromToken(token);
 					Optional<User> optUser = userService.findByUserName(userName);
@@ -186,11 +195,11 @@ public class TokensController {
 						ApplicationType applicationName = ApplicationType.valueOf(jwtTokenUtil.getApplicationName(token));
 						if(!applicationName.equals(ApplicationType.AUTH_APP) && !optUser.get().hasRegistry(applicationName)) {
 							log.error("Authentication error {} not registered for application {}.");
-							response.addError("Authentication error. User not registered for this application.");
+							response.addError(messageSource.getMessage("user.not.register.for.application", null, locale));
 						}
 					}else {
 						log.error("User {} not found.", userName);
-						response.addError("User not found.");
+						response.addError(messageSource.getMessage("user.not.found", null, locale));
 						return ResponseEntity.badRequest().body(response);
 					}
 				}
@@ -208,7 +217,7 @@ public class TokensController {
 			response.setData(tempUser);
 			return ResponseEntity.ok(response);
 		} catch (InvalidTokenException e) {
-			response.addError("Invalid token." + e.getMessage());
+			response.addError(messageSource.getMessage("invalid.token", null, locale) + e.getMessage());
 			return ResponseEntity.badRequest().body(response);
 		}
 

@@ -27,7 +27,7 @@ bash:
 compose-down:
 	docker-compose down -v 
 compose-up: compose-down
-	docker-compose up --no-recreate -d
+	docker-compose --compatibility up --no-recreate -d
 stats:
 	docker stats auth-api
 

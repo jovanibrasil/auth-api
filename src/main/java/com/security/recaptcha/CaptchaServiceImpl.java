@@ -27,14 +27,15 @@ public class CaptchaServiceImpl implements CaptchaService {
 	@Autowired
 	private RestOperations restTemplate;
 
-	private static Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
-
 	@Autowired
 	private RecaptchaAttemptService reCaptchaAttemptService;
 
 	@Autowired
 	private HttpServletRequest httpServletRequest;
 
+	private static Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
+
+	
 	@Override
 	public void processResponse(String response) throws InvalidRecaptchaException, ReCaptchaInvalidException {
 		log.info("Attempting to validate response {}", response);

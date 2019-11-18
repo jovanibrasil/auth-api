@@ -34,7 +34,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.jwt.dto.JwtAuthenticationDTO;
-import com.security.jwt.dto.UserDTO;
+import com.security.jwt.dto.CreateUserDTO;
 import com.security.jwt.entities.Application;
 import com.security.jwt.entities.Registry;
 import com.security.jwt.entities.User;
@@ -75,7 +75,7 @@ public class TokenControllerTest {
 			"Username must not be blank or null.");
 	
 	private User user;
-	private UserDTO userDto;
+	private CreateUserDTO userDto;
 	
 	@Before
 	public void setUp() {
@@ -88,7 +88,7 @@ public class TokenControllerTest {
 		user.setSignUpDate(new Date());
 		user.setRegistries(Arrays.asList(
 				new Registry(new Application(ApplicationType.BLOG_APP), user)));
-		userDto = new UserDTO();
+		userDto = new CreateUserDTO();
 		userDto.setEmail("test@gmail.com");
 		userDto.setUserName("test");
 		userDto.setPassword("password");
@@ -143,7 +143,7 @@ public class TokenControllerTest {
 			.content(asJsonString(tokenDTO)))
 			.andExpect(status().isUnauthorized())
 			.andExpect(jsonPath("$.errors[0].message", 
-					equalTo("Authentication error. Invalid user name or password")));
+					equalTo("Invalid username or password.")));
 	}
 	
 	/**
@@ -186,7 +186,7 @@ public class TokenControllerTest {
 			.content(asJsonString(tokenDTO)))
 			.andExpect(status().isUnauthorized())
 			.andExpect(jsonPath("$.errors[0].message", 
-					equalTo("Authentication error. Invalid username or password.")));
+					equalTo("Invalid username or password.")));
 	}
 	
 	/**
@@ -204,7 +204,7 @@ public class TokenControllerTest {
 			.content(asJsonString(userDto)))
 			.andExpect(status().isForbidden())
 			.andExpect(jsonPath("$.errors[0].message", 
-					equalTo("Authentication error. User not registered for this application.")));
+					equalTo("User not registered for this application.")));
 	}
 	
 	/**

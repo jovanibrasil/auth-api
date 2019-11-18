@@ -1,14 +1,20 @@
 package com.security;
 
+import java.util.Locale;
+
+import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties.LocaleResolver;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 @Profile("prod")
 @Configuration
@@ -39,4 +45,27 @@ public class AuthPropertiesConfig {
 		return dataSource;
 	}
 
+	/**
+	 * Creates a LocaleResolver with default locale Us.
+	 * 
+	 * @return
+	 */
+	@Bean
+	public LocaleResolver localResolver() {
+		SessionLocaleResolver localeResolver = new SessionLocaleResolver();
+		localeResolver.setDefaultLocale(Locale.US);
+		return localResolver();
+	}
+	
+	/**
+	 * Creates a message source resources.
+	 * 
+	 */
+	@Bean
+	public ResourceBundleMessageSource bundleMessageSource() {
+		ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+		messageSource.setBasename("messages");
+		return messageSource;
+	}
+	
 }
