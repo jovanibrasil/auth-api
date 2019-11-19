@@ -20,7 +20,7 @@ if [ "$(systemctl is-active docker)" = "active" ];
 				#docker stop $CONTAINER_NAME
 				#docker rm $CONTAINER_NAME
 				#docker build --build-arg ENVIRONMENT=dev -t $CONTAINER_NAME .
-				docker run -d -p 8090:8080 -m 896m --memory-swap 896m \
+				docker run -d -p 8090:8080 -m 896m --memory-swap 896m -v /var/www/blog:/apps/blog \
 					   	-e VAULT_TOKEN=${VAULT_TOKEN} -e SPRING_PROFILES_ACTIVE=${PROFILE} \
 					   	--name=$CONTAINER_NAME --network net $CONTAINER_NAME
 		fi
