@@ -8,6 +8,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.security.jwt.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +32,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.security.jwt.dto.ConfirmUserDTO;
-import com.security.jwt.dto.DTOUtils;
-import com.security.jwt.dto.RegistrationUserDTO;
-import com.security.jwt.dto.TokenDTO;
-import com.security.jwt.dto.UpdateUserDTO;
-import com.security.jwt.dto.CreateUserDTO;
 import com.security.jwt.entities.Application;
 import com.security.jwt.entities.Registry;
 import com.security.jwt.entities.User;
@@ -121,15 +116,15 @@ public class UserController {
 	@PostMapping
 	public ResponseEntity<Response<?>> createUser(@Valid @RequestBody RegistrationUserDTO userDto, HttpServletRequest request,
 			@RequestHeader(name="Accept-Language", required = false) Locale locale) throws InvalidRecaptchaException, ReCaptchaInvalidException{
-		
+
+		log.info("User registration");
+
 		String recaptchaResponse = request.getParameter("recaptchaResponseToken");
 		captchaService.processResponse(recaptchaResponse);
-		
-		log.info("User registration");
-		
+
 		Response<?> response = new Response<>();
 		try {			
-			// Get user informations from token
+			// Get user information from token
 			String email = jwtTokenUtil.getEmailFromToken(userDto.getToken());
 			String applicationName = jwtTokenUtil.getApplicationName(userDto.getToken());
 			
@@ -175,10 +170,10 @@ public class UserController {
 	
 	/**
 	 * 
-	 * Generates an email verification with a token. The token contains user information like email and 
-	 * application name. The email must be unique.
+	 * Generates a verification email with a token. The token contains user information like email and
+	 * application name.
 	 * 
-	 * @param userDto contains email and application name
+	 * @param userDto contains email address and application name. The email address must be unique.
 	 *
 	 * @throws InvalidRecaptchaException  
 	 * @throws ReCaptchaInvalidException 
@@ -187,11 +182,12 @@ public class UserController {
 	@PostMapping("/confirmation")
 	public ResponseEntity<Response<?>> confirmUserEmail(@Valid @RequestBody ConfirmUserDTO userDto, 
 			HttpServletRequest request, @RequestHeader(name="Accept-Language", required = false) Locale locale) throws InvalidRecaptchaException, ReCaptchaInvalidException {
-		
+
+		log.info("Creating confirmation token for the email {}", userDto.getEmail());
+
 		String recaptchaResponse = request.getParameter("recaptchaResponseToken");
 		captchaService.processResponse(recaptchaResponse);
-		
-		log.info("Creating confirmation token for the email {}", userDto.getEmail());
+
 		Response<TokenDTO> response = new Response<>();
 		
 		try {
@@ -224,10 +220,10 @@ public class UserController {
 	 */
 	@PutMapping
 	public ResponseEntity<Response<?>> updateUser(@Valid @RequestBody UpdateUserDTO userDto){
-		
+
 		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
 		log.info("Updating user {}", userName);
-		
+
 		Response<?> response = new Response<>();
 		try {
 			Optional<User> optUser = this.userService.findByUserName(userName);
@@ -250,15 +246,14 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
 		}
 	}
-	
-	
+
 	/**
 	 * Deletes an user by name.
 	 * 
 	 * This endpoint is accessible only for services. Please, see the security configuration.
 	 * 
 	 * @param userName is the name of the user that you want to delete.
-	 * @return ...
+	 * @return
 	 * 
 	 */
 	@DeleteMapping(value="/{username}")

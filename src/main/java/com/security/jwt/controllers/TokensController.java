@@ -165,7 +165,7 @@ public class TokensController {
 	public ResponseEntity<Response<TempUser>> checkToken(HttpServletRequest request, 
 			@RequestHeader(name="Accept-Language", required = false) Locale locale){
 		
-		log.info("Cheking JWT token");
+		log.info("Checking JWT token");
 		
 		Response<TempUser> response = new Response<>();
 		try {
