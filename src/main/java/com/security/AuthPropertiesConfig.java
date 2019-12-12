@@ -4,8 +4,10 @@ import java.util.Locale;
 
 import javax.sql.DataSource;
 
+import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +17,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-@Profile("prod")
+@Profile({ "default", "dev", "prod" })
 @Configuration
 @EnableConfigurationProperties(AuthDataSourceProperties.class)
 public class AuthPropertiesConfig {
@@ -34,7 +36,7 @@ public class AuthPropertiesConfig {
 	public DataSource getDataResource() {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		
-		log.info("Generatig datasource ...");
+		log.info("Generating datasource ...");
 		
 		dataSource.setUrl(configuration.getUrl()); //BLOG_MYSQL_URL
 		dataSource.setUsername(configuration.getUsername()); //BLOG_MYSQL_USERNAME
@@ -54,6 +56,19 @@ public class AuthPropertiesConfig {
 		SessionLocaleResolver localeResolver = new SessionLocaleResolver();
 		localeResolver.setDefaultLocale(Locale.US);
 		return localeResolver;
+	}
+
+	@Bean
+	@Profile("dev")
+	public FlywayMigrationStrategy cleanMigrateStrategy() {
+	    FlywayMigrationStrategy strategy = new FlywayMigrationStrategy() {
+		@Override
+		public void migrate(Flyway flyway) {
+		    flyway.clean();
+		    flyway.migrate();
+		}
+	    };
+	    return strategy;
 	}
 	
 	/**

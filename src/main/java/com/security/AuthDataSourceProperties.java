@@ -3,7 +3,7 @@ package com.security;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Profile;
 
-@Profile("prod")
+@Profile({ "default", "dev", "prod" })
 @ConfigurationProperties("auth-cred")
 public class AuthDataSourceProperties {
 
@@ -60,5 +60,17 @@ public class AuthDataSourceProperties {
 
 	public void setJwtsecretkey(String jwtsecretkey) {
 		this.jwtsecretkey = jwtsecretkey;
-	}	
+	}
+
+	@Override
+	public String toString() {
+		return "AuthDataSourceProperties{" +
+				"username='" + username + '\'' +
+				", url='" + url + '\'' +
+				", password='" + password + '\'' +
+				", recaptchakeysite='" + recaptchakeysite + '\'' +
+				", recaptchakeysecret='" + recaptchakeysecret + '\'' +
+				", jwtsecretkey='" + jwtsecretkey + '\'' +
+				'}';
+	}
 }
