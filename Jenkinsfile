@@ -4,6 +4,10 @@ pipeline {
     environment {
         VAULT_TOKEN = credentials('VAULT_TOKEN')
     }
+
+    parameters {
+        string(name: 'TASK', defaultValue: 'BUILD')
+    }
     
     stages {
  
@@ -16,29 +20,34 @@ pipeline {
             }
         }
 
-        stage("Clone from git") {
+  		stage("BUILD"){
+  		    when{
+               expression { return params.TASK == 'BUILD' }
+            }
             steps {
                 echo 'Cloning git ...'
-                git([url: 'https://github.com/jovanibrasil/auth-api.git', branch: 'master', 
+                git([url: 'https://github.com/jovanibrasil/auth-api.git', branch: 'master',
                 	credentialsId: '9bae9c61-0a29-483c-a07f-47273c351555'])
-            }
-        }
-
-  		stage("Test"){
-            steps {
             	echo 'Running tests ...'
                 sh 'make run-tests'
-            }
-        }
-
-        stage("Registry image"){
-            steps {
-                echo 'TODO'
+                // Build
+                //sh 'make build'
+                // Registry Image TODO
+                //sh "docker tag auth-api docker.pkg.github.com/jovanibrasil/auth-api/auth-api:$BUILD_NUMBER"
+                //sh "docker push docker.pkg.github.com/jovanibrasil/auth-api/auth-api:$BUILD_NUMBER"
+                echo 'Finished!'
             }
         }
 
         stage("Deploy"){
+            when{
+               expression { return params.TASK == 'DEPLOY' }
+            }
             steps {
+                git([url: 'https://github.com/jovanibrasil/auth-api.git', branch: 'master',
+                    credentialsId: '9bae9c61-0a29-483c-a07f-47273c351555'])
+                // TODO deploy docker image
+                //sh 'docker pull docker.pkg.github.com/jovanibrasil/auth-api/auth-api:docker-base-layer'
                 sh 'make deploy-production VAULT_TOKEN=${VAULT_TOKEN} PROFILE=prod'
             }
         }
