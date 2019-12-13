@@ -7,6 +7,7 @@ import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.security.jwt.utils.CustomMessageSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,9 +65,9 @@ public class TokensController {
 		
 	@Autowired
 	private CaptchaService captchaService;
-	
+
 	@Autowired
-	private MessageSource messageSource;
+	private CustomMessageSource msgSrc;
 	
 	/**
 	 * Creates and returns a new token JWT.
@@ -81,7 +81,7 @@ public class TokensController {
 	 */
 	@PostMapping("/create")
 	public ResponseEntity<Response<TokenDTO>> createTokenJwt(@Valid @RequestBody JwtAuthenticationDTO authenticationDto,
-			HttpServletRequest request, @RequestHeader(name="Accept-Language", required = false) Locale locale) 
+			HttpServletRequest request, Locale locale)
 					throws AuthenticationException, InvalidRecaptchaException, ReCaptchaInvalidException {
 		
 		log.info("User {} is requesting a JWT token.", authenticationDto.getUserName());
@@ -93,10 +93,10 @@ public class TokensController {
 		if(optUser.isPresent()) {
 			if(!optUser.get().hasRegistry(authenticationDto.getApplication())) {
 				log.error("Authentication error. User not register for {}", authenticationDto.getApplication());
-				throw new ForbiddenUserException(messageSource.getMessage("user.not.register.for.application", null, locale));
+				throw new ForbiddenUserException(msgSrc.getMessage("user.not.register.for.application", locale));
 			}
 		}else {
-			throw new UnauthorizedUserException(messageSource.getMessage("invalid.input", null, locale));
+			throw new UnauthorizedUserException(msgSrc.getMessage("invalid.input", locale));
 		}
 		
 		// Does user authentication 
@@ -108,7 +108,7 @@ public class TokensController {
 		// Verify authentication result
 		if(!auth.isAuthenticated()) {
 			log.error("Authentication error {}");
-			throw new UnauthorizedUserException(messageSource.getMessage("invalid.input", null, locale));		
+			throw new UnauthorizedUserException(msgSrc.getMessage("invalid.input", locale));
 		}
 		log.info("Creating token for {}", authenticationDto.getUserName());
 		UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDto.getUserName());
@@ -120,8 +120,7 @@ public class TokensController {
 	}
 	
 	@GetMapping(value="/refresh")
-	public ResponseEntity<Response<TokenDTO>> refreshTokenJwt(HttpServletRequest request, 
-			@RequestHeader(name="Accept-Language", required = false) Locale locale){
+	public ResponseEntity<Response<TokenDTO>> refreshTokenJwt(HttpServletRequest request, Locale locale){
 		
 		log.info("Refreshing JWT token");
 		
@@ -134,10 +133,10 @@ public class TokensController {
 					token = Optional.of(token.get().substring(7));
 				}
 				if(!jwtTokenUtil.tokenIsValid(token.get())) {
-					response.addError(messageSource.getMessage("invalid.or.expired.token", null, locale));
+					response.addError(msgSrc.getMessage("invalid.or.expired.token", locale));
 				}
 			}else {
-				response.addError(messageSource.getMessage("request.without.token", null, locale));
+				response.addError(msgSrc.getMessage("request.without.token", locale));
 			}
 			
 			if(!response.getErrors().isEmpty())
@@ -149,21 +148,20 @@ public class TokensController {
 			return ResponseEntity.ok(response);
 			
 		} catch (InvalidTokenException e) {
-			response.addError(messageSource.getMessage("invalid.token", null, locale) + e.getMessage());
+			response.addError(msgSrc.getMessage("invalid.token", locale) + e.getMessage());
 			return ResponseEntity.badRequest().body(response);
 		}
 	}
 	
 	/**
-	 * Return a list of errors if the token has problems. Otherwise, returns an empty
+	 * Returns a list of errors if the token has problems. Otherwise, returns an empty
 	 * list of errors.
 	 * 
 	 * @param request
 	 * @return
 	 */
 	@GetMapping(value="/check")
-	public ResponseEntity<Response<TempUser>> checkToken(HttpServletRequest request, 
-			@RequestHeader(name="Accept-Language", required = false) Locale locale){
+	public ResponseEntity<Response<TempUser>> checkToken(HttpServletRequest request, Locale locale){
 		
 		log.info("Checking JWT token");
 		
@@ -175,18 +173,18 @@ public class TokensController {
 					optToken = Optional.of(optToken.get().substring(7));
 				}else {
 					log.error("Invalid token");
-					response.addError(messageSource.getMessage("invalid.token", null, locale));
+					response.addError(msgSrc.getMessage("invalid.token", locale));
 				}
 			}
 		
 			if(!optToken.isPresent()) {
 				log.error("The request do not contain a token");
-				response.addError(messageSource.getMessage("request.without.token", null, locale));
+				response.addError(msgSrc.getMessage("request.without.token", locale));
 			}else {
 				String token = optToken.get();
 				if(!jwtTokenUtil.tokenIsValid(token)) {
 					log.error("The token in invalid or expired");
-					response.addError(messageSource.getMessage("invalid.or.expired.token", null, locale));
+					response.addError(msgSrc.getMessage("invalid.or.expired.token", locale));
 				}else {
 					// Verify if user has register for the required application
 					String userName = jwtTokenUtil.getUserNameFromToken(token);
@@ -195,11 +193,11 @@ public class TokensController {
 						ApplicationType applicationName = ApplicationType.valueOf(jwtTokenUtil.getApplicationName(token));
 						if(!applicationName.equals(ApplicationType.AUTH_APP) && !optUser.get().hasRegistry(applicationName)) {
 							log.error("Authentication error {} not registered for application {}.");
-							response.addError(messageSource.getMessage("user.not.register.for.application", null, locale));
+							response.addError(msgSrc.getMessage("user.not.register.for.application", locale));
 						}
 					}else {
 						log.error("User {} not found.", userName);
-						response.addError(messageSource.getMessage("user.not.found", null, locale));
+						response.addError(msgSrc.getMessage("user.not.found", locale));
 						return ResponseEntity.badRequest().body(response);
 					}
 				}
@@ -217,7 +215,7 @@ public class TokensController {
 			response.setData(tempUser);
 			return ResponseEntity.ok(response);
 		} catch (InvalidTokenException e) {
-			response.addError(messageSource.getMessage("invalid.token", null, locale) + e.getMessage());
+			response.addError(msgSrc.getMessage("invalid.token", locale) + e.getMessage());
 			return ResponseEntity.badRequest().body(response);
 		}
 

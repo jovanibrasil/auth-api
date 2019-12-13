@@ -9,11 +9,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.security.jwt.dto.*;
+import com.security.jwt.utils.CustomMessageSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,10 +70,10 @@ public class UserController {
 	
 	@Value("${urls.notes.userconfirmationview}")
 	private String userConfirmationViewUrl;
-	
+
 	@Autowired
-	private MessageSource messageSource;
-	
+	private CustomMessageSource msgSrc;
+
 	@Autowired
 	private AuthenticationManager authenticationManager;
 	
@@ -106,8 +106,7 @@ public class UserController {
 	
 	/**
 	 * Creates an user.
-	 * 
-	 * @param token contains the user email and application name
+	 *
 	 * @param userDto contains password and user name.
 	 * @return
 	 * @throws ReCaptchaInvalidException 
@@ -115,7 +114,7 @@ public class UserController {
 	 */
 	@PostMapping
 	public ResponseEntity<Response<?>> createUser(@Valid @RequestBody RegistrationUserDTO userDto, HttpServletRequest request,
-			@RequestHeader(name="Accept-Language", required = false) Locale locale) throws InvalidRecaptchaException, ReCaptchaInvalidException{
+			Locale locale) throws InvalidRecaptchaException, ReCaptchaInvalidException{
 
 		log.info("User registration");
 
@@ -129,7 +128,7 @@ public class UserController {
 			String applicationName = jwtTokenUtil.getApplicationName(userDto.getToken());
 			
 			if(this.userService.findUserByEmail(email).isPresent()) {
-				response.addError(messageSource.getMessage("email.already.exists", null, locale));
+				response.addError(msgSrc.getMessage("email.already.exists", locale));
 				return ResponseEntity.badRequest().body(response);
 			}
 			
@@ -155,11 +154,11 @@ public class UserController {
 			
 		} catch (MicroServiceIntegrationException e) { 
 			log.info("The required application server is not responding. {}",  e.getMessage());
-			response.addError(messageSource.getMessage("appserver.not.responding", null, locale));
+			response.addError(msgSrc.getMessage("appserver.not.responding", locale));
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
 		} catch (InvalidTokenException e) {
-			log.info(messageSource.getMessage("invalid.token", null, locale) + e.getMessage());
-			response.addError(messageSource.getMessage("invalid.token", null, locale) + e.getMessage());
+			log.info(msgSrc.getMessage("invalid.token", locale) + e.getMessage());
+			response.addError(msgSrc.getMessage("invalid.token", locale) + e.getMessage());
 			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
 		} catch (UserServiceException e) {
 			log.info("It was not possible to save the user. {}",  e.getMessage());
@@ -209,7 +208,7 @@ public class UserController {
 			
 		} catch (MicroServiceIntegrationException e) { 
 			log.info("The required application server is not responding. {}",  e.getMessage());
-			response.addError(messageSource.getMessage("appserver.not.responding", null, locale));
+			response.addError(msgSrc.getMessage("appserver.not.responding", locale));
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
 		}
 	}
