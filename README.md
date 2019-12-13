@@ -1,4 +1,4 @@
-[![Build Status](http://13.58.51.172:8085/buildStatus/icon?job=auth-api)](http://13.58.51.172:8085/job/auth-api/)
+[![Build Status](http://jovanibrasil.com:8085/buildStatus/icon?job=auth-api)](http://13.58.51.172:8085/job/auth-api/)
 
 # API para autenticação utilizando JWT
 
