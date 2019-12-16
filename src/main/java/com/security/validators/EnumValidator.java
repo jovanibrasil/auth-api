@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @Target( { ElementType.FIELD })
 @Constraint(validatedBy = EnumValidatorImpl.class)
 public @interface EnumValidator {
-	String message() default "Application is not valid.";
+	String message() default "{error.application.invalid}";
     Class<?>[] groups() default { };
     Class<? extends Enum<?>> enumClass();
     Class<? extends Payload>[] payload() default { };

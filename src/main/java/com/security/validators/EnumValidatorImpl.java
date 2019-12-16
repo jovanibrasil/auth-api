@@ -24,7 +24,7 @@ public class EnumValidatorImpl implements ConstraintValidator<EnumValidator, Enu
 		if(value == null) {
 			context.disableDefaultConstraintViolation();
 	        context
-	        	.buildConstraintViolationWithTemplate("Application cannot be null.")
+	        	.buildConstraintViolationWithTemplate("{error.application.notnull}")
 	        	.addConstraintViolation();
 			return false;
 		}

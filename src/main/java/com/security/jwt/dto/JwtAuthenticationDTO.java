@@ -10,11 +10,11 @@ import com.security.validators.EnumValidator;
 
 public class JwtAuthenticationDTO {
 
-	@Size(min = 2, max = 12, message="Username length must be between 2 and 12.")
-	@NotBlank(message = "Username must not be blank or null.")
+	@Size(min = 2, max = 12, message="{error.user.name.size}")
+	@NotBlank(message = "{error.user.name.notblank}")
 	private String userName;
-	@NotBlank(message = "Password must not be blank or null.")
-	@Size(min=4, max=12, message="Password length must be between 4 and 12.")
+	@NotBlank(message = "{error.user.password.notblank}")
+	@Size(min=4, max=12, message="{error.user.password.size}")
 	private String password;
 	@EnumValidator(enumClass=ApplicationType.class)
 	private ApplicationType application;

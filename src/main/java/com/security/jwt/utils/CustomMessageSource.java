@@ -9,8 +9,11 @@ import java.util.Locale;
 @Component
 public class CustomMessageSource {
 
-    @Autowired
     private MessageSource messageSource;
+
+    public CustomMessageSource(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     /**
      * Returns language specific from the resources.

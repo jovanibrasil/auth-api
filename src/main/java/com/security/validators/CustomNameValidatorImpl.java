@@ -27,16 +27,16 @@ public class CustomNameValidatorImpl implements ConstraintValidator<CustomNameVa
 		try {
 			String message;
 			if(strVals.isBlank(value)) {
-				message = "Username must not be blank or null.";
+				message = "{error.user.name.notblank}";
 			}else if(!strVals.hasValidSize(value, 2, 12)) {
-				message = "Username length must be between 2 and 12.";
+				message = "{error.user.name.size}";
 			}else {
-				log.info("Validanting : {}", value);
+				log.info("Validating : {}", value);
 				boolean isValid = !userService.findByUserName(value).isPresent();
 				if(isValid) { 
 					return true;
 				}else {
-					message = "This user name already exists.";
+					message = "{error.user.name.unique}";
 				}
 			}
 			context.disableDefaultConstraintViolation();

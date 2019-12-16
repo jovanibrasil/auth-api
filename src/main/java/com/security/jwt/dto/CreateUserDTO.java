@@ -16,8 +16,8 @@ public class CreateUserDTO {
 	private String email;
 	@CustomNameValidator
 	private String userName;
-	@NotNull
-	@Size(min=4, max=12, message="Password length must be between 4 and 12.")
+	@NotNull(message = "{error.user.password.notnull}")
+	@Size(min=4, max=12, message="{error.user.password.size}")
 	private String password;
 	@EnumValidator(enumClass=ApplicationType.class)
 	private ApplicationType application;

@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -128,7 +127,7 @@ public class UserController {
 			String applicationName = jwtTokenUtil.getApplicationName(userDto.getToken());
 			
 			if(this.userService.findUserByEmail(email).isPresent()) {
-				response.addError(msgSrc.getMessage("email.already.exists", locale));
+				response.addError(msgSrc.getMessage("error.email.alreadyexists", locale));
 				return ResponseEntity.badRequest().body(response);
 			}
 			
@@ -154,11 +153,11 @@ public class UserController {
 			
 		} catch (MicroServiceIntegrationException e) { 
 			log.info("The required application server is not responding. {}",  e.getMessage());
-			response.addError(msgSrc.getMessage("appserver.not.responding", locale));
+			response.addError(msgSrc.getMessage("error.app.notresponding", locale));
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
 		} catch (InvalidTokenException e) {
-			log.info(msgSrc.getMessage("invalid.token", locale) + e.getMessage());
-			response.addError(msgSrc.getMessage("invalid.token", locale) + e.getMessage());
+			log.info(msgSrc.getMessage("error.token.invalid", locale) + e.getMessage());
+			response.addError(msgSrc.getMessage("error.token.invalid", locale) + e.getMessage());
 			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
 		} catch (UserServiceException e) {
 			log.info("It was not possible to save the user. {}",  e.getMessage());
@@ -180,7 +179,7 @@ public class UserController {
 	 */
 	@PostMapping("/confirmation")
 	public ResponseEntity<Response<?>> confirmUserEmail(@Valid @RequestBody ConfirmUserDTO userDto, 
-			HttpServletRequest request, @RequestHeader(name="Accept-Language", required = false) Locale locale) throws InvalidRecaptchaException, ReCaptchaInvalidException {
+			HttpServletRequest request, Locale locale) throws InvalidRecaptchaException, ReCaptchaInvalidException {
 
 		log.info("Creating confirmation token for the email {}", userDto.getEmail());
 
@@ -208,7 +207,7 @@ public class UserController {
 			
 		} catch (MicroServiceIntegrationException e) { 
 			log.info("The required application server is not responding. {}",  e.getMessage());
-			response.addError(msgSrc.getMessage("appserver.not.responding", locale));
+			response.addError(msgSrc.getMessage("error.app.notresponding", locale));
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
 		}
 	}

@@ -5,11 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import org.junit.After;
 import org.junit.Before;
@@ -205,6 +201,25 @@ public class TokenControllerTest {
 			.andExpect(status().isForbidden())
 			.andExpect(jsonPath("$.errors[0].message", 
 					equalTo("User not registered for this application.")));
+	}
+
+	/**
+	 * Test token creation for a user that are not registered for the application.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testTokenCreationForbiddenApplicationPtMessage() throws Exception {
+		user.setRegistries(Arrays.asList(
+				new Registry(new Application(ApplicationType.NOTES_APP), user)));
+		BDDMockito.given(this.userService.findByUserName("test")).willReturn(Optional.of(user));
+		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+				.contentType(MediaType.APPLICATION_JSON)
+				.locale( new Locale("pt"))
+				.content(asJsonString(userDto)))
+				.andExpect(status().isForbidden())
+				.andExpect(jsonPath("$.errors[0].message",
+						equalTo("Usuário não registrado para esta aplicação.")));
 	}
 	
 	/**

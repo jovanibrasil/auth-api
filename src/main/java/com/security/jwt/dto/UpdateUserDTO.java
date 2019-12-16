@@ -6,11 +6,11 @@ import javax.validation.constraints.Size;
 public class UpdateUserDTO {
 
 	@NotNull
-	@Size(min=4, max=12, message="Password length must be between 4 and 12.")
+	@Size(min=4, max=12, message="{error.user.password.size}")
 	private String actualPassword;
 
 	@NotNull
-	@Size(min=4, max=12, message="Password length must be between 4 and 12.")
+	@Size(min=4, max=12, message="{error.user.password.size}")
 	private String newPassword;
 	
 	public UpdateUserDTO() {}

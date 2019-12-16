@@ -13,10 +13,10 @@ import javax.validation.constraints.NotNull;
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.FIELD })
 @Constraint(validatedBy = EnumListValidatorImpl.class)
-@NotNull(message = "Applications cannot be null.")
-@NotEmpty(message = "Applications must not be empty.")
+@NotNull(message = "{error.applications.notnull}")
+@NotEmpty(message = "{error.applications.notempty}")
 public @interface EnumListValidator {
-	String message() default "Applications is not valid.";
+	String message() default "{error.applications.invalid}";
     Class<?>[] groups() default { };
     Class<? extends Enum<?>> enumClass();
     Class<? extends Payload>[] payload() default { };

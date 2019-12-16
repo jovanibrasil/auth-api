@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 @Target( { ElementType.FIELD })
 @Constraint(validatedBy = CustomEmailValidatorImpl.class)
 public @interface CustomEmailValidator {
-	String message() default "Email is not valid.";
+	String message() default "{error.email.invalid}";
 	Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

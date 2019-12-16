@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 @Target( { ElementType.FIELD })
 @Constraint(validatedBy = CustomNameValidatorImpl.class)
 public @interface CustomNameValidator {
-	String message() default "Username is not valid.";
+	String message() default "{error.user.name.invalid}";
 	Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

@@ -28,18 +28,18 @@ public class CustomEmailValidatorImpl implements ConstraintValidator<CustomEmail
 		try {
 			String message;
 			if(strVals.isBlank(value)) {
-				message = "Email must not be blank or null.";
+				message = "{error.email.notnull}";
 			}else if(!strVals.hasValidSize(value, 0, 30)) {
-				message = "Email length must be between 0 and 30.";
+				message = "{error.email.size}";
 			}else if(!strVals.isEmail(value)) {
-				message = "Email must be a well-formed email address.";
+				message = "{error.email.invalid}";
 			}else {
-				log.info("Validanting : {}", value);
+				log.info("Validating : {}", value);
 				boolean isValid = !userService.findUserByEmail(value).isPresent();
 				if(isValid) { 
 					return true;
 				}else {
-					message = "This email already exists.";
+					message = "{error.email.alreadyexists}";
 				}
 			}
 			context.disableDefaultConstraintViolation();
