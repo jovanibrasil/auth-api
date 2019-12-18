@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import org.junit.After;
@@ -81,7 +83,7 @@ public class TokenControllerTest {
 		user.setUserName("test");
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
-		user.setSignUpDate(new Date());
+		user.setSignUpDateTime(LocalDateTime.now());
 		user.setRegistries(Arrays.asList(
 				new Registry(new Application(ApplicationType.BLOG_APP), user)));
 		userDto = new CreateUserDTO();

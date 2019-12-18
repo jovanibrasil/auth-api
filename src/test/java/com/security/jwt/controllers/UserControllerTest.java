@@ -1,14 +1,14 @@
 package com.security.jwt.controllers;
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,8 +23,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -33,7 +31,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.jwt.dto.ConfirmUserDTO;
 import com.security.jwt.dto.RegistrationUserDTO;
-import com.security.jwt.dto.UpdateUserDTO;
 import com.security.jwt.dto.CreateUserDTO;
 import com.security.jwt.entities.Application;
 import com.security.jwt.entities.Registry;
@@ -45,8 +42,6 @@ import com.security.jwt.security.utils.JwtTokenUtil;
 import com.security.jwt.services.UserService;
 import com.security.jwt.utils.ApplicationType;
 import com.security.recaptcha.CaptchaService;
-import com.security.recaptcha.CaptchaServiceImpl;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -77,7 +72,7 @@ public class UserControllerTest {
 		user.setUserName("test");
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
-		user.setSignUpDate(new Date());
+		user.setSignUpDateTime(LocalDateTime.now());
 		user.setRegistries(Arrays.asList(
 				new Registry(new Application(ApplicationType.BLOG_APP), user)));
 		userDto = new CreateUserDTO();

@@ -15,7 +15,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import javax.sql.DataSource;
 
-@Profile({ "default", "dev", "prod" })
+@Profile({ "default", "prod" })
 @Configuration
 @EnableConfigurationProperties(AuthDataSourceProperties.class)
 public class AuthPropertiesConfig {

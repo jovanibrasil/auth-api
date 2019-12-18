@@ -1,5 +1,7 @@
 package com.security.jwt.services.impl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -64,7 +66,7 @@ public class UserServiceImpl implements UserService {
 		if(!errors.isEmpty()) {
 			throw new UserServiceException(errors);
 		}	
-		user.setSignUpDate(new Date());
+		user.setSignUpDateTime(LocalDateTime.now());
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user = this.userRepository.save(user);
 		

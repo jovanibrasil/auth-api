@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
@@ -63,7 +65,7 @@ public class UserServiceTest {
 		user.setUserName("test");
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
-		user.setSignUpDate(new Date());
+		user.setSignUpDateTime(LocalDateTime.now());
 		
 		BDDMockito.given(userRepository.findUserByEmail("test@gmail.com")).willReturn(user);
 		BDDMockito.given(userRepository.findUserByEmail("test2@gmail.com")).willReturn(null);
@@ -113,7 +115,7 @@ public class UserServiceTest {
 		user.setUserName("test2");
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
-		user.setSignUpDate(new Date());
+		user.setSignUpDateTime(LocalDateTime.now());
 		user.addApplication(application);
 		this.userService.save(user);
 		
@@ -129,7 +131,7 @@ public class UserServiceTest {
 		user.setUserName("test2");
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
-		user.setSignUpDate(new Date());
+		user.setSignUpDateTime(LocalDateTime.now());
 		user.setRegistries(Arrays.asList());
 		this.userService.save(user);
 	}
@@ -143,7 +145,7 @@ public class UserServiceTest {
 		user.setUserName("test");
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
-		user.setSignUpDate(new Date());
+		user.setSignUpDateTime(LocalDateTime.now());
 		user.setRegistries(Arrays.asList());
 		this.userService.save(user);
 	}

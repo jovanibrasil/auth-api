@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 
@@ -13,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -49,7 +52,7 @@ public class UserRepositoryTest {
 		user.setUserName("test");
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
-		user.setSignUpDate(new Date());
+		user.setSignUpDateTime(LocalDateTime.now());
 		user.addApplication(blog);		
 		user = userRepository.save(user);
 	}
@@ -95,7 +98,7 @@ public class UserRepositoryTest {
 		u.setUserName("test");
 		u.setPassword("password");
 		u.setProfile(ProfileEnum.ROLE_USER);
-		u.setSignUpDate(new Date());
+		u.setSignUpDateTime(LocalDateTime.now());
 		u.addApplication(blog);		
 		u = userRepository.save(u);
 		assertNotNull(u.getId());

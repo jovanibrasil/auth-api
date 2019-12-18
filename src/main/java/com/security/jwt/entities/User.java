@@ -1,7 +1,7 @@
 package com.security.jwt.entities;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -45,7 +45,7 @@ public class User {
 	@Column(name="profile", nullable=false)
 	private ProfileEnum profile;
 	@Column(name="date", nullable=false)
-	private Date signUpDate;
+	private LocalDateTime signUpDateTime;
 	
 	@OneToMany(
 	        mappedBy = "user",
@@ -89,12 +89,12 @@ public class User {
 		this.profile = profile;
 	}
 	
-	public Date getSignUpDate() {
-		return signUpDate;
+	public LocalDateTime getSignUpDateTime() {
+		return signUpDateTime;
 	}
 
-	public void setSignUpDate(Date signUpDate) {
-		this.signUpDate = signUpDate;
+	public void setSignUpDateTime(LocalDateTime signUpDateTime) {
+		this.signUpDateTime = signUpDateTime;
 	}
 	
 	public String getUserName() {
@@ -170,7 +170,7 @@ public class User {
 	public String toString() {
 		return "User [id=" + id + ", userName=" + userName + ", email=" + email
 				+ ", password=" + password + ", profile=" + profile 
-				+ ", signUpDate=" + signUpDate + ", registries=" 
+				+ ", signUpDate=" + signUpDateTime + ", registries="
 				+ registries.toString() + "]";
 	}
 

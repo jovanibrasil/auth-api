@@ -3,7 +3,7 @@ package com.security;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Profile;
 
-@Profile({ "default", "dev", "prod" })
+@Profile({ "default", "prod" })
 @ConfigurationProperties("auth-cred")
 public class AuthDataSourceProperties {
 
