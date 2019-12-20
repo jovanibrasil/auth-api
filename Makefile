@@ -1,5 +1,5 @@
 ifndef PROFILE
-override PROFILE = dev
+override PROFILE = stage
 endif
 
 run-tests:
@@ -12,7 +12,7 @@ clean: stop
 build: clean
 	mvn clean package -P${PROFILE} -Dmaven.test.skip=true
 	FILE_NAME=blog-api\#\#$(shell find target/*.war -type f | grep -Eo '[0-9]+)
-	docker build  --build-arg ENVIRONMENT=dev --build-arg FILE_NAME -t auth-api .
+	docker build  --build-arg ENVIRONMENT=stage --build-arg FILE_NAME -t auth-api .
 	chmod -R ugo+rw target/
 run: clean
 	docker run -d -p 8083:8080 -m 192m --memory-swap 256m \
@@ -24,10 +24,17 @@ logs:
 	docker logs auth-api
 bash:
 	docker container exec -i -t --user root auth-api bash
+
 compose-down:
-	docker-compose down -v 
-compose-up: compose-down
-	docker-compose --compatibility up --no-recreate -d
+	#docker network disconnect -f auth-api_net auth-api
+	docker-compose down -v --remove-orphans
+
+compose-up-dev: compose-down
+	docker-compose -f docker-compose.yml --compatibility up -d --no-recreate
+
+compose-up-stage: compose-down
+	docker-compose -f docker-compose.yml -f docker-compose.stage.yml --compatibility up -d --no-recreate
+
 stats:
 	docker stats auth-api
 

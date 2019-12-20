@@ -1,0 +1,17 @@
+version: "3"
+networks:
+  net:
+    external: true
+services:
+  auth-api: # Authentication API (Spring)
+    image: auth-api
+    container_name: auth-api
+    ports:
+      - 8083:8080
+    networks:
+      - net
+    environment:
+      - "SPRING_PROFILES_ACTIVE=stage"
+    depends_on:
+      - mysql-database
+      - email-api

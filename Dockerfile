@@ -23,7 +23,7 @@ ENV VAULT_HOST="vault-server"
 
 COPY ./target/${FILE_NAME} /usr/local/tomcat/webapps/${FILE_NAME}
 COPY ./scripts ./scripts
-RUN if [ "$ENVIRONMENT" = "dev" ]; \
+RUN if [ "$ENVIRONMENT" = "stage" ]; \
 	then cp ./scripts/startup-dev.sh /startup.sh; \
 	else cp ./scripts/startup-prod.sh /startup.sh;\
 	fi
