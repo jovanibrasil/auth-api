@@ -13,8 +13,7 @@ public class CustomEmailValidatorImpl implements ConstraintValidator<CustomEmail
 
 	private UserService userService;
 	private StringValidations strVals;
-	
-	@Autowired
+
 	public CustomEmailValidatorImpl(UserService userService, StringValidations strVals) {
 		this.userService = userService;
 		this.strVals = strVals;

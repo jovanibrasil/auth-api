@@ -6,6 +6,7 @@ import com.security.jwt.exceptions.implementations.UnauthorizedUserException;
 import com.security.jwt.security.utils.JwtTokenUtil;
 import com.security.jwt.services.UserService;
 import com.security.jwt.utils.ApplicationType;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,19 +24,22 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
+@NoArgsConstructor
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
 	private static final String AUTH_HEADER = "Authorization";
 	private static final String BEARER_PREFIX = "Bearer ";
 
-	@Autowired
 	private UserDetailsService userDetailService;
-
-	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
-
-	@Autowired
 	private UserService userService;
+
+	public JwtAuthenticationTokenFilter(UserDetailsService userDetailService,
+										JwtTokenUtil jwtTokenUtil, UserService userService) {
+		this.userDetailService = userDetailService;
+		this.jwtTokenUtil = jwtTokenUtil;
+		this.userService = userService;
+	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

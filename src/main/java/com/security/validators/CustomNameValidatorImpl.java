@@ -12,8 +12,7 @@ public class CustomNameValidatorImpl implements ConstraintValidator<CustomNameVa
 
 	private UserService userService;
 	private StringValidations strVals;
-	
-	@Autowired
+
 	public CustomNameValidatorImpl(UserService userService, StringValidations strVals) {
 		this.userService = userService;
 		this.strVals = strVals;

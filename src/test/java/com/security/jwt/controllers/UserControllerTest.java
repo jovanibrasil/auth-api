@@ -14,6 +14,7 @@ import com.security.jwt.security.utils.JwtTokenUtil;
 import com.security.jwt.services.UserService;
 import com.security.jwt.utils.ApplicationType;
 import com.security.recaptcha.CaptchaService;
+import com.security.recaptcha.CaptchaServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,7 +59,7 @@ public class UserControllerTest {
 	private UserService userService;
 	
 	@Mock
-	private CaptchaService captchaService;
+	private CaptchaServiceImpl captchaService;
 	
 	private User user;
 	private CreateUserDTO userDto;

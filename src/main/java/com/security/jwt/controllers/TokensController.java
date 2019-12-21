@@ -41,24 +41,23 @@ public class TokensController {
 	private static final String TOKEN_HEADER = "Authorization";
 	private static final String BEARER_PREFIX = "Bearer ";
 	
-	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
-	
-	@Autowired
 	private UserService userService;
-	
-	@Autowired
 	private AuthenticationManager authenticationManager;
-	
-	@Autowired
 	private UserDetailsService userDetailsService;
-		
-	@Autowired
 	private CaptchaService captchaService;
-
-	@Autowired
 	private CustomMessageSource msgSrc;
-	
+
+	public TokensController(JwtTokenUtil jwtTokenUtil, UserService userService, AuthenticationManager authenticationManager,
+							UserDetailsService userDetailsService, CaptchaService captchaService, CustomMessageSource msgSrc) {
+		this.jwtTokenUtil = jwtTokenUtil;
+		this.userService = userService;
+		this.authenticationManager = authenticationManager;
+		this.userDetailsService = userDetailsService;
+		this.captchaService = captchaService;
+		this.msgSrc = msgSrc;
+	}
+
 	/**
 	 * Creates and returns a new token JWT.
 	 * 

@@ -31,8 +31,11 @@ public class Integration {
 	@Value("${urls.email.server.url}")
 	private String emailServerUrl;
 
-	@Autowired
 	private Token token;
+
+	public Integration(Token token) {
+		this.token = token;
+	}
 
 	/**
 	 * Creates an user in a specific application service, like notes-app or blog-app.

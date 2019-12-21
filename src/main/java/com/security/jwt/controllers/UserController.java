@@ -43,27 +43,27 @@ import java.util.Optional;
 @RequestMapping("/users")
 public class UserController {
 
-	@Autowired
 	private UserService userService;
-		
-	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
-	
-	@Autowired
 	private Integration integration;
-	
-	@Autowired
 	private CaptchaService captchaService;
-	
+	private CustomMessageSource msgSrc;
+	private AuthenticationManager authenticationManager;
+
 	@Value("${urls.notes.userconfirmationview}")
 	private String userConfirmationViewUrl;
 
-	@Autowired
-	private CustomMessageSource msgSrc;
+	public UserController(UserService userService, JwtTokenUtil jwtTokenUtil,
+						  Integration integration, CaptchaService captchaService,
+						  CustomMessageSource msgSrc, AuthenticationManager authenticationManager) {
+		this.userService = userService;
+		this.jwtTokenUtil = jwtTokenUtil;
+		this.integration = integration;
+		this.captchaService = captchaService;
+		this.msgSrc = msgSrc;
+		this.authenticationManager = authenticationManager;
+	}
 
-	@Autowired
-	private AuthenticationManager authenticationManager;
-	
 	/**
 	 * Returns the user with the specified name.
 	 * 

@@ -2,6 +2,7 @@ package com.security.jwt.configurations;
 
 import com.security.jwt.exceptions.handlers.ExceptionHandlerFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,18 +28,20 @@ import java.util.Arrays;
 @EnableGlobalMethodSecurity(prePostEnabled=true) // evaluate using methods 
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired
 	private JwtAuthenticationEntryPoint unauthorizedHandler; // is an exception
-	
-	@Autowired
 	private UserDetailsService userDetailsService;
-	
+
+	public WebSecurityConfig(JwtAuthenticationEntryPoint unauthorizedHandler,
+							 @Qualifier("userDetailServiceImpl") UserDetailsService userDetailsService) {
+		this.unauthorizedHandler = unauthorizedHandler;
+		this.userDetailsService = userDetailsService;
+	}
+
 	/*
 	 * Configures AuthenticationManager.
 	 * 
 	 * 
 	 */
-	@Autowired
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
 		authenticationManagerBuilder.authenticationProvider(authenticationProvider());
 	}

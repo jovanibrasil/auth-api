@@ -4,6 +4,7 @@ import com.security.jwt.security.utils.JwtTokenUtil;
 import com.security.jwt.utils.ApplicationType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
@@ -15,13 +16,12 @@ public class Token {
 	private static String token = null;
 	private JwtTokenUtil jwtTokenUtil;
 	private UserDetailsService userDetailsService;
-	
-	@Autowired
-	public Token(JwtTokenUtil jwtTokenUtil, UserDetailsService userDetailsService) {
+
+	public Token(JwtTokenUtil jwtTokenUtil, @Qualifier("userDetailServiceImpl") UserDetailsService userDetailsService) {
 		this.jwtTokenUtil = jwtTokenUtil;
 		this.userDetailsService = userDetailsService;
 	}
-	
+
 	public String getToken() {
 		if(token == null) {
 			try {

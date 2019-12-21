@@ -16,9 +16,12 @@ import java.util.Optional;
 @Service
 public class UserDetailServiceImpl implements UserDetailsService {
 
-	@Autowired
 	private UserService userService;
-	
+
+	public UserDetailServiceImpl(UserService userService) {
+		this.userService = userService;
+	}
+
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		log.info("Searching for " + username);

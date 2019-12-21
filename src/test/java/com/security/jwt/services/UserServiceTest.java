@@ -26,28 +26,29 @@ import java.util.Optional;
 
 import static org.junit.Assert.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 @ActiveProfiles("test")
 public class UserServiceTest {
 	
 	@Mock
 	UserRepository userRepository;
-	
-	@Autowired
+
+	@Mock
+	Integration integrationService;
+
+	@Mock
 	ApplicationRepository applicationRepository;
 	
 	@InjectMocks
-	UserService userService = new UserServiceImpl();
-	
-	@Spy
-	Integration integrationService;
-	
+	UserServiceImpl userService;
+
 	@Rule
 	public ExpectedException expectedEx = ExpectedException.none();
 	
 	@Before
 	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		this.userService = new UserServiceImpl(userRepository, integrationService);
+
 		User user = new User();
 		user.setId(1L);
 		user.setEmail("test@gmail.com");
@@ -55,7 +56,7 @@ public class UserServiceTest {
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user.setSignUpDateTime(LocalDateTime.now());
-		
+
 		BDDMockito.given(userRepository.findUserByEmail("test@gmail.com")).willReturn(user);
 		BDDMockito.given(userRepository.findUserByEmail("test2@gmail.com")).willReturn(null);
 		BDDMockito.given(userRepository.findUserByUserName("test")).willReturn(user);

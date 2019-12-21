@@ -17,19 +17,22 @@ import java.util.regex.Pattern;
 @Service
 public class CaptchaServiceImpl implements CaptchaService {
 
-	@Autowired
+	private static Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
+
 	private CaptchaSettings captchaSettings;
-
-	@Autowired
 	private RestOperations restTemplate;
-
-	@Autowired
 	private RecaptchaAttemptService reCaptchaAttemptService;
-
-	@Autowired
 	private HttpServletRequest httpServletRequest;
 
-	private static Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
+	public CaptchaServiceImpl(CaptchaSettings captchaSettings,
+							  RecaptchaAttemptService reCaptchaAttemptService,
+							  RestOperations restTemplate,
+							  HttpServletRequest httpServletRequest) {
+		this.captchaSettings = captchaSettings;
+		this.reCaptchaAttemptService = reCaptchaAttemptService;
+		this.httpServletRequest = httpServletRequest;
+		this.restTemplate = restTemplate;
+	}
 
 	@Override
 	public void processResponse(String response) throws InvalidRecaptchaException, ReCaptchaInvalidException {
@@ -104,11 +107,6 @@ public class CaptchaServiceImpl implements CaptchaService {
 	 */
 	private boolean responseSanityCheck(String response) {
 		return StringUtils.hasLength(response) && RESPONSE_PATTERN.matcher(response).matches();
-	}
-	
-	@Bean
-	public RestTemplate restTemplate() {
-	    return new RestTemplate();
 	}
 
 }

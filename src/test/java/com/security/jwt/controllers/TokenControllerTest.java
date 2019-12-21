@@ -16,7 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +33,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.client.RestOperations;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -46,24 +49,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class TokenControllerTest {
 
-	@Mock
-	private UserRepository userRepository;
-	
 	@Autowired
 	private MockMvc mvc;
-	
+
 	@MockBean
-	UserService userService;
-	
+	private UserService userService;
+
 	@MockBean
 	private JwtTokenUtil jwtTokenUtil;
-	
+
 	@MockBean
 	private AuthenticationManager authenticationManager;
-	
+
 	@MockBean
 	private UserDetailsService userDetailsService;
-	
+
+	@MockBean
+	private UserRepository userRepository;
+
+	@MockBean
+	private RestOperations restTemplate;
+
 	private List<String> passwordBlankErrors = Arrays.asList("Password length must be between 4 and 12.", 
 			"Password must not be blank or null.");
 	
@@ -72,7 +78,7 @@ public class TokenControllerTest {
 	
 	private User user;
 	private CreateUserDTO userDto;
-	
+
 	@Before
 	public void setUp() {
 		user = new User();

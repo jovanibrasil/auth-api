@@ -7,6 +7,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @SpringBootApplication
@@ -22,6 +23,11 @@ public class AuthApplication extends SpringBootServletInitializer {
 		final LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
 		validator.setValidationMessageSource(messageSource);
 		return validator;
+	}
+
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
 	}
 	
 }

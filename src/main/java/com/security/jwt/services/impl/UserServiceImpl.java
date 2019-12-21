@@ -23,12 +23,14 @@ import java.util.Optional;
 @Primary
 public class UserServiceImpl implements UserService {
 
-	@Autowired
 	private UserRepository userRepository;
-	
-	@Autowired
 	private Integration integrationService;
-	
+
+	public UserServiceImpl(UserRepository userRepository, Integration integrationService) {
+		this.userRepository = userRepository;
+		this.integrationService = integrationService;
+	}
+
 	@Override
 	public Optional<User> findByUserName(String userName) {
 		return Optional.ofNullable(this.userRepository.findUserByUserName(userName));
