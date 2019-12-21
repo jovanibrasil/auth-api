@@ -33,7 +33,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 				.stream().map(e -> new ValidationError(e.getDefaultMessage(), e.getField(), e.getRejectedValue()))
 				.collect(Collectors.toList());
 
-		ErrorDetail error = new ErrorDetail.Builder()
+		ErrorDetail error = ErrorDetail.builder()
 				.message("Invalid field values")
 				.code(status.value())
 				.status(status.getReasonPhrase())
@@ -56,7 +56,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(UnauthorizedUserException.class)
 	public ResponseEntity<Response<?>> handleUnauthorizedUserException(UnauthorizedUserException untException){
 		Response<String> response = new Response<String>();
-		ErrorDetail errorDetail = new ErrorDetail.Builder()
+		ErrorDetail errorDetail = ErrorDetail.builder()
 				.message(untException.getMessage())
 				.build();
 		response.addError(errorDetail);
@@ -74,7 +74,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(ForbiddenUserException.class)
 	public ResponseEntity<Response<?>> handleForbiddenUserException(ForbiddenUserException fbdException){
 		Response<String> response = new Response<String>();
-		ErrorDetail errorDetail = new ErrorDetail.Builder()
+		ErrorDetail errorDetail = ErrorDetail.builder()
 				.message(fbdException.getMessage())
 				.build();
 		response.addError(errorDetail);

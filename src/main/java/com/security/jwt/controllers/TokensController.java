@@ -8,10 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.security.jwt.utils.CustomMessageSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,13 +39,12 @@ import com.security.recaptcha.CaptchaService;
 import com.security.recaptcha.InvalidRecaptchaException;
 import com.security.recaptcha.ReCaptchaInvalidException;
 
+@Slf4j
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/token")
 public class TokensController {
 
-	private static final Logger log = LoggerFactory.getLogger(TokensController.class);
-	
 	private static final String TOKEN_HEADER = "Authorization";
 	private static final String BEARER_PREFIX = "Bearer ";
 	

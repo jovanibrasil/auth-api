@@ -4,7 +4,12 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.security.validators.CustomNameValidator;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter @Setter
+@NoArgsConstructor
 public class RegistrationUserDTO {
 
 	@CustomNameValidator
@@ -16,31 +21,5 @@ public class RegistrationUserDTO {
 
 	@NotBlank(message = "{error.token.notblank}")
 	private String token;
-	
-	public RegistrationUserDTO() {}
-	
-	public String getUserName() {
-		return userName;
-	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
-	
 }

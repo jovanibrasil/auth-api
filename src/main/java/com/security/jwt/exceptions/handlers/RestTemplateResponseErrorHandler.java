@@ -2,8 +2,7 @@ package com.security.jwt.exceptions.handlers;
 
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
@@ -12,11 +11,10 @@ import org.springframework.web.client.ResponseErrorHandler;
 import com.security.jwt.exceptions.implementations.MicroServiceIntegrationException;
 import com.security.jwt.integration.Integration;
 
+@Slf4j
 @Component
 public class RestTemplateResponseErrorHandler implements ResponseErrorHandler {
 
-	private final Logger log = LoggerFactory.getLogger(Integration.class);
-	
 	@Override
 	public boolean hasError(ClientHttpResponse response) throws IOException {
 		return (response.getStatusCode().series() == HttpStatus.Series.CLIENT_ERROR || 

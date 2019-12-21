@@ -16,10 +16,17 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.NaturalIdCache;
 
 import com.security.jwt.utils.ApplicationType;
 
+@Getter @Setter
+@NoArgsConstructor
+@ToString
 @Entity
 @Table(name="applications")
 @NaturalIdCache
@@ -40,40 +47,9 @@ public class Application {
 	        fetch = FetchType.LAZY
 	    )
 	private List<Registry> registries = new ArrayList<Registry>();
-	
-	public Application() {}
-	
+
 	public Application(ApplicationType applicationType) {
 		this.application = applicationType;
-	}
-	
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public ApplicationType getApplication() {
-		return application;
-	}
-
-	public void setApplication(ApplicationType application) {
-		this.application = application;
-	}
-
-	public List<Registry> getRegistries() {
-		return registries;
-	}
-
-	public void setRegistries(List<Registry> registries) {
-		this.registries = registries;
-	}
-	
-	@Override
-	public String toString() {
-		return "Application [id=" + id + ", application=" + application.toString() + "]";
 	}
 
 	@Override

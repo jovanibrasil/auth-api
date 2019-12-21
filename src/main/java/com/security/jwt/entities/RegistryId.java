@@ -1,5 +1,9 @@
 package com.security.jwt.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -13,6 +17,8 @@ import javax.persistence.Embeddable;
  * @author Jovani Brasil
  *
  */
+@Getter
+@NoArgsConstructor @AllArgsConstructor
 @Embeddable
 public class RegistryId implements Serializable {
 
@@ -23,21 +29,6 @@ public class RegistryId implements Serializable {
 	
 	@Column(name="user_id")
 	private Long userId;
-
-	public RegistryId() {}
-	
-	public RegistryId(Long userId, Long applicationId) {
-		this.userId = userId;
-		this.applicationId = applicationId;
-	}
-	
-	public Long getApplicationId() {
-		return applicationId;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
 
 	@Override
 	public boolean equals(Object o) {

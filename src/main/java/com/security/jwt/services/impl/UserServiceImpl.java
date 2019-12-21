@@ -8,8 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -22,12 +21,11 @@ import com.security.jwt.repositories.UserRepository;
 import com.security.jwt.services.UserService;
 import com.security.jwt.utils.PasswordUtils;
 
+@Slf4j
 @Service
 @Primary
 public class UserServiceImpl implements UserService {
 
-	private static final Logger log = LoggerFactory.getLogger(UserService.class);
-	
 	@Autowired
 	private UserRepository userRepository;
 	

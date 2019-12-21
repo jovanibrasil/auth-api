@@ -5,8 +5,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +14,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
-
+@Slf4j
 @Service
 public class CaptchaServiceImpl implements CaptchaService {
 
-	private static final Logger log = LoggerFactory.getLogger(CaptchaServiceImpl.class);
-	
 	@Autowired
 	private CaptchaSettings captchaSettings;
 
@@ -35,7 +32,6 @@ public class CaptchaServiceImpl implements CaptchaService {
 
 	private static Pattern RESPONSE_PATTERN = Pattern.compile("[A-Za-z0-9_-]+");
 
-	
 	@Override
 	public void processResponse(String response) throws InvalidRecaptchaException, ReCaptchaInvalidException {
 		log.info("Attempting to validate response {}", response);

@@ -1,8 +1,7 @@
 package com.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -12,13 +11,12 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
+@Slf4j
 @Profile({ "default", "prod" })
 @Configuration
 @EnableConfigurationProperties(AuthDataSourceProperties.class)
 public class AuthPropertiesConfig {
 
-	private static final Logger log = LoggerFactory.getLogger(AuthPropertiesConfig.class);
-	
 	private final AuthDataSourceProperties configuration;
 
 	public AuthPropertiesConfig(AuthDataSourceProperties configuration) {

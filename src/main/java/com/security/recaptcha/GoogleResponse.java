@@ -9,7 +9,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonPropertyOrder({
@@ -69,34 +72,6 @@ public class GoogleResponse {
 
 	public boolean isSuccess() {
 		return success;
-	}
-
-	public void setSuccess(boolean success) {
-		this.success = success;
-	}
-
-	public String getChallengeTs() {
-		return challengeTs;
-	}
-
-	public void setChallengeTs(String challengeTs) {
-		this.challengeTs = challengeTs;
-	}
-
-	public String getHostname() {
-		return hostname;
-	}
-
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
-	}
-
-	public ErrorCode[] getErrorCodes() {
-		return errorCodes;
-	}
-
-	public void setErrorCodes(ErrorCode[] errorCodes) {
-		this.errorCodes = errorCodes;
 	}
 
 }

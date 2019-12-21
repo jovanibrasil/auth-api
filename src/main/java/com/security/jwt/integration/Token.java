@@ -1,7 +1,6 @@
 package com.security.jwt.integration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -10,13 +9,11 @@ import org.springframework.stereotype.Component;
 import com.security.jwt.security.utils.JwtTokenUtil;
 import com.security.jwt.utils.ApplicationType;
 
+@Slf4j
 @Component
 public class Token {
 
 	private static String token = null;
-	
-	private final Logger log = LoggerFactory.getLogger(Token.class);
-	
 	private JwtTokenUtil jwtTokenUtil;
 	private UserDetailsService userDetailsService;
 	

@@ -3,16 +3,14 @@ package com.security.validators;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.security.jwt.services.UserService;
 
+@Slf4j
 public class CustomNameValidatorImpl implements ConstraintValidator<CustomNameValidator, String> {
-	
-	private static final Logger log = LoggerFactory.getLogger(CustomNameValidatorImpl.class);
-	
+
 	private UserService userService;
 	private StringValidations strVals;
 	

@@ -1,10 +1,13 @@
 package com.security.recaptcha;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import com.security.AuthDataSourceProperties;
 
+@Getter @Setter
 @Component
 @EnableConfigurationProperties(AuthDataSourceProperties.class)
 public class CaptchaSettings {
@@ -16,18 +19,5 @@ public class CaptchaSettings {
     	this.site = configuration.getRecaptchakeysite();
     	this.secret = configuration.getRecaptchakeysecret();
     }
-	
-    public String getSite() {
-		return site;
-	}
-	public void setSite(String site) {
-		this.site = site;
-	}
-	public String getSecret() {
-		return secret;
-	}
-	public void setSecret(String secret) {
-		this.secret = secret;
-	}
-	
+
 }

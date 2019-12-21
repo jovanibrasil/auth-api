@@ -1,8 +1,16 @@
 package com.security.jwt.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+@NoArgsConstructor
+@Getter @Setter
+@ToString
 public class UpdateUserDTO {
 
 	@NotNull
@@ -12,34 +20,12 @@ public class UpdateUserDTO {
 	@NotNull
 	@Size(min=4, max=12, message="{error.user.password.size}")
 	private String newPassword;
-	
-	public UpdateUserDTO() {}
+
 
 	public UpdateUserDTO(String actualPassword, String newPassword) {
 		super();
 		this.actualPassword = actualPassword;
 		this.newPassword = newPassword;
 	}
-
-	public String getActualPassword() {
-		return actualPassword;
-	}
-
-	public void setActualPassword(String actualPassword) {
-		this.actualPassword = actualPassword;
-	}
-
-	public String getNewPassword() {
-		return newPassword;
-	}
-
-	public void setNewPassword(String newPassword) {
-		this.newPassword = newPassword;
-	}
-
-	@Override
-	public String toString() {
-		return "UpdateUserDTO [actualPassword=" + actualPassword + ", newPassword=" + newPassword + "]";
-	}	
 	
 }
