@@ -1,13 +1,13 @@
 package com.security.jwt.dto;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import com.security.jwt.utils.ApplicationType;
 import com.security.validators.CustomEmailValidator;
 import com.security.validators.CustomNameValidator;
 import com.security.validators.EnumValidator;
 import lombok.*;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder

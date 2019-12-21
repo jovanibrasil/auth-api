@@ -1,10 +1,7 @@
 package com.security.jwt.integration;
 
-import static org.junit.Assert.assertNotNull;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-
+import com.security.jwt.exceptions.handlers.RestTemplateResponseErrorHandler;
+import com.security.jwt.exceptions.implementations.MicroServiceIntegrationException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -22,8 +19,10 @@ import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
-import com.security.jwt.exceptions.handlers.RestTemplateResponseErrorHandler;
-import com.security.jwt.exceptions.implementations.MicroServiceIntegrationException;
+import static org.junit.Assert.assertNotNull;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 @RunWith(SpringRunner.class)
 @RestClientTest

@@ -1,35 +1,6 @@
 package com.security.jwt.controllers;
 
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
 import com.security.jwt.dto.*;
-import com.security.jwt.utils.CustomMessageSource;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import com.security.jwt.entities.Application;
 import com.security.jwt.entities.Registry;
 import com.security.jwt.entities.User;
@@ -42,10 +13,29 @@ import com.security.jwt.response.Response;
 import com.security.jwt.security.utils.JwtTokenUtil;
 import com.security.jwt.services.UserService;
 import com.security.jwt.utils.ApplicationType;
+import com.security.jwt.utils.CustomMessageSource;
 import com.security.jwt.utils.PasswordUtils;
 import com.security.recaptcha.CaptchaService;
 import com.security.recaptcha.InvalidRecaptchaException;
 import com.security.recaptcha.ReCaptchaInvalidException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Optional;
 
 @Slf4j
 @CrossOrigin(origins = "*")

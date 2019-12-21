@@ -1,9 +1,8 @@
 package com.security.jwt.repositories;
 
+import com.security.jwt.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import com.security.jwt.entities.User;
 
 //@Transactional(readOnly=true)
 @Repository

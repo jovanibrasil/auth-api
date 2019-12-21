@@ -1,11 +1,10 @@
 package com.security.recaptcha;
 
+import com.security.AuthDataSourceProperties;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
-
-import com.security.AuthDataSourceProperties;
 
 @Getter @Setter
 @Component

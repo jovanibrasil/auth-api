@@ -1,17 +1,19 @@
 package com.security.jwt.controllers;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.security.jwt.dto.ConfirmUserDTO;
+import com.security.jwt.dto.CreateUserDTO;
+import com.security.jwt.dto.RegistrationUserDTO;
+import com.security.jwt.entities.Application;
+import com.security.jwt.entities.Registry;
+import com.security.jwt.entities.User;
+import com.security.jwt.enums.ProfileEnum;
+import com.security.jwt.exceptions.implementations.UserServiceException;
+import com.security.jwt.integration.Integration;
+import com.security.jwt.security.utils.JwtTokenUtil;
+import com.security.jwt.services.UserService;
+import com.security.jwt.utils.ApplicationType;
+import com.security.recaptcha.CaptchaService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,20 +30,17 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.security.jwt.dto.ConfirmUserDTO;
-import com.security.jwt.dto.RegistrationUserDTO;
-import com.security.jwt.dto.CreateUserDTO;
-import com.security.jwt.entities.Application;
-import com.security.jwt.entities.Registry;
-import com.security.jwt.entities.User;
-import com.security.jwt.enums.ProfileEnum;
-import com.security.jwt.exceptions.implementations.UserServiceException;
-import com.security.jwt.integration.Integration;
-import com.security.jwt.security.utils.JwtTokenUtil;
-import com.security.jwt.services.UserService;
-import com.security.jwt.utils.ApplicationType;
-import com.security.recaptcha.CaptchaService;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.isIn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

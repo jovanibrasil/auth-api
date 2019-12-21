@@ -1,13 +1,11 @@
 package com.security.jwt.configurations;
 
-import java.io.IOException;
-import java.util.Optional;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.security.jwt.entities.User;
+import com.security.jwt.exceptions.implementations.ForbiddenUserException;
+import com.security.jwt.exceptions.implementations.UnauthorizedUserException;
+import com.security.jwt.security.utils.JwtTokenUtil;
+import com.security.jwt.services.UserService;
+import com.security.jwt.utils.ApplicationType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,12 +15,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.security.jwt.entities.User;
-import com.security.jwt.exceptions.implementations.ForbiddenUserException;
-import com.security.jwt.exceptions.implementations.UnauthorizedUserException;
-import com.security.jwt.security.utils.JwtTokenUtil;
-import com.security.jwt.services.UserService;
-import com.security.jwt.utils.ApplicationType;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {

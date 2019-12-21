@@ -1,10 +1,9 @@
 package com.security.validators;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EnumListValidatorImpl implements ConstraintValidator<EnumListValidator, ArrayList<String>> {
 

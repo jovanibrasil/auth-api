@@ -1,15 +1,13 @@
 package com.security.jwt.exceptions.handlers;
 
-import java.io.IOException;
-
+import com.security.jwt.exceptions.implementations.MicroServiceIntegrationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 
-import com.security.jwt.exceptions.implementations.MicroServiceIntegrationException;
-import com.security.jwt.integration.Integration;
+import java.io.IOException;
 
 @Slf4j
 @Component

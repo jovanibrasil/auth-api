@@ -1,14 +1,16 @@
 package com.security.jwt.controllers;
 
-import static org.hamcrest.Matchers.*;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.security.jwt.dto.CreateUserDTO;
+import com.security.jwt.dto.JwtAuthenticationDTO;
+import com.security.jwt.entities.Application;
+import com.security.jwt.entities.Registry;
+import com.security.jwt.entities.User;
+import com.security.jwt.enums.ProfileEnum;
+import com.security.jwt.repositories.UserRepository;
+import com.security.jwt.security.utils.JwtTokenUtil;
+import com.security.jwt.services.UserService;
+import com.security.jwt.utils.ApplicationType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,17 +32,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.security.jwt.dto.JwtAuthenticationDTO;
-import com.security.jwt.dto.CreateUserDTO;
-import com.security.jwt.entities.Application;
-import com.security.jwt.entities.Registry;
-import com.security.jwt.entities.User;
-import com.security.jwt.enums.ProfileEnum;
-import com.security.jwt.repositories.UserRepository;
-import com.security.jwt.security.utils.JwtTokenUtil;
-import com.security.jwt.services.UserService;
-import com.security.jwt.utils.ApplicationType;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.isIn;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

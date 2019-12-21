@@ -1,9 +1,9 @@
 package com.security.jwt.services;
 
-import java.util.Optional;
-
 import com.security.jwt.entities.User;
 import com.security.jwt.exceptions.implementations.UserServiceException;
+
+import java.util.Optional;
 
 public interface UserService {
 

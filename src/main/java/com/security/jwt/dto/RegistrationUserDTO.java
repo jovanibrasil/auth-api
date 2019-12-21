@@ -1,12 +1,12 @@
 package com.security.jwt.dto;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 import com.security.validators.CustomNameValidator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Getter @Setter
 @NoArgsConstructor

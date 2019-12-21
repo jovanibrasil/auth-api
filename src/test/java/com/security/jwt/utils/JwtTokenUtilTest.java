@@ -1,11 +1,10 @@
 package com.security.jwt.utils;
 
-import static org.junit.Assert.assertNotNull;
-
-import org.junit.Test;
-
 import com.security.jwt.entities.User;
 import com.security.jwt.security.utils.JwtTokenUtil;
+import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
 
 public class JwtTokenUtilTest {
 	

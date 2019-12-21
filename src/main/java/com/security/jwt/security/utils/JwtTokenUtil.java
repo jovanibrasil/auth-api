@@ -1,24 +1,15 @@
 	package com.security.jwt.security.utils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+	import com.security.jwt.exceptions.implementations.InvalidTokenException;
+	import com.security.jwt.utils.ApplicationType;
+	import io.jsonwebtoken.*;
+	import org.springframework.beans.factory.annotation.Value;
+	import org.springframework.security.core.userdetails.UserDetails;
+	import org.springframework.stereotype.Component;
 
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-
-import com.security.jwt.exceptions.implementations.InvalidTokenException;
-import com.security.jwt.utils.ApplicationType;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
+	import java.util.Date;
+	import java.util.HashMap;
+	import java.util.Map;
 
 /*
  * Set of method used to manipulate JWT tokens.

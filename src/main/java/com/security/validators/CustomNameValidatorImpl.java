@@ -1,12 +1,11 @@
 package com.security.validators;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
+import com.security.jwt.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.security.jwt.services.UserService;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 @Slf4j
 public class CustomNameValidatorImpl implements ConstraintValidator<CustomNameValidator, String> {

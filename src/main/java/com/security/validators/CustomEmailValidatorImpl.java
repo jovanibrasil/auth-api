@@ -1,13 +1,12 @@
 package com.security.validators;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.constraints.NotBlank;
-
+import com.security.jwt.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.security.jwt.services.UserService;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraints.NotBlank;
 
 @Slf4j
 public class CustomEmailValidatorImpl implements ConstraintValidator<CustomEmailValidator, String> {

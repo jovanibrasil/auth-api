@@ -1,16 +1,14 @@
 package com.security.jwt.dto;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
+import com.security.jwt.utils.ApplicationType;
+import com.security.validators.EnumValidator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.lang.NonNull;
 
-import com.security.jwt.utils.ApplicationType;
-import com.security.validators.EnumValidator;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor

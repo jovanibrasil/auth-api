@@ -1,10 +1,5 @@
 package com.security.recaptcha;
 
-import java.net.URI;
-import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
+
+import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service

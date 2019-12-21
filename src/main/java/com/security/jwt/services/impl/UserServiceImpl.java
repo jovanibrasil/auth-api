@@ -1,18 +1,5 @@
 package com.security.jwt.services.impl;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
-
 import com.security.jwt.entities.User;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.exceptions.implementations.UserServiceException;
@@ -20,6 +7,16 @@ import com.security.jwt.integration.Integration;
 import com.security.jwt.repositories.UserRepository;
 import com.security.jwt.services.UserService;
 import com.security.jwt.utils.PasswordUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
