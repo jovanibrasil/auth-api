@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.jwt.dto.ConfirmUserDTO;
 import com.security.jwt.dto.CreateUserDTO;
 import com.security.jwt.dto.RegistrationUserDTO;
+import com.security.jwt.dto.UpdateUserDTO;
 import com.security.jwt.entities.Application;
 import com.security.jwt.entities.Registry;
 import com.security.jwt.entities.User;
@@ -57,7 +58,7 @@ public class UserControllerTest {
 	@MockBean
 	private UserService userService;
 	
-	@Mock
+	@MockBean
 	private CaptchaServiceImpl captchaService;
 	
 	private User user;
@@ -83,34 +84,33 @@ public class UserControllerTest {
 		
 	}
 
-//	/**
-//	 * Test user creation with valid data.
-//	 *
-//	 * @throws Exception
-//	 */
-//	@Test
-//	public void testCreateUser() throws Exception {
-//		BDDMockito.given(userService.findByUserName(Mockito.any()))
-//			.willReturn(Optional.empty()); // user name not registered yet
-//		BDDMockito.given(this.userService
-//			.save(Mockito.any())).willReturn(user); // save successfully
-//
-//		// validate recaptcha successfully
-////		CaptchaService captchaService = mock(CaptchaService.class);
-//		Mockito.doNothing().when(captchaService)
-//			.processResponse(null);
-//
-//		RegistrationUserDTO userRegDTO = new RegistrationUserDTO();
-//		userRegDTO.setPassword("teste");
-//		userRegDTO.setUserName("teste");
-//		userRegDTO.setToken(jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP));
-//
-//		mvc.perform(MockMvcRequestBuilders.post("/users")
-//			.contentType(MediaType.APPLICATION_JSON)
-//			.content(asJsonString(userRegDTO)))
-//			.andExpect(status().isCreated())
-//			.andExpect(jsonPath("$.errors").isEmpty());
-//	}
+	/**
+	 * Test user creation with valid data.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testCreateUser() throws Exception {
+		BDDMockito.given(userService.findByUserName(Mockito.any()))
+			.willReturn(Optional.empty()); // user name not registered yet
+		BDDMockito.given(this.userService
+			.save(Mockito.any())).willReturn(user); // save successfully
+
+		// validate recaptcha successfully
+		//	CaptchaService captchaService = mock(CaptchaService.class);
+		Mockito.doNothing().when(captchaService).processResponse(null);
+
+		RegistrationUserDTO userRegDTO = new RegistrationUserDTO();
+		userRegDTO.setPassword("teste");
+		userRegDTO.setUserName("teste");
+		userRegDTO.setToken(jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP));
+
+		mvc.perform(MockMvcRequestBuilders.post("/users")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(asJsonString(userRegDTO)))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.errors").isEmpty());
+	}
 	
 	/**
 	 * Test user creation with an user name that already exists.
@@ -319,7 +319,7 @@ public class UserControllerTest {
 	
 //	/**
 //	 * Tests the user update operation. The updated user is valid.
-//	 * 
+//	 *
 //	 * @throws Exception
 //	 */
 //	@Test
@@ -329,23 +329,21 @@ public class UserControllerTest {
 //		updatedUser.setEmail("newtest@gmail.com");
 //		updatedUser.setUserName("newtest");
 //		updatedUser.setPassword("password");
-//		user.setRegistries(Arrays.asList(
-//				new Registry(new Application(ApplicationType.BLOG_APP), user)));
-//		
+//		user.setRegistries(Arrays.asList(new Registry(new Application(ApplicationType.BLOG_APP), user)));
+//
 //		// SecurityContextHolder.getContext().getAuthentication().getName();
-//		
 ////		org.springframework.security.core.Authentication auth = authenticationManager.authenticate(
 ////				new UsernamePasswordAuthenticationToken(userName, userDto.getActualPassword()));
-//		
+//
 //		BDDMockito.given(this.userService.findByUserName("newtest"))
 //			.willReturn(Optional.of(updatedUser));
-//		
+//
 //		UpdateUserDTO updateUserDto = new UpdateUserDTO("password", "newpassword");
 //		BDDMockito.given(this.userService.updateUser(Mockito.any()))
 //			.willReturn(updatedUser);
-//		
+//
 //		mvc.perform(MockMvcRequestBuilders.put("/users")
-//			.header("Authorization", "Bearer x.x.x.x")	
+//			.header("Authorization", "Bearer x.x.x.x")
 //			.contentType(MediaType.APPLICATION_JSON)
 //			.content(asJsonString(updateUserDto)))
 //			.andExpect(status().isOk())
