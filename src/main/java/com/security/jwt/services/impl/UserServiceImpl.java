@@ -3,12 +3,11 @@ package com.security.jwt.services.impl;
 import com.security.jwt.entities.User;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.exceptions.implementations.UserServiceException;
-import com.security.jwt.integration.Integration;
+import com.security.jwt.integration.IntegrationService;
 import com.security.jwt.repositories.UserRepository;
 import com.security.jwt.services.UserService;
 import com.security.jwt.utils.PasswordUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +19,12 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@Primary
 public class UserServiceImpl implements UserService {
 
 	private UserRepository userRepository;
-	private Integration integrationService;
+	private IntegrationService integrationService;
 
-	public UserServiceImpl(UserRepository userRepository, Integration integrationService) {
+	public UserServiceImpl(UserRepository userRepository, IntegrationService integrationService) {
 		this.userRepository = userRepository;
 		this.integrationService = integrationService;
 	}

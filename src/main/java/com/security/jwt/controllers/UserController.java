@@ -8,7 +8,7 @@ import com.security.jwt.exceptions.implementations.InvalidTokenException;
 import com.security.jwt.exceptions.implementations.MicroServiceIntegrationException;
 import com.security.jwt.exceptions.implementations.UserServiceException;
 import com.security.jwt.integration.EmailMessage;
-import com.security.jwt.integration.Integration;
+import com.security.jwt.integration.IntegrationService;
 import com.security.jwt.response.Response;
 import com.security.jwt.security.utils.JwtTokenUtil;
 import com.security.jwt.services.UserService;
@@ -19,7 +19,6 @@ import com.security.recaptcha.CaptchaService;
 import com.security.recaptcha.InvalidRecaptchaException;
 import com.security.recaptcha.ReCaptchaInvalidException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -45,7 +44,7 @@ public class UserController {
 
 	private UserService userService;
 	private JwtTokenUtil jwtTokenUtil;
-	private Integration integration;
+	private IntegrationService integration;
 	private CaptchaService captchaService;
 	private CustomMessageSource msgSrc;
 	private AuthenticationManager authenticationManager;
@@ -54,7 +53,7 @@ public class UserController {
 	private String userConfirmationViewUrl;
 
 	public UserController(UserService userService, JwtTokenUtil jwtTokenUtil,
-						  Integration integration, CaptchaService captchaService,
+						  IntegrationService integration, CaptchaService captchaService,
 						  CustomMessageSource msgSrc, AuthenticationManager authenticationManager) {
 		this.userService = userService;
 		this.jwtTokenUtil = jwtTokenUtil;

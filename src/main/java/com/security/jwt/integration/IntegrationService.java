@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
-public class Integration {
+public class IntegrationService {
 
 	@Value("${urls.blog.createuser}")
 	private String createBlogUser;
@@ -31,9 +31,9 @@ public class Integration {
 	@Value("${urls.email.server.url}")
 	private String emailServerUrl;
 
-	private Token token;
+	private final Token token;
 
-	public Integration(Token token) {
+	public IntegrationService(Token token) {
 		this.token = token;
 	}
 
@@ -97,12 +97,12 @@ public class Integration {
 
 			if (!loginResponse.getStatusCode().equals(HttpStatus.OK)) {
 				throw new MicroServiceIntegrationException(
-						"It was not posssible to create the user. Status code: " + loginResponse.getStatusCode(), null);
+						"It was not possible to create the user. Status code: " + loginResponse.getStatusCode(), null);
 			}
 			log.info("The user was successfully deleted by the remote service.");
 		} catch (Exception e) {
 			log.info(e.getMessage());
-			throw new MicroServiceIntegrationException("It was not posssible to delete the user.", e);
+			throw new MicroServiceIntegrationException("It was not possible to delete the user.", e);
 		}
 	}
 
@@ -139,11 +139,11 @@ public class Integration {
 				throw new MicroServiceIntegrationException(
 						"It was not possible to send the email. Status code: " + loginResponse.getStatusCode(), null);
 			}
-			log.info("The email was successfully sended by the remote service.");
+			log.info("The email was successfully sent by the remote service.");
 
 		} catch (Exception e) {
-			log.info("It was not posssible to send the email via remote server.");
-			throw new MicroServiceIntegrationException("It was not posssible to send the email via remote server.", e);
+			log.info("It was not possible to send the email via remote server.");
+			throw new MicroServiceIntegrationException("It was not possible to send the email via remote server.", e);
 		}
 	}
 

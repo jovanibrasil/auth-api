@@ -4,7 +4,7 @@ import com.security.jwt.entities.Application;
 import com.security.jwt.entities.User;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.exceptions.implementations.UserServiceException;
-import com.security.jwt.integration.Integration;
+import com.security.jwt.integration.IntegrationService;
 import com.security.jwt.repositories.ApplicationRepository;
 import com.security.jwt.repositories.UserRepository;
 import com.security.jwt.services.impl.UserServiceImpl;
@@ -13,12 +13,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -33,7 +29,7 @@ public class UserServiceTest {
 	UserRepository userRepository;
 
 	@Mock
-	Integration integrationService;
+	IntegrationService integrationService;
 
 	@Mock
 	ApplicationRepository applicationRepository;

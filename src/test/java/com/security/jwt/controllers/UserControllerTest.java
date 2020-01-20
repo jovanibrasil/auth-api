@@ -9,11 +9,10 @@ import com.security.jwt.entities.Registry;
 import com.security.jwt.entities.User;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.exceptions.implementations.UserServiceException;
-import com.security.jwt.integration.Integration;
+import com.security.jwt.integration.IntegrationService;
 import com.security.jwt.security.utils.JwtTokenUtil;
 import com.security.jwt.services.UserService;
 import com.security.jwt.utils.ApplicationType;
-import com.security.recaptcha.CaptchaService;
 import com.security.recaptcha.CaptchaServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
@@ -86,7 +85,7 @@ public class UserControllerTest {
 
 //	/**
 //	 * Test user creation with valid data.
-//	 * 
+//	 *
 //	 * @throws Exception
 //	 */
 //	@Test
@@ -95,17 +94,17 @@ public class UserControllerTest {
 //			.willReturn(Optional.empty()); // user name not registered yet
 //		BDDMockito.given(this.userService
 //			.save(Mockito.any())).willReturn(user); // save successfully
-//		
+//
 //		// validate recaptcha successfully
 ////		CaptchaService captchaService = mock(CaptchaService.class);
 //		Mockito.doNothing().when(captchaService)
 //			.processResponse(null);
-//		
+//
 //		RegistrationUserDTO userRegDTO = new RegistrationUserDTO();
 //		userRegDTO.setPassword("teste");
 //		userRegDTO.setUserName("teste");
 //		userRegDTO.setToken(jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP));
-//		
+//
 //		mvc.perform(MockMvcRequestBuilders.post("/users")
 //			.contentType(MediaType.APPLICATION_JSON)
 //			.content(asJsonString(userRegDTO)))
@@ -148,7 +147,7 @@ public class UserControllerTest {
 		BDDMockito.given(this.userService
 			.save(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
-		Integration integration = mock(Integration.class);
+		IntegrationService integration = mock(IntegrationService.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());
 		
@@ -176,7 +175,7 @@ public class UserControllerTest {
 		BDDMockito.given(this.userService
 			.save(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
-		Integration integration = mock(Integration.class);
+		IntegrationService integration = mock(IntegrationService.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());
 		
@@ -209,7 +208,7 @@ public class UserControllerTest {
 		BDDMockito.given(this.userService
 			.save(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
-		Integration integration = mock(Integration.class);
+		IntegrationService integration = mock(IntegrationService.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());
 		
@@ -237,7 +236,7 @@ public class UserControllerTest {
 		BDDMockito.given(this.userService
 			.save(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
-		Integration integration = mock(Integration.class);
+		IntegrationService integration = mock(IntegrationService.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());
 		
@@ -381,7 +380,16 @@ public class UserControllerTest {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0]", equalTo("The user does not exist.")));
 	}
-	
+
+	/**
+	 * Tests full registration process.
+	 *
+	 * @throws Exception
+	 */
+	public void testFullRegistrationProcess() throws Exception {
+		// todo
+	}
+
 	public static String asJsonString(final Object obj) {
 	    try {
 	        final ObjectMapper mapper = new ObjectMapper();
@@ -390,6 +398,6 @@ public class UserControllerTest {
 	    } catch (Exception e) {
 	        throw new RuntimeException(e);
 	    }
-	}  
+	}
 
 }

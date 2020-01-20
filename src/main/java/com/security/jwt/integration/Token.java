@@ -5,6 +5,7 @@ import com.security.jwt.utils.ApplicationType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ public class Token {
 	private JwtTokenUtil jwtTokenUtil;
 	private UserDetailsService userDetailsService;
 
-	public Token(JwtTokenUtil jwtTokenUtil, @Qualifier("userDetailServiceImpl") UserDetailsService userDetailsService) {
+	public Token(JwtTokenUtil jwtTokenUtil, @Qualifier("userDetailServiceImpl") @Lazy UserDetailsService userDetailsService) {
 		this.jwtTokenUtil = jwtTokenUtil;
 		this.userDetailsService = userDetailsService;
 	}
@@ -27,7 +28,7 @@ public class Token {
 			try {
 				UserDetails userDetails = userDetailsService.loadUserByUsername("AUTH");
 				log.info("Creating a token ...");
-				token = jwtTokenUtil.createToken(userDetails, ApplicationType.AUTH_APP); //AUTH_APP
+				token = jwtTokenUtil.createToken(userDetails, ApplicationType.AUTH_APP);
 				log.info("Generated token: " + token);
 			} catch (Exception e) {
 				e.printStackTrace();
