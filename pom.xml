@@ -124,7 +124,6 @@
 			<properties>
 				<activatedProperties>dev</activatedProperties>
 				<spring.profiles.active>dev</spring.profiles.active>
-				<spring.cloud.vault.host>127.0.0.1</spring.cloud.vault.host>
 				<enableVault>false</enableVault>
 			</properties>
 		</profile>
@@ -133,6 +132,7 @@
 			<properties>
 				<activatedProperties>stage</activatedProperties>
 				<spring.profiles.active>stage</spring.profiles.active>
+				<vaultHost>127.0.0.1</vaultHost>
 				<enableVault>true</enableVault>
 			</properties>
 		</profile>
@@ -140,7 +140,7 @@
 			<id>test</id>
 			<properties>
 				<spring.profiles.active>test</spring.profiles.active>
-				<spring.cloud.vault.host>vault-server</spring.cloud.vault.host>
+				<vaultHost>vault-server</vaultHost>
 			</properties>
 		</profile>
 		<profile>
@@ -148,7 +148,7 @@
 			<properties>
 				<activatedProperties>prod</activatedProperties>
 				<spring.profiles.active>prod</spring.profiles.active>
-				<spring.cloud.vault.host>vault-server</spring.cloud.vault.host>
+				<vaultHost>vault-server</vaultHost>
 				<enableVault>true</enableVault>
 			</properties>
 		</profile>
