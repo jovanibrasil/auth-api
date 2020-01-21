@@ -146,6 +146,7 @@
 		<profile>
 			<id>prod</id>
 			<properties>
+				<activatedProperties>prod</activatedProperties>
 				<spring.profiles.active>prod</spring.profiles.active>
 				<spring.cloud.vault.host>vault-server</spring.cloud.vault.host>
 				<enableVault>true</enableVault>

@@ -19,14 +19,14 @@ if [ "$(systemctl is-active docker)" = "active" ];
 				echo "RUNNING ${CONTAINER_NAME} ..."
 				#docker stop $CONTAINER_NAME
 				#docker rm $CONTAINER_NAME
-				#docker build --build-arg ENVIRONMENT=dev -t $CONTAINER_NAME .
+				#docker build --build-arg ENVIRONMENT=prod -t $CONTAINER_NAME .
 				docker run -d -p 8090:8080 -m 896m --memory-swap 896m -v /var/www/blog:/apps/blog \
 					   	-e VAULT_TOKEN=${VAULT_TOKEN} -e SPRING_PROFILES_ACTIVE=${PROFILE} \
 					   	--name=$CONTAINER_NAME --network net $CONTAINER_NAME
 		fi
 
 		echo "BUILDING APP ..."
-		mvn clean package -Pdev
+		mvn clean package -Pprod
 		find target/*.war -type f -execdir cp "{}" ../ ";"
 		FILENAME=$(find *.war -type f)
 		REVISION=$(find *.war -type f | grep -Eo '[0-9]+')
