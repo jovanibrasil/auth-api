@@ -7,7 +7,7 @@ services:
     image: auth-api
     container_name: auth-api
     ports:
-      - 8083:8080
+      - 8083:8083
     networks:
       - net
     environment:

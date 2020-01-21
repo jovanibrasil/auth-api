@@ -11,6 +11,8 @@ ARG RECAPTCHA_KEY_SECRET
 ARG RECAPTCHA_KEY_SITE
 ARG ENVIRONMENT
 ARG FILE_NAME
+ARG DBSERVICEPORT
+ARG DBSERVICENAME
 
 ENV USERS_MYSQL_URL=$USERS_MYSQL_URL
 ENV USERS_MYSQL_USERNAME=$USERS_MYSQL_USERNAME
@@ -21,13 +23,21 @@ ENV RECAPTCHA_KEY_SITE=$RECAPTCHA_KEY_SITE
 ENV FILE_NAME=${FILE_NAME}
 ENV VAULT_HOST="vault-server"
 
+ENV DBSERVICEPORT=$DBSERVICEPORT
+ENV DBSERVICENAME=$DBSERVICENAME
+
 COPY ./target/${FILE_NAME} /usr/local/tomcat/webapps/${FILE_NAME}
 COPY ./scripts ./scripts
+
+RUN sed -i 's/port="8080"/port="8083"/' /usr/local/tomcat/conf/server.xml
+
 RUN if [ "$ENVIRONMENT" = "stage" ]; \
 	then cp ./scripts/startup-dev.sh /startup.sh; \
 	else cp ./scripts/startup-prod.sh /startup.sh;\
 	fi
-RUN rm ./scripts -rf
-EXPOSE 8080
 
-CMD ["/bin/bash", "/startup.sh"]
+RUN rm ./scripts -rf
+EXPOSE 8083
+
+RUN ["chmod", "+x", "/startup.sh"]
+CMD ["sh", "-c", "/startup.sh $DBSERVICENAME $DBSERVICEPORT"]

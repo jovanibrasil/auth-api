@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Profile;
 
 @Getter @Setter
 @ToString
-@Profile({ "default", "prod" })
+@Profile({ "default", "prod", "stage" })
 @ConfigurationProperties("auth-cred")
 public class AuthDataSourceProperties {
 

@@ -24,15 +24,14 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
-@NoArgsConstructor
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
 	private static final String AUTH_HEADER = "Authorization";
 	private static final String BEARER_PREFIX = "Bearer ";
 
-	private UserDetailsService userDetailService;
-	private JwtTokenUtil jwtTokenUtil;
-	private UserService userService;
+	private final UserDetailsService userDetailService;
+	private final JwtTokenUtil jwtTokenUtil;
+	private final UserService userService;
 
 	public JwtAuthenticationTokenFilter(UserDetailsService userDetailService,
 										JwtTokenUtil jwtTokenUtil, UserService userService) {

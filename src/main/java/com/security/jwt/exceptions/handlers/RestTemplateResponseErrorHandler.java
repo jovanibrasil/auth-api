@@ -32,7 +32,7 @@ public class RestTemplateResponseErrorHandler implements ResponseErrorHandler {
 				//throw new NotFoundException();
 			}
 		}
-		throw new MicroServiceIntegrationException("It was not posssible to create the user. Code" + 
+		throw new MicroServiceIntegrationException("It was not possible to create the user. Code" +
 				response.getStatusCode() + " Message:" + response.getStatusText(), null);
 	}
 

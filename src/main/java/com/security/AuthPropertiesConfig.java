@@ -12,7 +12,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import javax.sql.DataSource;
 
 @Slf4j
-@Profile({ "default", "prod" })
+@Profile({ "default", "prod", "stage" })
 @Configuration
 @EnableConfigurationProperties(AuthDataSourceProperties.class)
 public class AuthPropertiesConfig {
@@ -31,25 +31,12 @@ public class AuthPropertiesConfig {
 		
 		log.info("Generating datasource ...");
 		
-		dataSource.setUrl(configuration.getUrl()); //BLOG_MYSQL_URL
-		dataSource.setUsername(configuration.getUsername()); //BLOG_MYSQL_USERNAME
-		dataSource.setPassword(configuration.getPassword()); //BLOG_MYSQL_PASSWORD
+		dataSource.setUrl(configuration.getUrl());
+		dataSource.setUsername(configuration.getUsername());
+		dataSource.setPassword(configuration.getPassword());
 		dataSource.setDriverClassName("com.mysql.jdbc.Driver");
 		
 		return dataSource;
-	}
-
-	@Bean
-	@Profile({"dev", "stage"})
-	public FlywayMigrationStrategy cleanMigrateStrategy() {
-	    FlywayMigrationStrategy strategy = new FlywayMigrationStrategy() {
-		@Override
-		public void migrate(Flyway flyway) {
-		    flyway.clean();
-		    flyway.migrate();
-		}
-	    };
-	    return strategy;
 	}
 
 }

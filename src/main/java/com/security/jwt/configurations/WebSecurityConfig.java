@@ -1,7 +1,8 @@
 package com.security.jwt.configurations;
 
 import com.security.jwt.exceptions.handlers.ExceptionHandlerFilter;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.security.jwt.security.utils.JwtTokenUtil;
+import com.security.jwt.services.UserService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,13 +29,19 @@ import java.util.Arrays;
 @EnableGlobalMethodSecurity(prePostEnabled=true) // evaluate using methods 
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	private JwtAuthenticationEntryPoint unauthorizedHandler; // is an exception
-	private UserDetailsService userDetailsService;
+	private final JwtAuthenticationEntryPoint unauthorizedHandler; // is an exception
+	private final UserDetailsService userDetailsService;
+	private final JwtTokenUtil jwtTokenUtil;
+	private final UserService userService;
+
 
 	public WebSecurityConfig(JwtAuthenticationEntryPoint unauthorizedHandler,
-							 @Qualifier("userDetailServiceImpl") UserDetailsService userDetailsService) {
+							 @Qualifier("userDetailServiceImpl") UserDetailsService userDetailsService,
+							 JwtTokenUtil jwtTokenUtil, UserService userService) {
 		this.unauthorizedHandler = unauthorizedHandler;
 		this.userDetailsService = userDetailsService;
+		this.jwtTokenUtil = jwtTokenUtil;
+		this.userService = userService;
 	}
 
 	/*
@@ -43,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 * 
 	 */
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
-		authenticationManagerBuilder.authenticationProvider(authenticationProvider());
+		authenticationManagerBuilder.authenticationProvider(this.authenticationProvider());
 	}
 	
 	/**
@@ -55,7 +62,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	DaoAuthenticationProvider authenticationProvider() {
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 		provider.setPasswordEncoder(passwordEncoder());
-		provider.setUserDetailsService(userDetailsService);
+		provider.setUserDetailsService(this.userDetailsService);
 		return provider;
 	}
 	
@@ -72,7 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 */
 	@Bean
 	public JwtAuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
-		return new JwtAuthenticationTokenFilter();
+		return new JwtAuthenticationTokenFilter(this.userDetailsService, this.jwtTokenUtil, this.userService);
 	}
 	
 	@Bean

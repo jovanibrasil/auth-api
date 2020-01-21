@@ -10,7 +10,7 @@ stop:
 clean: stop
 	- docker rm auth-api
 build: clean
-	mvn clean package -P${PROFILE} -Dmaven.test.skip=true
+	mvn clean package -P$(PROFILE) -Dmaven.test.skip=true
 	FILE_NAME=blog-api\#\#$(shell find target/*.war -type f | grep -Eo '[0-9]+)
 	docker build  --build-arg ENVIRONMENT=stage --build-arg FILE_NAME -t auth-api .
 	chmod -R ugo+rw target/
@@ -39,4 +39,4 @@ stats:
 	docker stats auth-api
 
 deploy-production:
-	/bin/sh scripts/deploy-docker-tomcat.sh VAULT_TOKEN=${VAULT_TOKEN} SPRING_PROFILES_ACTIVE=${PROFILE}
+	/bin/sh scripts/deploy-docker-tomcat.sh VAULT_TOKEN=$(VAULT_TOKEN) SPRING_PROFILES_ACTIVE=$(PROFILE)

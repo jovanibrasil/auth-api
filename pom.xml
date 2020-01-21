@@ -133,7 +133,7 @@
 			<properties>
 				<activatedProperties>stage</activatedProperties>
 				<spring.profiles.active>stage</spring.profiles.active>
-				<enableVault>false</enableVault>
+				<enableVault>true</enableVault>
 			</properties>
 		</profile>
 		<profile>

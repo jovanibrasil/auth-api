@@ -49,6 +49,7 @@ public class IntegrationService {
 			restTemplate.setErrorHandler(new RestTemplateResponseErrorHandler());
 			HttpHeaders headers = new HttpHeaders();
 			String finalToken = "Bearer " + token.getToken();
+			log.info("Token: {}", finalToken);
 			headers.add("Authorization", finalToken);
 			headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -65,14 +66,14 @@ public class IntegrationService {
 			ResponseEntity<String> loginResponse = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
 
 			if (!loginResponse.getStatusCode().equals(HttpStatus.CREATED)) {
-				log.info("It was not posssible to create the user. Status code: " + loginResponse.getStatusCode());
+				log.info("It was not possible to create the user. Status code: " + loginResponse.getStatusCode());
 				throw new MicroServiceIntegrationException(
-						"It was not posssible to create the user. Status code: " + loginResponse.getStatusCode(), null);
+						"It was not possible to create the user. Status code: " + loginResponse.getStatusCode(), null);
 			}
 			log.info("The user was successfully created by the remote service.");
 		} catch (Exception e) {
-			log.info("It was not posssible to create the user in the remote server. {}", e.getMessage());
-			throw new MicroServiceIntegrationException("It was not posssible to create the user.", e);
+			log.info("It was not possible to create the user in the remote server. {}", e.getMessage());
+			throw new MicroServiceIntegrationException("It was not possible to create the user.", e);
 		}
 	}
 

@@ -1,4 +1,4 @@
-while ! nc -z mysql-database 3306;
+while ! nc -z $1 $2;
         do
           echo sleeping;
           sleep 1;
