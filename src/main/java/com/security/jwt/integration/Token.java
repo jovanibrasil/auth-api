@@ -24,12 +24,13 @@ public class Token {
 	}
 
 	public String getToken() {
+		log.info("Generating Service token.");
 		if(token == null) {
 			try {
-				UserDetails userDetails = userDetailsService.loadUserByUsername("AUTH");
-				log.info("Creating a token ...");
+				UserDetails userDetails = this.userDetailsService.loadUserByUsername("AUTH");
+				log.info("Creating the token ...");
 				token = jwtTokenUtil.createToken(userDetails, ApplicationType.AUTH_APP);
-				log.info("Generated token: " + token);
+				log.info("Generated token: {}.", token);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}	
