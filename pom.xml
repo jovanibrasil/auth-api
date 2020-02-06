@@ -2,13 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.api</groupId>
+    <modules>
+        <module>captcha</module>
+        <module>jwt</module>
+        <module>web</module>
+    </modules>
+
+	<groupId>com.security</groupId>
 	<artifactId>auth-api</artifactId>
-	<version>1.0</version>
-	<packaging>war</packaging>
+    <modelVersion>4.0.0</modelVersion>
+    <version>1.0</version>
 	<name>auth-api</name>
+
+    <packaging>pom</packaging>
+
 	<description>Auth API</description>
 
 	<scm>
@@ -182,7 +190,7 @@
 					<doCheck>false</doCheck>
 					<doUpdate>false</doUpdate>
 					<buildNumberPropertiesFileLocation>
-						src/main/resources/buildNumber.properties
+						web/src/main/resources/buildNumber.properties
 					</buildNumberPropertiesFileLocation>
 				</configuration>
 			</plugin>

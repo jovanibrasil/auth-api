@@ -1,0 +1,37 @@
+package com.security.web.services.impl;
+
+import com.security.web.domain.User;
+import com.security.web.services.UserService;
+import com.security.jwt.utils.JwtUserFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Slf4j
+@Service
+public class UserDetailServiceImpl implements UserDetailsService {
+
+	private UserService userService;
+
+	public UserDetailServiceImpl(UserService userService) {
+		this.userService = userService;
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		log.info("Searching for " + username);
+		Optional<User> user = userService.findByUserName(username);
+		if(user.isPresent()) {
+			log.info("The user {} was found.", username);
+			return JwtUserFactory.create(user.get().getUserName(),
+					user.get().getEmail(), user.get().getProfile());
+		}
+		log.error("No user {} was found.", username);
+		throw new UsernameNotFoundException("User name not encontered.");
+	}
+
+}
