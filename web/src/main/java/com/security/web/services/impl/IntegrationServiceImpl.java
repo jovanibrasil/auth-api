@@ -1,10 +1,10 @@
 package com.security.web.services.impl;
 
+import com.security.web.domain.ApplicationType;
+import com.security.web.domain.User;
 import com.security.web.dto.EmailMessage;
 import com.security.web.exceptions.implementations.MicroServiceIntegrationException;
-import com.security.web.domain.User;
-import com.security.web.exceptions.handlers.RestTemplateResponseErrorHandler;
-import com.security.web.domain.ApplicationType;
+import com.security.web.services.IntegrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class IntegrationServiceImpl {
+public class IntegrationServiceImpl implements IntegrationService {
 
 	@Value("${urls.blog.createuser}")
 	private String createBlogUser;
@@ -34,17 +34,17 @@ public class IntegrationServiceImpl {
 	private String emailServerUrl;
 
 	private final TokenServiceImpl tokenService;
+	private final RestTemplate restTemplate;
 
 	/**
 	 * Creates an user in a specific application service, like notes-app or blog-app.
 	 * 
 	 * @param user
 	 */
+	@Override
 	public void createServiceUser(User user) {
 		log.info("Creating the user in the remote server ...");
 		try {
-			RestTemplate restTemplate = new RestTemplate();
-			restTemplate.setErrorHandler(new RestTemplateResponseErrorHandler());
 			HttpHeaders headers = new HttpHeaders();
 			String finalToken = "Bearer " + tokenService.getToken();
 			log.info("Token: {}", finalToken);
@@ -80,10 +80,9 @@ public class IntegrationServiceImpl {
 	 * 
 	 * @param user
 	 */
+	@Override
 	public void deleteServiceUser(User user) {
 		try {
-			RestTemplate restTemplate = new RestTemplate();
-			restTemplate.setErrorHandler(new RestTemplateResponseErrorHandler());
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.add("Authorization", "Bearer " + tokenService.getToken());
@@ -110,11 +109,10 @@ public class IntegrationServiceImpl {
 	 * 
 	 * @param emailMessage
 	 */
+	@Override
 	public void sendEmail(EmailMessage emailMessage) {
 		log.info("Send remote server ...");
 		try {
-			RestTemplate restTemplate = new RestTemplate();
-			restTemplate.setErrorHandler(new RestTemplateResponseErrorHandler());
 			HttpHeaders headers = new HttpHeaders();
 			String finalToken = "Bearer " + tokenService.getToken();
 			headers.add("Authorization", finalToken);

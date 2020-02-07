@@ -1,8 +1,8 @@
 package com.security.web.services.impl;
 
+import com.security.jwt.utils.JwtUserFactory;
 import com.security.web.domain.User;
 import com.security.web.services.UserService;
-import com.security.jwt.utils.JwtUserFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

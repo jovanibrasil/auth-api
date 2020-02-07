@@ -2,6 +2,7 @@ package com.security.web.services.impl;
 
 import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.web.domain.ApplicationType;
+import com.security.web.services.TokenService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class TokenServiceImpl {
+public class TokenServiceImpl implements TokenService {
 
 	private static String token = null;
 	private final JwtTokenGenerator jwtTokenUtil;
@@ -23,6 +24,7 @@ public class TokenServiceImpl {
 		this.userDetailsService = userDetailsService;
 	}
 
+	@Override
 	public String getToken() {
 		log.info("Generating Service token.");
 		if(token == null) {

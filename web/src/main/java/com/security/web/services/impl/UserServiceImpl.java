@@ -1,9 +1,9 @@
 package com.security.web.services.impl;
 
-import com.security.web.domain.User;
-import com.security.web.exceptions.implementations.UserServiceException;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.utils.PasswordUtils;
+import com.security.web.domain.User;
+import com.security.web.exceptions.implementations.UserServiceException;
 import com.security.web.repositories.UserRepository;
 import com.security.web.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +36,7 @@ public class UserServiceImpl implements UserService {
 	 * @param user
 	 * @return
 	 */
+	@Override
 	public List<String> validateUser(User user){
 		List<String> errors = new ArrayList<>();
 		this.findByUserName(user.getUserName()).ifPresent(x -> {
@@ -68,7 +69,8 @@ public class UserServiceImpl implements UserService {
 			throw new UserServiceException("Integration service error. " + e.getMessage()); 
 		}
 	}
-	
+
+	@Override
 	public User updateUser(User user) throws UserServiceException {
 		
 		Optional<User> optUser = this.findUserById(user.getId());

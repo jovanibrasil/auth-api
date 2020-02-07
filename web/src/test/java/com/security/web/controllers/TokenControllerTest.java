@@ -31,6 +31,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -65,7 +66,7 @@ public class TokenControllerTest {
 	private UserRepository userRepository;
 
 	@MockBean
-	private RestOperations restTemplate;
+	private RestTemplate restTemplate;
 
 	private List<String> passwordBlankErrors = Arrays.asList("Password length must be between 4 and 12.", 
 			"Password must not be blank or null.");
