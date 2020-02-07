@@ -1,10 +1,11 @@
-package com.security.web.integration;
+package com.security.web.services.impl;
 
 import com.security.web.dto.EmailMessage;
 import com.security.web.exceptions.implementations.MicroServiceIntegrationException;
 import com.security.web.domain.User;
 import com.security.web.exceptions.handlers.RestTemplateResponseErrorHandler;
 import com.security.web.domain.ApplicationType;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,8 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
-public class IntegrationService {
+@RequiredArgsConstructor
+public class IntegrationServiceImpl {
 
 	@Value("${urls.blog.createuser}")
 	private String createBlogUser;
@@ -31,11 +33,7 @@ public class IntegrationService {
 	@Value("${urls.email.server.url}")
 	private String emailServerUrl;
 
-	private final Token token;
-
-	public IntegrationService(Token token) {
-		this.token = token;
-	}
+	private final TokenServiceImpl tokenService;
 
 	/**
 	 * Creates an user in a specific application service, like notes-app or blog-app.
@@ -48,7 +46,7 @@ public class IntegrationService {
 			RestTemplate restTemplate = new RestTemplate();
 			restTemplate.setErrorHandler(new RestTemplateResponseErrorHandler());
 			HttpHeaders headers = new HttpHeaders();
-			String finalToken = "Bearer " + token.getToken();
+			String finalToken = "Bearer " + tokenService.getToken();
 			log.info("Token: {}", finalToken);
 			headers.add("Authorization", finalToken);
 			headers.setContentType(MediaType.APPLICATION_JSON);
@@ -88,7 +86,7 @@ public class IntegrationService {
 			restTemplate.setErrorHandler(new RestTemplateResponseErrorHandler());
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
-			headers.add("Authorization", "Bearer " + token.getToken());
+			headers.add("Authorization", "Bearer " + tokenService.getToken());
 			HttpEntity<String> entity = new HttpEntity<String>(headers);
 			String url = user.hasRegistry(ApplicationType.BLOG_APP) ? url = deleteBlogUser : deleteNotesUser;
 			// send request and parse result
@@ -118,7 +116,7 @@ public class IntegrationService {
 			RestTemplate restTemplate = new RestTemplate();
 			restTemplate.setErrorHandler(new RestTemplateResponseErrorHandler());
 			HttpHeaders headers = new HttpHeaders();
-			String finalToken = "Bearer " + token.getToken();
+			String finalToken = "Bearer " + tokenService.getToken();
 			headers.add("Authorization", finalToken);
 			headers.setContentType(MediaType.APPLICATION_JSON);
 

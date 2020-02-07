@@ -14,7 +14,7 @@ import com.security.web.exceptions.implementations.MicroServiceIntegrationExcept
 import com.security.web.exceptions.implementations.UserServiceException;
 import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.jwt.utils.PasswordUtils;
-import com.security.web.integration.IntegrationService;
+import com.security.web.services.impl.IntegrationServiceImpl;
 import com.security.web.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +42,7 @@ public class UserController {
 
 	private UserService userService;
 	private JwtTokenGenerator jwtTokenUtil;
-	private IntegrationService integration;
+	private IntegrationServiceImpl integration;
 	private CaptchaService captchaService;
 	private CustomMessageSource msgSrc;
 	private AuthenticationManager authenticationManager;
@@ -51,7 +51,7 @@ public class UserController {
 	private String userConfirmationViewUrl;
 
 	public UserController(UserService userService, JwtTokenGenerator jwtTokenUtil,
-						  IntegrationService integration, CaptchaService captchaService,
+						  IntegrationServiceImpl integration, CaptchaService captchaService,
 						  CustomMessageSource msgSrc, AuthenticationManager authenticationManager) {
 		this.userService = userService;
 		this.jwtTokenUtil = jwtTokenUtil;

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.captcha.CaptchaServiceImpl;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.web.domain.ApplicationType;
-import com.security.web.integration.IntegrationService;
+import com.security.web.services.impl.IntegrationServiceImpl;
 import com.security.web.dto.ConfirmUserDTO;
 import com.security.web.dto.CreateUserDTO;
 import com.security.web.dto.RegistrationUserDTO;
@@ -145,7 +145,7 @@ public class UserControllerTest {
 		BDDMockito.given(this.userService
 			.save(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
-		IntegrationService integration = mock(IntegrationService.class);
+		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());
 		
@@ -173,7 +173,7 @@ public class UserControllerTest {
 		BDDMockito.given(this.userService
 			.save(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
-		IntegrationService integration = mock(IntegrationService.class);
+		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());
 		
@@ -206,7 +206,7 @@ public class UserControllerTest {
 		BDDMockito.given(this.userService
 			.save(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
-		IntegrationService integration = mock(IntegrationService.class);
+		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());
 		
@@ -234,7 +234,7 @@ public class UserControllerTest {
 		BDDMockito.given(this.userService
 			.save(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
-		IntegrationService integration = mock(IntegrationService.class);
+		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());
 		

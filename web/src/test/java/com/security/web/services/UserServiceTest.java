@@ -4,7 +4,7 @@ import com.security.web.domain.ApplicationType;
 import com.security.web.domain.User;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.web.exceptions.implementations.UserServiceException;
-import com.security.web.integration.IntegrationService;
+import com.security.web.services.impl.IntegrationServiceImpl;
 import com.security.web.repositories.ApplicationRepository;
 import com.security.web.repositories.UserRepository;
 import com.security.web.services.impl.UserServiceImpl;
@@ -29,7 +29,7 @@ public class UserServiceTest {
     UserRepository userRepository;
 
 	@Mock
-    IntegrationService integrationService;
+    IntegrationServiceImpl integrationService;
 
 	@Mock
     ApplicationRepository applicationRepository;

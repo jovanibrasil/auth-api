@@ -4,9 +4,9 @@ import com.security.web.domain.User;
 import com.security.web.exceptions.implementations.UserServiceException;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.utils.PasswordUtils;
-import com.security.web.integration.IntegrationService;
 import com.security.web.repositories.UserRepository;
 import com.security.web.services.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -18,15 +18,11 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-	private UserRepository userRepository;
-	private IntegrationService integrationService;
-
-	public UserServiceImpl(UserRepository userRepository, IntegrationService integrationService) {
-		this.userRepository = userRepository;
-		this.integrationService = integrationService;
-	}
+	private final UserRepository userRepository;
+	private final IntegrationServiceImpl integrationService;
 
 	@Override
 	public Optional<User> findByUserName(String userName) {

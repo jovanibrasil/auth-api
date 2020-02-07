@@ -1,4 +1,4 @@
-package com.security.web.integration;
+package com.security.web.services.impl;
 
 import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.web.domain.ApplicationType;
@@ -11,13 +11,14 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class Token {
+public class TokenServiceImpl {
 
 	private static String token = null;
-	private JwtTokenGenerator jwtTokenUtil;
-	private UserDetailsService userDetailsService;
+	private final JwtTokenGenerator jwtTokenUtil;
+	private final UserDetailsService userDetailsService;
 
-	public Token(JwtTokenGenerator jwtTokenUtil, @Qualifier("userDetailServiceImpl") @Lazy UserDetailsService userDetailsService) {
+	public TokenServiceImpl(JwtTokenGenerator jwtTokenUtil,
+							@Qualifier("userDetailServiceImpl") @Lazy UserDetailsService userDetailsService) {
 		this.jwtTokenUtil = jwtTokenUtil;
 		this.userDetailsService = userDetailsService;
 	}
