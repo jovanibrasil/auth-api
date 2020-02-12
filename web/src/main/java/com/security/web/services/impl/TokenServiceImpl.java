@@ -89,7 +89,7 @@ public class TokenServiceImpl implements TokenService {
 		UserDetails userDetails = userDetailsService.loadUserByUsername(currentUser.getUserName());
 		String token = jwtTokenUtil.createToken(userDetails, applicationType);
 		log.info("Token successfully generated for {}.", currentUser.getUserName());
-		return null;
+		return token;
 	}
 
 	@Override
