@@ -23,7 +23,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 		log.info("Searching for " + username);
 		User user = userService.findByUserName(username);
 		return JwtUserFactory.create(user.getUserName(),
-				user.getEmail(), user.getProfile());
+				user.getPassword(), user.getProfile());
 	}
 
 }
