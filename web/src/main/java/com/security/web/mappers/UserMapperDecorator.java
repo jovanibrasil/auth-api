@@ -1,12 +1,14 @@
 package com.security.web.mappers;
 
 import com.security.jwt.generator.JwtTokenGenerator;
-import com.security.web.domain.*;
+import com.security.web.domain.Application;
+import com.security.web.domain.ApplicationType;
+import com.security.web.domain.Registry;
+import com.security.web.domain.User;
 import com.security.web.dto.ConfirmUserDTO;
 import com.security.web.dto.JwtAuthenticationDTO;
 import com.security.web.dto.RegistrationUserDTO;
 import com.security.web.dto.UpdateUserDTO;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 

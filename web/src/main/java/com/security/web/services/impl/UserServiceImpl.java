@@ -11,7 +11,6 @@ import com.security.web.exceptions.implementations.NotFoundException;
 import com.security.web.exceptions.implementations.ValidationException;
 import com.security.web.repositories.UserRepository;
 import com.security.web.services.UserService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -19,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,32 +46,32 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User findByUserName(String userName) {
-		Optional<User> optUser = this.userRepository.findByUserName(userName);
+		Optional<User> optUser = userRepository.findByUserName(userName);
 		if(!optUser.isPresent()) throw new NotFoundException("error.user.notfound");
 		return optUser.get();
 	}
 
 	@Override
 	public User findUserByEmail(String email) {
-		Optional<User> optUser = this.userRepository.findByEmail(email);
+		Optional<User> optUser = userRepository.findByEmail(email);
 		if(!optUser.isPresent()) throw new NotFoundException("error.user.notfound");
 		return optUser.get();
 	}
 
 	@Override
 	public boolean existUserWithUserName(String userName) {
-		return this.userRepository.findByUserName(userName).isPresent();
+		return userRepository.findByUserName(userName).isPresent();
 	}
 
 	@Override
 	public boolean existUserWithEmail(String email) {
-		return this.userRepository.findByEmail(email).isPresent();
+		return userRepository.findByEmail(email).isPresent();
 	}
 
 	@Override
 	public void deleteUser(String userName) {
-		User user = this.findByUserName(userName);
-		this.userRepository.delete(user);
+		User user = findByUserName(userName);
+		userRepository.delete(user);
 		// remove the user for each registered application
 		integrationService.deleteServiceUser(user);
 	}
@@ -133,7 +133,7 @@ public class UserServiceImpl implements UserService {
 		validateUser(user);
 		user.setSignUpDateTime(LocalDateTime.now());
 		user.setProfile(ProfileEnum.ROLE_USER);
-		user = this.userRepository.save(user);
+		user = userRepository.save(user);
 		integrationService.createServiceUser(user);
 		return user;
 	}
@@ -164,7 +164,7 @@ public class UserServiceImpl implements UserService {
 		if(!errors.isEmpty()) throw new ValidationException(errors);
 
 		currentUser.setPassword(PasswordUtils.generateHash(user.getPassword()));
-		this.userRepository.save(currentUser);
+		userRepository.save(currentUser);
 		return currentUser;
 	}
 

@@ -1,18 +1,17 @@
 package com.security.web.services;
 
+import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.web.AuthenticationMock;
-import com.security.web.controllers.TokenControllerTest;
+import com.security.web.domain.Application;
 import com.security.web.domain.ApplicationType;
 import com.security.web.domain.User;
-import com.security.jwt.enums.ProfileEnum;
 import com.security.web.exceptions.implementations.NotFoundException;
 import com.security.web.exceptions.implementations.ValidationException;
-import com.security.web.services.impl.IntegrationServiceImpl;
 import com.security.web.repositories.ApplicationRepository;
 import com.security.web.repositories.UserRepository;
+import com.security.web.services.impl.IntegrationServiceImpl;
 import com.security.web.services.impl.UserServiceImpl;
-import com.security.web.domain.Application;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -31,7 +30,6 @@ import java.util.Optional;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
@@ -64,7 +62,7 @@ public class UserServiceTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		this.userService = new UserServiceImpl(userRepository,
+		userService = new UserServiceImpl(userRepository,
 				integrationService, authenticationManager, jwtTokenUtil);
 		user = new User();
 		user.setId(1L);
@@ -95,7 +93,7 @@ public class UserServiceTest {
 	
 	@Test(expected = NotFoundException.class)
 	public void testFindInvalidUserByUserName() {
-		this.userService.findByUserName("invalidUser");
+		userService.findByUserName("invalidUser");
 	}
 
 	@Test
@@ -106,7 +104,7 @@ public class UserServiceTest {
 	
 	@Test(expected = NotFoundException.class)
 	public void testFindInvalidUserByEmail() {
-		this.userService.findUserByEmail("test");
+		userService.findUserByEmail("test");
 	}
 	
 	@Test
@@ -126,7 +124,7 @@ public class UserServiceTest {
 		newUser.addApplication(application);
 
 		when(userRepository.save(newUser)).thenReturn(newUser);
-		newUser = this.userService.saveUser(newUser);
+		newUser = userService.saveUser(newUser);
 		
 		assertNotNull(newUser.getId());
 	}
@@ -239,7 +237,7 @@ public class UserServiceTest {
 	@Test(expected = NotFoundException.class)
 	public void testDeleteInvalidUser() {
 		//The user does not exist.
-		this.userService.deleteUser("java");
+		userService.deleteUser("java");
 	}
 
 }

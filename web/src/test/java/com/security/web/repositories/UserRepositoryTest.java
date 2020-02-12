@@ -1,10 +1,10 @@
 package com.security.web.repositories;
 
+import com.security.jwt.enums.ProfileEnum;
 import com.security.web.domain.Application;
+import com.security.web.domain.ApplicationType;
 import com.security.web.domain.Registry;
 import com.security.web.domain.User;
-import com.security.jwt.enums.ProfileEnum;
-import com.security.web.domain.ApplicationType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,25 +49,25 @@ public class UserRepositoryTest {
 	
 	@Test
 	public void testFindValidUserByName() {
-		optUser = this.userRepository.findByUserName("test");
+		optUser = userRepository.findByUserName("test");
 		assertTrue(optUser.isPresent());
 	}
 	
 	@Test
 	public void testFindValidUserByEmail() {
-		optUser = this.userRepository.findByEmail("test@gmail.com");
+		optUser = userRepository.findByEmail("test@gmail.com");
 		assertTrue(optUser.isPresent());
 	}
 	
 	@Test
 	public void testFindInvalidUserByName() {
-		optUser = this.userRepository.findByUserName("test@gmail.com");
+		optUser = userRepository.findByUserName("test@gmail.com");
 		assertFalse(optUser.isPresent());
 	}
 	
 	@Test
 	public void testFindInvalidUserByEmail() {
-		optUser = this.userRepository.findByEmail("test");
+		optUser = userRepository.findByEmail("test");
 		assertFalse(optUser.isPresent());
 	}
 
@@ -96,20 +96,20 @@ public class UserRepositoryTest {
 
 	@Test
 	public void testFindValidUserByNameVerifyApplications() {
-		optUser = this.userRepository.findByUserName("test");
+		optUser = userRepository.findByUserName("test");
 		Application app = optUser.get().getRegistries().get(0).getApplication();
 		assertEquals(ApplicationType.BLOG_APP, app.getApplication());
 	}
 	
 	@Test
 	public void testHasSpecificApplication() {
-		optUser = this.userRepository.findByUserName("test");
+		optUser = userRepository.findByUserName("test");
 		assertTrue(optUser.get().hasRegistry(ApplicationType.BLOG_APP));
 	}
 	
 	@Test
 	public void testHasValidApplications() {
-		optUser = this.userRepository.findByEmail("test@gmail.com");
+		optUser = userRepository.findByEmail("test@gmail.com");
 		assertNotNull(optUser.get().getRegistries());
 		assertNotEquals(0, optUser.get().getRegistries().size());
 		Registry registry = optUser.get().getRegistries().get(0);

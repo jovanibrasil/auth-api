@@ -3,19 +3,19 @@ package com.security.web.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.captcha.CaptchaServiceImpl;
 import com.security.jwt.enums.ProfileEnum;
+import com.security.jwt.generator.JwtTokenGenerator;
+import com.security.web.domain.Application;
 import com.security.web.domain.ApplicationType;
-import com.security.web.exceptions.implementations.NotFoundException;
-import com.security.web.exceptions.implementations.ValidationException;
-import com.security.web.mappers.UserMapper;
-import com.security.web.services.impl.IntegrationServiceImpl;
+import com.security.web.domain.Registry;
+import com.security.web.domain.User;
 import com.security.web.dto.ConfirmUserDTO;
 import com.security.web.dto.CreateUserDTO;
 import com.security.web.dto.RegistrationUserDTO;
-import com.security.web.domain.Application;
-import com.security.web.domain.Registry;
-import com.security.web.domain.User;
-import com.security.jwt.generator.JwtTokenGenerator;
+import com.security.web.exceptions.implementations.NotFoundException;
+import com.security.web.exceptions.implementations.ValidationException;
+import com.security.web.mappers.UserMapper;
 import com.security.web.services.UserService;
+import com.security.web.services.impl.IntegrationServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -143,7 +143,7 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserEmptyUserName() throws Exception {
-		BDDMockito.given(this.userService
+		BDDMockito.given(userService
 			.saveUser(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
@@ -169,7 +169,7 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserEmptyPassword() throws Exception {
-		BDDMockito.given(this.userService
+		BDDMockito.given(userService
 			.saveUser(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
@@ -200,7 +200,7 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserNullUserName() throws Exception {
-		BDDMockito.given(this.userService
+		BDDMockito.given(userService
 			.saveUser(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);

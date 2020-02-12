@@ -1,7 +1,6 @@
 package com.security.web.services;
 
 import com.security.web.domain.ApplicationType;
-import com.security.web.domain.CheckedTokenInfoDTO;
 import com.security.web.domain.User;
 
 public interface TokenService {

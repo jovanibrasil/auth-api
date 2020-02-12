@@ -1,11 +1,11 @@
 package com.security.web.configurations;
 
+import com.security.jwt.generator.JwtTokenGenerator;
+import com.security.web.domain.ApplicationType;
 import com.security.web.domain.User;
 import com.security.web.exceptions.implementations.ForbiddenUserException;
 import com.security.web.exceptions.implementations.UnauthorizedUserException;
-import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.web.services.UserService;
-import com.security.web.domain.ApplicationType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +19,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
 
 @Slf4j
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
@@ -60,16 +59,16 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 								+ " ApplicationName: " + applicationName);
 
 					log.info("Verifying token with user name {} and application name {}.", userName, applicationName);
-					UserDetails userDetails = this.userDetailService.loadUserByUsername(userName);
+					UserDetails userDetails = userDetailService.loadUserByUsername(userName);
 
-					if (userDetails == null || !this.userService.existUserWithUserName(userName)) {
+					if (userDetails == null || !userService.existUserWithUserName(userName)) {
 						log.info("Invalid token information.");
 						throw new UnauthorizedUserException("Invalid token information.");
 					}
 
 					try {
 						// Verify authorization
-						User user = this.userService.findByUserName(userName);
+						User user = userService.findByUserName(userName);
 						if (!user.hasRegistry(ApplicationType.valueOf(applicationName))) {
 							String message = String.format(
 									"Forbidden. The user %s doesn't have authorization " + "to access %s",

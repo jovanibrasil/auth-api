@@ -129,7 +129,7 @@ public class JwtTokenGenerator<T> {
 	 */
 	public String getUserNameFromToken(String token) throws TokenException {
 		try {
-			Claims claims = this.getClaimsFromToken(token);
+			Claims claims = getClaimsFromToken(token);
 			return claims.getSubject();	
 		} catch (TokenException e) {
 			throw e;
@@ -147,7 +147,7 @@ public class JwtTokenGenerator<T> {
 	 */
 	public String getAuthority(String token) throws TokenException {
 		try {
-			Claims claims = this.getClaimsFromToken(token);
+			Claims claims = getClaimsFromToken(token);
 			return claims.get(CLAIM_KEY_ROLE).toString();
 		} catch (TokenException e) {
 			throw e;
@@ -164,7 +164,7 @@ public class JwtTokenGenerator<T> {
 	 * @throws TokenException
 	 */
 	public Date getExpirationDate(String token) throws TokenException {
-		Claims claims = this.getClaimsFromToken(token);
+		Claims claims = getClaimsFromToken(token);
 		if(claims == null) throw new TokenException("Expiration date is null.");
 		return claims.getExpiration();
 	}
@@ -177,7 +177,7 @@ public class JwtTokenGenerator<T> {
 	 * @throws TokenException
 	 */
 	public String getApplicationName(String token) throws TokenException {
-		Claims claims = this.getClaimsFromToken(token);
+		Claims claims = getClaimsFromToken(token);
 		Object obj = claims.get(CLAIM_KEY_APPLICATION_NAME);
 		if(obj == null) throw new TokenException("Application name is null");
 		return (String) obj; 
@@ -191,7 +191,7 @@ public class JwtTokenGenerator<T> {
 	 * @throws TokenException
 	 */
 	public String getEmailFromToken(String token) throws TokenException {
-		Claims claims = this.getClaimsFromToken(token);
+		Claims claims = getClaimsFromToken(token);
 		Object obj = claims.get(CLAIM_KEY_EMAIL);
 		if(obj == null) throw new TokenException("Email is null.");
 		return (String) obj;
@@ -205,7 +205,7 @@ public class JwtTokenGenerator<T> {
 	 * @throws TokenException
 	 */
 	public String refreshToken(String token) throws TokenException {
-		Claims claims = this.getClaimsFromToken(token);
+		Claims claims = getClaimsFromToken(token);
 		claims.put(CLAIM_KEY_CREATED, new Date());
 		return buildToken(claims);
 	}
@@ -219,7 +219,7 @@ public class JwtTokenGenerator<T> {
 	 */
 	public boolean tokenIsValid(String token) throws TokenException {
 		try {
-			Date expirationDate = this.getExpirationDate(token);
+			Date expirationDate = getExpirationDate(token);
 			if(expirationDate == null) return false;
 			return new Date().before(expirationDate);
 		} catch (Exception e) {

@@ -1,31 +1,20 @@
 package com.security.web.controllers;
 
-import com.security.captcha.CaptchaService;
-import com.security.captcha.InvalidRecaptchaException;
-import com.security.captcha.ReCaptchaInvalidException;
 import com.security.jwt.utils.Keys;
-import com.security.web.domain.Registry;
-import com.security.web.dto.JwtAuthenticationDTO;
-import com.security.web.dto.TokenDTO;
 import com.security.web.domain.CheckedTokenInfoDTO;
 import com.security.web.domain.User;
+import com.security.web.dto.JwtAuthenticationDTO;
 import com.security.web.dto.Response;
-import com.security.jwt.generator.JwtTokenGenerator;
+import com.security.web.dto.TokenDTO;
 import com.security.web.mappers.UserMapper;
 import com.security.web.services.TokenService;
-import com.security.web.services.UserService;
-import com.security.web.configurations.CustomMessageSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
-import javax.naming.AuthenticationException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Arrays;
-import java.util.Locale;
 
 @RequiredArgsConstructor
 @Slf4j

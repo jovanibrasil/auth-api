@@ -55,7 +55,7 @@ public class User {
 	}
 
 	public boolean hasRegistry(ApplicationType aplication) {
-		for (Registry reg : this.getRegistries()) {
+		for (Registry reg : getRegistries()) {
 			if(reg.getApplication().getApplication().equals(aplication)) {
 				return true;
 			}

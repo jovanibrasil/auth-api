@@ -50,7 +50,7 @@ public class Application {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.id, this.application);
+		return Objects.hash(id, application);
 	}
 	
 }

@@ -1,7 +1,7 @@
 package com.security.web.configurations;
 
-import com.security.web.exceptions.handlers.ExceptionHandlerFilter;
 import com.security.jwt.generator.JwtTokenGenerator;
+import com.security.web.exceptions.handlers.ExceptionHandlerFilter;
 import com.security.web.services.UserService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -50,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 * 
 	 */
 	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) {
-		authenticationManagerBuilder.authenticationProvider(this.authenticationProvider());
+		authenticationManagerBuilder.authenticationProvider(authenticationProvider());
 	}
 	
 	/**
@@ -62,7 +62,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	DaoAuthenticationProvider authenticationProvider() {
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 		provider.setPasswordEncoder(passwordEncoder());
-		provider.setUserDetailsService(this.userDetailsService);
+		provider.setUserDetailsService(userDetailsService);
 		return provider;
 	}
 	
@@ -79,7 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 */
 	@Bean
 	public JwtAuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
-		return new JwtAuthenticationTokenFilter(this.userDetailsService, this.jwtTokenUtil, this.userService);
+		return new JwtAuthenticationTokenFilter(userDetailsService, jwtTokenUtil, userService);
 	}
 	
 	@Bean

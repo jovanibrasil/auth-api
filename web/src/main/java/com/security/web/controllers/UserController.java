@@ -18,7 +18,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Locale;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -46,7 +45,6 @@ public class UserController {
 		userDto.setUserName(user.getUserName());
 		
 		return ResponseEntity.ok(new Response<>(userDto));
-		
 	}
 	
 	/**
@@ -65,7 +63,7 @@ public class UserController {
 		captchaService.processResponse(recaptchaResponse);
 
 		User user = userMapper.registrationUserDtoToUser(userDto);
-		user = this.userService.saveUser(user);
+		user = userService.saveUser(user);
 
 		// Set the resource location and return 201 Created
 		URI location = ServletUriComponentsBuilder
@@ -110,7 +108,7 @@ public class UserController {
 	@PutMapping
 	public ResponseEntity<Response<?>> updateUser(@Valid @RequestBody UpdateUserDTO userDto){
 		User user = userMapper.updateUserDtoToUser(userDto);
-		user = this.userService.updateUser(user);
+		user = userService.updateUser(user);
 		return ResponseEntity.ok().body(new Response<>());
 	}
 
@@ -126,7 +124,7 @@ public class UserController {
 	@DeleteMapping(value="/{username}")
 	public ResponseEntity<Response<String>> deleteUser(@PathVariable("username") String userName){
 		log.info("Delete user {}", userName);
-		this.userService.deleteUser(userName);
+		userService.deleteUser(userName);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new Response<>());
 	}
 	

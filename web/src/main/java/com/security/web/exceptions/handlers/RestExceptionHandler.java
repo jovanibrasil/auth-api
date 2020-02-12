@@ -1,10 +1,13 @@
 package com.security.web.exceptions.handlers;
 
 import com.security.jwt.exceptions.TokenException;
-import com.security.web.exceptions.implementations.*;
 import com.security.web.exceptions.entities.ErrorDetail;
 import com.security.web.exceptions.entities.Response;
 import com.security.web.exceptions.entities.ValidationError;
+import com.security.web.exceptions.implementations.ForbiddenUserException;
+import com.security.web.exceptions.implementations.MicroServiceIntegrationException;
+import com.security.web.exceptions.implementations.NotFoundException;
+import com.security.web.exceptions.implementations.UnauthorizedUserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;

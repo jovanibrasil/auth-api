@@ -2,7 +2,7 @@ package com.security.web.validators;
 
 import com.security.web.services.UserService;
 import lombok.extern.slf4j.Slf4j;
-import com.security.web.validators.StringValidations;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.constraints.NotBlank;

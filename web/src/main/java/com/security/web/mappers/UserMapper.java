@@ -1,7 +1,5 @@
 package com.security.web.mappers;
 
-import com.security.web.domain.Application;
-import com.security.web.domain.ApplicationType;
 import com.security.web.domain.CheckedTokenInfoDTO;
 import com.security.web.domain.User;
 import com.security.web.dto.ConfirmUserDTO;
