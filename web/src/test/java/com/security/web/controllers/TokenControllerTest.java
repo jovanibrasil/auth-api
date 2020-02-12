@@ -3,26 +3,29 @@ package com.security.web.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.generator.JwtTokenGenerator;
-import com.security.web.dto.CreateUserDTO;
-import com.security.web.dto.JwtAuthenticationDTO;
 import com.security.web.domain.Application;
+import com.security.web.domain.ApplicationType;
 import com.security.web.domain.Registry;
 import com.security.web.domain.User;
+import com.security.web.dto.CreateUserDTO;
+import com.security.web.dto.JwtAuthenticationDTO;
+import com.security.web.exceptions.implementations.ForbiddenUserException;
+import com.security.web.exceptions.implementations.UnauthorizedUserException;
+import com.security.web.mappers.UserMapper;
 import com.security.web.repositories.UserRepository;
+import com.security.web.services.TokenService;
 import com.security.web.services.UserService;
-import com.security.web.domain.ApplicationType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.BDDMockito;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,14 +33,17 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isIn;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -67,6 +73,12 @@ public class TokenControllerTest {
 
 	@MockBean
 	private RestTemplate restTemplate;
+
+	@MockBean
+	private TokenService tokenService;
+
+	@MockBean
+	private UserMapper userMapper;
 
 	private List<String> passwordBlankErrors = Arrays.asList("Password length must be between 4 and 12.", 
 			"Password must not be blank or null.");
@@ -108,14 +120,17 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testTokenCreation() throws Exception {
+
+		when(userMapper.jwtAuthenticationDtoToUser(ArgumentMatchers.any()))
+				.thenReturn(user);
+		when(tokenService.createToken(ArgumentMatchers.any(), ArgumentMatchers.any()))
+				.thenReturn("TOKEN");
+
 		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
 		tokenDTO.setUserName(user.getUserName());
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
-		BDDMockito.given(this.userService.findByUserName("test")).willReturn(Optional.of(user));
-		BDDMockito.given(this.authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken("test", "password")))
-		.willReturn(new AuthenticationMock());
+
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(tokenDTO)))
@@ -130,14 +145,16 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testTokenCreationInvalidPassword() throws Exception {
+		when(userMapper.jwtAuthenticationDtoToUser(ArgumentMatchers.any()))
+				.thenReturn(user);
+		when(tokenService.createToken(ArgumentMatchers.any(), ArgumentMatchers.any()))
+				.thenThrow(new UnauthorizedUserException("error.login.invalid"));
+
 		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
 		tokenDTO.setUserName(user.getUserName());
 		tokenDTO.setPassword("kkkk");
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
-		BDDMockito.given(this.userService.findByUserName(user.getUserName())).willReturn(Optional.of(user));
-		BDDMockito.given(this.authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(tokenDTO.getUserName(), tokenDTO.getPassword())))
-		.willReturn(new AuthenticationMock(false));
+
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(tokenDTO)))
@@ -153,19 +170,19 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testTokenCreationInvalidApplication() throws Exception {
+		when(userMapper.jwtAuthenticationDtoToUser(ArgumentMatchers.any()))
+				.thenReturn(user);
+
 		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
 		tokenDTO.setUserName(user.getUserName());
-		tokenDTO.setPassword("kkkk");
+		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(null);
-		BDDMockito.given(this.userService.findByUserName(user.getUserName())).willReturn(Optional.of(user));
-		BDDMockito.given(this.authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(tokenDTO.getUserName(), tokenDTO.getPassword())))
-		.willReturn(new AuthenticationMock());
+
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(tokenDTO)))
-			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", 
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(asJsonString(tokenDTO)))
+				.andExpect(status().isUnprocessableEntity())
+				.andExpect(jsonPath("$.errors[0].errors[0].message",
 					equalTo("Application cannot be null.")));
 	}
 	
@@ -175,20 +192,48 @@ public class TokenControllerTest {
 	 * @throws Exception
 	 */
 	@Test
+	public void testTokenCreationNullUsername() throws Exception {
+		when(userMapper.jwtAuthenticationDtoToUser(ArgumentMatchers.any()))
+				.thenReturn(user);
+
+		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
+		tokenDTO.setUserName(null);
+		tokenDTO.setPassword(user.getPassword());
+		tokenDTO.setApplication(ApplicationType.BLOG_APP);
+
+		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(asJsonString(tokenDTO)))
+				.andExpect(status().isUnprocessableEntity())
+				.andExpect(jsonPath("$.errors[0].errors[0].message",
+						equalTo("Username must not be blank or null.")));
+	}
+
+	/**
+	 * Test token creation passing a invalid username for a registered user.
+	 *
+	 * @throws Exception
+	 */
+	@Test
 	public void testTokenCreationInvalidUsername() throws Exception {
+		when(userMapper.jwtAuthenticationDtoToUser(ArgumentMatchers.any()))
+				.thenReturn(user);
+		when(tokenService.createToken(ArgumentMatchers.any(), ArgumentMatchers.any()))
+				.thenThrow(new UnauthorizedUserException("error.login.invalid"));
+
 		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
 		tokenDTO.setUserName("kkk");
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
-		BDDMockito.given(this.userService.findByUserName(tokenDTO.getUserName())).willReturn(Optional.empty());
+
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(tokenDTO)))
-			.andExpect(status().isUnauthorized())
-			.andExpect(jsonPath("$.errors[0].message", 
-					equalTo("Invalid username or password.")));
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(asJsonString(tokenDTO)))
+				.andExpect(status().isUnauthorized())
+				.andExpect(jsonPath("$.errors[0].message",
+						equalTo("Invalid username or password.")));
 	}
-	
+
 	/**
 	 * Test token creation for a user that are not registered for the application. 
 	 * 
@@ -198,7 +243,12 @@ public class TokenControllerTest {
 	public void testTokenCreationForbiddenApplication() throws Exception {
 		user.setRegistries(Arrays.asList(
 				new Registry(new Application(ApplicationType.NOTES_APP), user)));
-		BDDMockito.given(this.userService.findByUserName("test")).willReturn(Optional.of(user));
+
+		when(userMapper.jwtAuthenticationDtoToUser(ArgumentMatchers.any()))
+				.thenReturn(user);
+		when(tokenService.createToken(ArgumentMatchers.any(), ArgumentMatchers.any()))
+				.thenThrow(new ForbiddenUserException("error.user.notregistered"));
+
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
@@ -216,7 +266,12 @@ public class TokenControllerTest {
 	public void testTokenCreationForbiddenApplicationPtMessage() throws Exception {
 		user.setRegistries(Arrays.asList(
 				new Registry(new Application(ApplicationType.NOTES_APP), user)));
-		BDDMockito.given(this.userService.findByUserName("test")).willReturn(Optional.of(user));
+
+		when(userMapper.jwtAuthenticationDtoToUser(ArgumentMatchers.any()))
+				.thenReturn(user);
+		when(tokenService.createToken(ArgumentMatchers.any(), ArgumentMatchers.any()))
+				.thenThrow(new ForbiddenUserException("error.user.notregistered"));
+
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 				.contentType(MediaType.APPLICATION_JSON)
 				.locale( new Locale("pt"))
@@ -225,22 +280,7 @@ public class TokenControllerTest {
 				.andExpect(jsonPath("$.errors[0].message",
 						equalTo("Usuário não registrado para esta aplicação.")));
 	}
-	
-	/**
-	 * Test token creation with null user name.
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	public void testTokenCreationNullUserName() throws Exception {
-		userDto.setUserName(null);
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
-			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userDto)))
-			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Username must not be blank or null.")));
-	}
-	
+
 	/**
 	 * Test token creation with blank user name.
 	 * 
@@ -253,7 +293,8 @@ public class TokenControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", isIn(userNameBlankErrors)));
+			.andExpect(jsonPath("$.errors[0].errors[0].message",
+					isIn(userNameBlankErrors)));
 	}
 	
 	/**
@@ -268,7 +309,8 @@ public class TokenControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Username length must be between 2 and 12.")));
+			.andExpect(jsonPath("$.errors[0].errors[0].message",
+					equalTo("Username length must be between 2 and 12.")));
 	}
 	
 	/**
@@ -325,42 +367,5 @@ public class TokenControllerTest {
 	        throw new RuntimeException(e);
 	    }
 	}  
-	
-	public class AuthenticationMock implements Authentication {
-
-		private static final long serialVersionUID = 6373211614082998724L;
-
-		private boolean isAuthenticated;
-		
-		public AuthenticationMock() {
-			this.isAuthenticated = true;
-		}
-		
-		public AuthenticationMock(boolean isAuthenticated) {
-			this.isAuthenticated = isAuthenticated;
-		}
-		
-		@Override
-		public String getName() { return null; }
-
-		@Override
-		public Collection<? extends GrantedAuthority> getAuthorities() { return null; }
-
-		@Override
-		public Object getCredentials() { return null; }
-
-		@Override
-		public Object getDetails() { return null; }
-
-		@Override
-		public Object getPrincipal() { return null; }
-
-		@Override
-		public boolean isAuthenticated() { return isAuthenticated; }
-
-		@Override
-		public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {}
-	}
-
 
 }

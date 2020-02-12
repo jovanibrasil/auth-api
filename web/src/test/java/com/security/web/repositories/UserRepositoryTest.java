@@ -31,7 +31,7 @@ public class UserRepositoryTest {
 	@Autowired
 	private ApplicationRepository applicationRepository;
 
-	private User user;
+	private Optional<User> optUser;
 	
 	@Before
 	public void setUp() {
@@ -49,33 +49,33 @@ public class UserRepositoryTest {
 	
 	@Test
 	public void testFindValidUserByName() {
-		User user = this.userRepository.findUserByUserName("test");
-		assertNotNull(user);
+		optUser = this.userRepository.findByUserName("test");
+		assertTrue(optUser.isPresent());
 	}
 	
 	@Test
 	public void testFindValidUserByEmail() {
-		User user = this.userRepository.findUserByEmail("test@gmail.com");
-		assertNotNull(user);
+		optUser = this.userRepository.findByEmail("test@gmail.com");
+		assertTrue(optUser.isPresent());
 	}
 	
 	@Test
 	public void testFindInvalidUserByName() {
-		User user = this.userRepository.findUserByUserName("test@gmail.com");
-		assertNull(user);
+		optUser = this.userRepository.findByUserName("test@gmail.com");
+		assertFalse(optUser.isPresent());
 	}
 	
 	@Test
 	public void testFindInvalidUserByEmail() {
-		User user = this.userRepository.findUserByEmail("test");
-		assertNull(user);
+		optUser = this.userRepository.findByEmail("test");
+		assertFalse(optUser.isPresent());
 	}
 
 	@Test
 	public void testDeleteUser() {
-		User user = userRepository.findUserByUserName("test");
-		userRepository.delete(user);
-		Optional<User> u = userRepository.findById(user.getId());
+		optUser = userRepository.findByUserName("test");
+		userRepository.delete(optUser.get());
+		Optional<User> u = userRepository.findById(optUser.get().getId());
 		assertEquals(false, u.isPresent());
 	}
 	
@@ -96,23 +96,23 @@ public class UserRepositoryTest {
 
 	@Test
 	public void testFindValidUserByNameVerifyApplications() {
-		user = this.userRepository.findUserByUserName("test");
-		Application app = user.getRegistries().get(0).getApplication();
+		optUser = this.userRepository.findByUserName("test");
+		Application app = optUser.get().getRegistries().get(0).getApplication();
 		assertEquals(ApplicationType.BLOG_APP, app.getApplication());
 	}
 	
 	@Test
 	public void testHasSpecificApplication() {
-		user = this.userRepository.findUserByUserName("test");
-		assertTrue(user.hasRegistry(ApplicationType.BLOG_APP));	
+		optUser = this.userRepository.findByUserName("test");
+		assertTrue(optUser.get().hasRegistry(ApplicationType.BLOG_APP));
 	}
 	
 	@Test
 	public void testHasValidApplications() {
-		user = this.userRepository.findUserByEmail("test@gmail.com");
-		assertNotNull(user.getRegistries());
-		assertNotEquals(0, user.getRegistries().size());
-		Registry registry = user.getRegistries().get(0);
+		optUser = this.userRepository.findByEmail("test@gmail.com");
+		assertNotNull(optUser.get().getRegistries());
+		assertNotEquals(0, optUser.get().getRegistries().size());
+		Registry registry = optUser.get().getRegistries().get(0);
 		if(registry != null) {
 			assertNotNull(registry.getApplication());
 			assertNotNull(registry.getApplication().getId());

@@ -6,7 +6,7 @@ import lombok.*;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @ToString
-public class TempUser {
+public class CheckedTokenInfoDTO {
 
 	private String name;
 	private ProfileEnum role;

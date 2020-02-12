@@ -1,6 +1,6 @@
 package com.security.jwt.generator;
 
-import com.security.jwt.exceptions.InvalidTokenException;
+import com.security.jwt.exceptions.TokenException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -99,24 +99,24 @@ public class JwtTokenGenerator<T> {
 	 * 
 	 * @param token
 	 * @return
-	 * @throws InvalidTokenException
+	 * @throws TokenException
 	 */
-	public Claims getClaimsFromToken(String token) throws InvalidTokenException {
+	public Claims getClaimsFromToken(String token) throws TokenException {
 		try {
 			return Jwts.parser() 			// Gets a JWT parser instance
 					.setSigningKey(secret)  // Sets the sign key used to verify the JWS signature
 					.parseClaimsJws(token)  // Parses JWS token. Throws an exception if the token aren't a JWS token. 
 					.getBody();
 		} catch (UnsupportedJwtException e) {
-			throw new InvalidTokenException("the token format is not supported. The token is not a JWS token. " + e.getMessage());
+			throw new TokenException("the token format is not supported. The token is not a JWS token. " + e.getMessage());
 		} catch (MalformedJwtException e) {
-			throw new InvalidTokenException("The token was not correctly constructed.");
+			throw new TokenException("The token was not correctly constructed.");
 		} catch (SignatureException e) {
-			throw new InvalidTokenException("Calculating a signature or verifying an existing signature of a JWS failed");
+			throw new TokenException("Calculating a signature or verifying an existing signature of a JWS failed");
 		} catch (ExpiredJwtException e) {
-			throw new InvalidTokenException("The token is expired.");
+			throw new TokenException("The token is expired.");
 		} catch (Exception e) {
-			throw new InvalidTokenException("Unexpected error while processing the token.");
+			throw new TokenException("Unexpected error while processing the token.");
 		}
 	}
 	
@@ -125,16 +125,16 @@ public class JwtTokenGenerator<T> {
 	 * 
 	 * @param token
 	 * @return
-	 * @throws InvalidTokenException
+	 * @throws TokenException
 	 */
-	public String getUserNameFromToken(String token) throws InvalidTokenException {
+	public String getUserNameFromToken(String token) throws TokenException {
 		try {
 			Claims claims = this.getClaimsFromToken(token);
 			return claims.getSubject();	
-		} catch (InvalidTokenException e) {
+		} catch (TokenException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new InvalidTokenException("Error getting user name from the token.");
+			throw new TokenException("Error getting user name from the token.");
 		}
 	}
 	
@@ -143,16 +143,16 @@ public class JwtTokenGenerator<T> {
 	 * 
 	 * @param token
 	 * @return
-	 * @throws InvalidTokenException
+	 * @throws TokenException
 	 */
-	public String getAuthority(String token) throws InvalidTokenException {
+	public String getAuthority(String token) throws TokenException {
 		try {
 			Claims claims = this.getClaimsFromToken(token);
 			return claims.get(CLAIM_KEY_ROLE).toString();
-		} catch (InvalidTokenException e) {
+		} catch (TokenException e) {
 			throw e;
 		} catch (Exception e) {
-			throw new InvalidTokenException("Error getting user authority from the token.");
+			throw new TokenException("Error getting user authority from the token.");
 		}
 	}
 	
@@ -161,11 +161,11 @@ public class JwtTokenGenerator<T> {
 	 * 
 	 * @param token
 	 * @return
-	 * @throws InvalidTokenException
+	 * @throws TokenException
 	 */
-	public Date getExpirationDate(String token) throws InvalidTokenException {
+	public Date getExpirationDate(String token) throws TokenException {
 		Claims claims = this.getClaimsFromToken(token);
-		if(claims == null) throw new InvalidTokenException("Expiration date is null.");
+		if(claims == null) throw new TokenException("Expiration date is null.");
 		return claims.getExpiration();
 	}
 	
@@ -174,12 +174,12 @@ public class JwtTokenGenerator<T> {
 	 * 
 	 * @param token
 	 * @return
-	 * @throws InvalidTokenException
+	 * @throws TokenException
 	 */
-	public String getApplicationName(String token) throws InvalidTokenException {
+	public String getApplicationName(String token) throws TokenException {
 		Claims claims = this.getClaimsFromToken(token);
 		Object obj = claims.get(CLAIM_KEY_APPLICATION_NAME);
-		if(obj == null) throw new InvalidTokenException("Application name is null");
+		if(obj == null) throw new TokenException("Application name is null");
 		return (String) obj; 
 	}
 	
@@ -188,12 +188,12 @@ public class JwtTokenGenerator<T> {
 	 * 
 	 * @param token
 	 * @return
-	 * @throws InvalidTokenException
+	 * @throws TokenException
 	 */
-	public String getEmailFromToken(String token) throws InvalidTokenException {
+	public String getEmailFromToken(String token) throws TokenException {
 		Claims claims = this.getClaimsFromToken(token);
 		Object obj = claims.get(CLAIM_KEY_EMAIL);
-		if(obj == null) throw new InvalidTokenException("Email is null.");
+		if(obj == null) throw new TokenException("Email is null.");
 		return (String) obj;
 	}
 	
@@ -202,9 +202,9 @@ public class JwtTokenGenerator<T> {
 	 * 
 	 * @param token
 	 * @return
-	 * @throws InvalidTokenException
+	 * @throws TokenException
 	 */
-	public String refreshToken(String token) throws InvalidTokenException {
+	public String refreshToken(String token) throws TokenException {
 		Claims claims = this.getClaimsFromToken(token);
 		claims.put(CLAIM_KEY_CREATED, new Date());
 		return buildToken(claims);
@@ -215,9 +215,9 @@ public class JwtTokenGenerator<T> {
 	 * 
 	 * @param token
 	 * @return
-	 * @throws InvalidTokenException
+	 * @throws TokenException
 	 */
-	public boolean tokenIsValid(String token) throws InvalidTokenException {
+	public boolean tokenIsValid(String token) throws TokenException {
 		try {
 			Date expirationDate = this.getExpirationDate(token);
 			if(expirationDate == null) return false;

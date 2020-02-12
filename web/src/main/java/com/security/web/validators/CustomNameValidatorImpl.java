@@ -27,8 +27,7 @@ public class CustomNameValidatorImpl implements ConstraintValidator<CustomNameVa
 				message = "{error.user.name.size}";
 			}else {
 				log.info("Validating : {}", value);
-				boolean isValid = !userService.findByUserName(value).isPresent();
-				if(isValid) { 
+				if(!userService.existUserWithUserName(value)) {
 					return true;
 				}else {
 					message = "{error.user.name.unique}";

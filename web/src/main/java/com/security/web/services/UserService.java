@@ -1,19 +1,21 @@
 package com.security.web.services;
 
+import com.security.web.domain.ApplicationType;
 import com.security.web.domain.User;
-import com.security.web.exceptions.implementations.UserServiceException;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
 
-	Optional<User> findByUserName(String userName);
-	User save(User user) throws UserServiceException;
-	Optional<User> findUserByEmail(String email);
-	void deleteUser(String userName) throws UserServiceException;
-	User updateUser(User user) throws UserServiceException;
-	Optional<User> findUserById(Long id);
+	User findByUserName(String userName);
+	boolean existUserWithUserName(String userName);
+	User saveUser(User user);
+	User findUserByEmail(String email);
+	boolean existUserWithEmail(String email);
+	void deleteUser(String userName);
+	User updateUser(User user);
+	User findUserById(Long id);
 	List<String> validateUser(User user);
-
+    void confirmUserEmail(User user, ApplicationType applicationType);
+	boolean authenticate(String userName, String password);
 }

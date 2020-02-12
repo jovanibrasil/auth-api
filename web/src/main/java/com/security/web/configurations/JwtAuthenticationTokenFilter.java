@@ -61,16 +61,15 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
 					log.info("Verifying token with user name {} and application name {}.", userName, applicationName);
 					UserDetails userDetails = this.userDetailService.loadUserByUsername(userName);
-					Optional<User> optUser = this.userService.findByUserName(userName);
 
-					if (userDetails == null || !optUser.isPresent()) {
+					if (userDetails == null || !this.userService.existUserWithUserName(userName)) {
 						log.info("Invalid token information.");
 						throw new UnauthorizedUserException("Invalid token information.");
 					}
 
 					try {
 						// Verify authorization
-						User user = optUser.get();
+						User user = this.userService.findByUserName(userName);
 						if (!user.hasRegistry(ApplicationType.valueOf(applicationName))) {
 							String message = String.format(
 									"Forbidden. The user %s doesn't have authorization " + "to access %s",

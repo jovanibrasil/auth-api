@@ -18,6 +18,8 @@ public class Response<T> {
 		this.errors = new ArrayList<>();
 	}
 
+	public Response(T data) { this.data = data; }
+
 	public T getData() {
 		return data;
 	}

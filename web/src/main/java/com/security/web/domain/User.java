@@ -99,4 +99,9 @@ public class User {
         return Objects.hash(id, userName, password);
     }
 
+	@Override
+	public String toString(){
+		return userName + " - " + email;
+	}
+
 }

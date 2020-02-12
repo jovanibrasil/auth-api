@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.captcha.CaptchaServiceImpl;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.web.domain.ApplicationType;
+import com.security.web.exceptions.implementations.NotFoundException;
+import com.security.web.exceptions.implementations.ValidationException;
+import com.security.web.mappers.UserMapper;
 import com.security.web.services.impl.IntegrationServiceImpl;
 import com.security.web.dto.ConfirmUserDTO;
 import com.security.web.dto.CreateUserDTO;
@@ -11,7 +14,6 @@ import com.security.web.dto.RegistrationUserDTO;
 import com.security.web.domain.Application;
 import com.security.web.domain.Registry;
 import com.security.web.domain.User;
-import com.security.web.exceptions.implementations.UserServiceException;
 import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.web.services.UserService;
 import org.junit.Before;
@@ -32,12 +34,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isIn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -58,7 +58,10 @@ public class UserControllerTest {
 	
 	@MockBean
 	private CaptchaServiceImpl captchaService;
-	
+
+	@MockBean
+	private UserMapper userMapper;
+
 	private User user;
 	private CreateUserDTO userDto;
 	
@@ -89,10 +92,8 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUser() throws Exception {
-		BDDMockito.given(userService.findByUserName(Mockito.any()))
-			.willReturn(Optional.empty()); // user name not registered yet
-		BDDMockito.given(this.userService
-			.save(Mockito.any())).willReturn(user); // save successfully
+		when(userService.saveUser(Mockito.any())).thenReturn(user);
+		when(userMapper.registrationUserDtoToUser(any())).thenReturn(user);
 
 		// validate recaptcha successfully
 		//	CaptchaService captchaService = mock(CaptchaService.class);
@@ -117,9 +118,11 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserNameAlreadyExists() throws Exception {
-		BDDMockito.given(userService.findByUserName(Mockito.any()))
-			.willReturn(Optional.of(user)); // user name not registered yet
-		
+		when(userService.saveUser(Mockito.any()))
+				.thenThrow(ValidationException.class);
+		when(userMapper.registrationUserDtoToUser(any())).thenReturn(user);
+		when(userService.existUserWithUserName(any())).thenReturn(true);
+
 		RegistrationUserDTO userRegDTO = new RegistrationUserDTO();
 		userRegDTO.setPassword("teste");
 		userRegDTO.setUserName("teste");
@@ -140,10 +143,8 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserEmptyUserName() throws Exception {
-		BDDMockito.given(userService.findByUserName(Mockito.any()))
-			.willReturn(Optional.empty()); // user name not registered yet
 		BDDMockito.given(this.userService
-			.save(Mockito.any())).willReturn(user); // save successfully
+			.saveUser(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
@@ -168,10 +169,8 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserEmptyPassword() throws Exception {
-		BDDMockito.given(userService.findByUserName(Mockito.any()))
-			.willReturn(Optional.empty()); // user name not registered yet
 		BDDMockito.given(this.userService
-			.save(Mockito.any())).willReturn(user); // save successfully
+			.saveUser(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
@@ -201,10 +200,8 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserNullUserName() throws Exception {
-		BDDMockito.given(userService.findByUserName(Mockito.any()))
-			.willReturn(Optional.empty()); // user name not registered yet
 		BDDMockito.given(this.userService
-			.save(Mockito.any())).willReturn(user); // save successfully
+			.saveUser(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
@@ -229,10 +226,8 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserNullPassword() throws Exception {
-		BDDMockito.given(userService.findByUserName(Mockito.any()))
-			.willReturn(Optional.empty()); // user name not registered yet
 		BDDMockito.given(this.userService
-			.save(Mockito.any())).willReturn(user); // save successfully
+			.saveUser(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
@@ -257,21 +252,19 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testConfirmUserEmailAlreadyExists() throws Exception {
-		BDDMockito.given(userService.findUserByEmail(Mockito.any()))
-			.willReturn(Optional.of(user));
-			
+		when(userService.existUserWithEmail(any())).thenReturn(true);
+		BDDMockito.willThrow(new ValidationException(""))
+				.given(userService).confirmUserEmail(any(), any());
 		mvc.perform(MockMvcRequestBuilders.post("/users/confirmation")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("This email already exists.")));
+			.andExpect(jsonPath("$.errors[0].errors[0].message",
+					equalTo("This email already exists.")));
 	}
 	
 	@Test
 	public void testConfirmUserEmptyEmail() throws Exception {
-		BDDMockito.given(userService.findUserByEmail(Mockito.any()))
-			.willReturn(Optional.empty()); // user email not registered yet
-		
 		ConfirmUserDTO userRegDTO = new ConfirmUserDTO();
 		userRegDTO.setEmail("");
 		userRegDTO.setApplication(ApplicationType.BLOG_APP);
@@ -285,9 +278,6 @@ public class UserControllerTest {
 	
 	@Test
 	public void testConfirmUserNullApplication() throws Exception {
-		BDDMockito.given(userService.findUserByEmail(Mockito.any()))
-			.willReturn(Optional.empty()); // user email not registered yet
-		
 		ConfirmUserDTO userRegDTO = new ConfirmUserDTO();
 		userRegDTO.setEmail("jovanibrasil@gmail.com");
 		userRegDTO.setApplication(null);
@@ -301,9 +291,6 @@ public class UserControllerTest {
 	
 	@Test
 	public void testConfirmUserNullEmail() throws Exception {
-		BDDMockito.given(userService.findUserByEmail(Mockito.any()))
-			.willReturn(Optional.empty()); // user email not registered yet
-		
 		ConfirmUserDTO userRegDTO = new ConfirmUserDTO();
 		userRegDTO.setEmail(null);
 		userRegDTO.setApplication(ApplicationType.BLOG_APP);
@@ -357,6 +344,7 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testDeleteUser() throws Exception {
+		BDDMockito.doNothing().when(userService).deleteUser(any());
 		mvc.perform(MockMvcRequestBuilders.delete("/users/test")
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent())
@@ -370,11 +358,13 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testDeleteInvalidUser() throws Exception {
-		doThrow(new UserServiceException("The user does not exist.")).when(this.userService).deleteUser(Mockito.anyString());
+		doThrow(new NotFoundException("error.user.notfound"))
+				.when(this.userService).deleteUser(Mockito.anyString());
 		mvc.perform(MockMvcRequestBuilders.delete("/users/java")
 			.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.errors[0]", equalTo("The user does not exist.")));
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.errors[0].message",
+					equalTo("User not found.")));
 	}
 
 	/**

@@ -5,6 +5,7 @@ import com.security.web.domain.User;
 import com.security.web.dto.EmailMessage;
 import com.security.web.exceptions.implementations.MicroServiceIntegrationException;
 import com.security.web.services.IntegrationService;
+import com.security.web.services.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
@@ -33,7 +34,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 	@Value("${urls.email.server.url}")
 	private String emailServerUrl;
 
-	private final TokenServiceImpl tokenService;
+	private final TokenService tokenService;
 	private final RestTemplate restTemplate;
 
 	/**

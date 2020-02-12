@@ -30,8 +30,7 @@ public class CustomEmailValidatorImpl implements ConstraintValidator<CustomEmail
 				message = "{error.email.invalid}";
 			}else {
 				log.info("Validating : {}", value);
-				boolean isValid = !userService.findUserByEmail(value).isPresent();
-				if(isValid) { 
+				if(!userService.existUserWithEmail(value)) {
 					return true;
 				}else {
 					message = "{error.email.alreadyexists}";

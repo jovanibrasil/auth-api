@@ -1,4 +1,4 @@
-package com.security.web.integration;
+package com.security.web.services;
 
 import com.security.web.exceptions.handlers.RestTemplateResponseErrorHandler;
 import com.security.web.exceptions.implementations.MicroServiceIntegrationException;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @RunWith(SpringRunner.class)
 @RestClientTest
-public class IntegrationTest {
+public class IntegrationServiceTest {
 
 	@Autowired
 	private MockRestServiceServer server;
@@ -54,7 +54,7 @@ public class IntegrationTest {
 	 * 
 	 */
 	@Test(expected = MicroServiceIntegrationException.class)
-	public void creatingNotesInavlidUser() {
+	public void creatingNotesInvalidUser() {
 		assertNotNull(this.builder);
 		assertNotNull(this.server);
 
