@@ -32,7 +32,7 @@ public class TokenServiceImpl implements TokenService {
 	private final Utils utils;
 
 	public TokenServiceImpl(JwtTokenGenerator jwtTokenUtil,
-							@Qualifier("userDetailServiceImpl") @Lazy UserDetailsService userDetailsService,
+							@Lazy @Qualifier("userDetailServiceImpl") UserDetailsService userDetailsService,
 							UserService userService, AuthenticationManager authenticationManager, Utils utils) {
 		this.jwtTokenUtil = jwtTokenUtil;
 		this.userDetailsService = userDetailsService;

@@ -12,11 +12,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Arrays;
 
-@RequiredArgsConstructor
 public abstract class UserMapperDecorator implements UserMapper {
 
     private UserMapper userMapper;
-    private final JwtTokenGenerator jwtTokenUtil;
+    private JwtTokenGenerator jwtTokenUtil;
 
     @Override
     public User registrationUserDtoToUser(RegistrationUserDTO registrationUserDTO) {
@@ -57,4 +56,7 @@ public abstract class UserMapperDecorator implements UserMapper {
     public void setUserMapper(UserMapper userMapper) {
         this.userMapper = userMapper;
     }
+
+    @Autowired
+    public void setJwtTokenUtil(JwtTokenGenerator jwtTokenUtil) { this.jwtTokenUtil = jwtTokenUtil; }
 }

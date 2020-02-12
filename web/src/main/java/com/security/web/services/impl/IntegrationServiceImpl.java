@@ -10,13 +10,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class IntegrationServiceImpl implements IntegrationService {
 
 	@Value("${urls.blog.createuser}")
@@ -36,6 +36,11 @@ public class IntegrationServiceImpl implements IntegrationService {
 
 	private final TokenService tokenService;
 	private final RestTemplate restTemplate;
+
+	public IntegrationServiceImpl(TokenService tokenService, RestTemplate restTemplate) {
+		this.tokenService = tokenService;
+		this.restTemplate = restTemplate;
+	}
 
 	/**
 	 * Creates an user in a specific application service, like notes-app or blog-app.

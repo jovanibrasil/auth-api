@@ -14,6 +14,7 @@ import com.security.web.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -25,13 +26,21 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
 	private final IntegrationServiceImpl integrationService;
 	private final AuthenticationManager authenticationManager;
 	private final JwtTokenGenerator jwtTokenUtil;
+
+	public UserServiceImpl(UserRepository userRepository, @Lazy IntegrationServiceImpl integrationService,
+						   AuthenticationManager authenticationManager, JwtTokenGenerator jwtTokenUtil) {
+		this.userRepository = userRepository;
+		this.integrationService = integrationService;
+		this.authenticationManager = authenticationManager;
+		this.jwtTokenUtil = jwtTokenUtil;
+	}
+
 	@Value("${urls.notes.userconfirmationview}")
 	private String userConfirmationViewUrl;
 

@@ -6,6 +6,7 @@ import com.security.web.services.UserService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -34,10 +35,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private final JwtTokenGenerator jwtTokenUtil;
 	private final UserService userService;
 
-
 	public WebSecurityConfig(JwtAuthenticationEntryPoint unauthorizedHandler,
-                             @Qualifier("userDetailServiceImpl") UserDetailsService userDetailsService,
-                             JwtTokenGenerator jwtTokenUtil, UserService userService) {
+                             @Lazy @Qualifier("userDetailServiceImpl") UserDetailsService userDetailsService,
+                             JwtTokenGenerator jwtTokenUtil, @Lazy UserService userService) {
 		this.unauthorizedHandler = unauthorizedHandler;
 		this.userDetailsService = userDetailsService;
 		this.jwtTokenUtil = jwtTokenUtil;
