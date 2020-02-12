@@ -12,11 +12,9 @@ import java.util.List;
 public class Response<T> {
 
 	private T data;
-	private List<String> errors;
+	private List<String> errors = new ArrayList<>();
 	
-	public Response() {
-		this.errors = new ArrayList<>();
-	}
+	public Response() {	}
 
 	public Response(T data) { this.data = data; }
 
