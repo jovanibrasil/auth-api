@@ -21,7 +21,7 @@ public class JwtUserFactory {
 	/*
 	 * Convert a role to a lists of granted authorities.
 	 */
-	private static List<GrantedAuthority> mapToGrantedAuthorities(ProfileEnum profileEnum) {
+	public static List<GrantedAuthority> mapToGrantedAuthorities(ProfileEnum profileEnum) {
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(profileEnum.toString()));
 		return authorities;

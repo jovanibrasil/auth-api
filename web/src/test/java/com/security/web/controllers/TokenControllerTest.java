@@ -2,7 +2,9 @@ package com.security.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.jwt.enums.ProfileEnum;
+import com.security.jwt.exceptions.TokenException;
 import com.security.jwt.generator.JwtTokenGenerator;
+import com.security.jwt.utils.Utils;
 import com.security.web.domain.Application;
 import com.security.web.domain.ApplicationType;
 import com.security.web.domain.Registry;
@@ -15,6 +17,7 @@ import com.security.web.mappers.UserMapper;
 import com.security.web.repositories.UserRepository;
 import com.security.web.services.TokenService;
 import com.security.web.services.UserService;
+import com.security.web.services.impl.TokenServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +43,7 @@ import java.util.Locale;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isIn;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -76,6 +80,9 @@ public class TokenControllerTest {
 
 	@MockBean
 	private UserMapper userMapper;
+
+	@MockBean
+	private Utils utils;
 
 	private List<String> passwordBlankErrors = Arrays.asList("Password length must be between 4 and 12.", 
 			"Password must not be blank or null.");
@@ -312,7 +319,7 @@ public class TokenControllerTest {
 	
 	/**
 	 * Test token creation with null password.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -354,7 +361,35 @@ public class TokenControllerTest {
 			.andExpect(status().isUnprocessableEntity())
 			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Password length must be between 4 and 12.")));
 	}
-	
+
+	/**
+	 * Test token checking with expired password.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testCheckingExpiredToken() throws Exception {
+		when(tokenService.checkToken(anyString()))
+				.thenThrow(TokenException.class);
+		mvc.perform(MockMvcRequestBuilders.get("/token/check")
+				.header("Authorization", "Bearer token"))
+				.andExpect(status().isUnprocessableEntity());
+	}
+
+	/**
+	 * Test token checking with expired password.
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testTokenCheckingValidToken() throws Exception {
+		when(tokenService.checkToken(anyString()))
+				.thenReturn(user);
+		mvc.perform(MockMvcRequestBuilders.get("/token/check")
+				.header("Authorization", "Bearer token"))
+				.andExpect(status().isOk());
+	}
+
 	public static String asJsonString(final Object obj) {
 	    try {
 	        final ObjectMapper mapper = new ObjectMapper();
@@ -363,6 +398,6 @@ public class TokenControllerTest {
 	    } catch (Exception e) {
 	        throw new RuntimeException(e);
 	    }
-	}  
+	}
 
 }

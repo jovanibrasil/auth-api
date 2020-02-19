@@ -46,12 +46,12 @@ public class TokenServiceImpl implements TokenService {
 		log.info("Generating Service token.");
 		if(token == null) {
 			try {
-				UserDetails userDetails = this.userDetailsService.loadUserByUsername("AUTH");
+				UserDetails userDetails = userDetailsService.loadUserByUsername("AUTH");
 				log.info("Creating the token ...");
 				token = jwtTokenUtil.createToken(userDetails, ApplicationType.AUTH_APP);
 				log.info("Generated token: {}.", token);
 			} catch (Exception e) {
-				e.printStackTrace();
+				e.printStackTrace(); // todo handle this exception
 			}	
 		}
 		return token;
