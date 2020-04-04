@@ -107,7 +107,7 @@ public class TokenServiceImpl implements TokenService {
 			ApplicationType applicationName = ApplicationType.valueOf(jwtTokenUtil.getApplicationName(token));
 			User user = userService.findByUserName(userName);
 
-			if(!applicationName.equals(ApplicationType.AUTH_APP) && user.hasRegistry(applicationName)) {
+			if(user.hasRegistry(applicationName)) {
 				log.info("Token ok from user {}", userName);
 				return user;
 			}else{
