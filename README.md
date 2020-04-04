@@ -1,4 +1,4 @@
-[![Build Status](http://jovanibrasil.com:8085/buildStatus/icon?job=auth-api)](http://13.58.51.172:8085/job/auth-api/)
+[![Build Status](https://travis-ci.org/jovanibrasil/auth-api.svg?branch=develop)](https://travis-ci.org/jovanibrasil/auth-api)
 
 # API para autenticação utilizando JWT
 
