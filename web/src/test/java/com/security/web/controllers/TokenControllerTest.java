@@ -17,7 +17,6 @@ import com.security.web.mappers.UserMapper;
 import com.security.web.repositories.UserRepository;
 import com.security.web.services.TokenService;
 import com.security.web.services.UserService;
-import com.security.web.services.impl.TokenServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

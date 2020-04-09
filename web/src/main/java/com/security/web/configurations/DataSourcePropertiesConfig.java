@@ -1,6 +1,6 @@
 package com.security.web.configurations;
 
-import com.security.captcha.AuthDataSourceProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -10,19 +10,14 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
+@Profile({ "dev", "prod", "stage" })
 @Slf4j
-@Profile({ "default", "prod", "stage" })
+@RequiredArgsConstructor
 @Configuration
-@EnableConfigurationProperties(AuthDataSourceProperties.class)
-public class AuthPropertiesConfig {
+@EnableConfigurationProperties(DataSourceProperties.class)
+public class DataSourcePropertiesConfig {
 
-	private final AuthDataSourceProperties configuration;
-
-	public AuthPropertiesConfig(AuthDataSourceProperties configuration) {
-		this.configuration = configuration;
-		log.info("Setting jwt secret ...");
-		System.setProperty("jwt.secret", configuration.getJwtsecretkey());
-	}
+	private final DataSourceProperties configuration;
 
 	@Bean
 	public DataSource getDataResource() {
@@ -33,7 +28,7 @@ public class AuthPropertiesConfig {
 		dataSource.setUrl(configuration.getUrl());
 		dataSource.setUsername(configuration.getUsername());
 		dataSource.setPassword(configuration.getPassword());
-		dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+		dataSource.setDriverClassName("org.mariadb.jdbc.Driver");
 		
 		return dataSource;
 	}

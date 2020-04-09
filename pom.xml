@@ -20,7 +20,7 @@
 	<description>Auth API</description>
 
 	<scm>
-		<connection>scm:git:https://jovanibrasil@github.com/jovanibrasil/ParallelDeploymentTest.git</connection>
+		<connection>scm:git:https://jovanibrasil@github.com/jovanibrasil/auth-api.git</connection>
 	</scm>
 
 	<parent>
@@ -32,7 +32,6 @@
 
 	<properties>
 		<java.version>1.8</java.version>
-		<spring-cloud.version>Greenwich.SR2</spring-cloud.version>
 		<mapstruct.version>1.3.0.Final</mapstruct.version>
 	</properties>
 
@@ -47,10 +46,6 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-vault-config</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
@@ -59,8 +54,8 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -91,11 +86,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>20.0</version>
@@ -117,18 +107,6 @@
 		</dependency>
 	</dependencies>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
 	<profiles>
 		<profile>
 			<id>dev</id>
@@ -138,7 +116,6 @@
 			<properties>
 				<activatedProperties>dev</activatedProperties>
 				<spring.profiles.active>dev</spring.profiles.active>
-				<enableVault>false</enableVault>
 			</properties>
 		</profile>
 		<profile>
@@ -146,15 +123,12 @@
 			<properties>
 				<activatedProperties>stage</activatedProperties>
 				<spring.profiles.active>stage</spring.profiles.active>
-				<vaultHost>127.0.0.1</vaultHost>
-				<enableVault>true</enableVault>
 			</properties>
 		</profile>
 		<profile>
 			<id>test</id>
 			<properties>
 				<spring.profiles.active>test</spring.profiles.active>
-				<vaultHost>vault-server</vaultHost>
 			</properties>
 		</profile>
 		<profile>
@@ -162,8 +136,6 @@
 			<properties>
 				<activatedProperties>prod</activatedProperties>
 				<spring.profiles.active>prod</spring.profiles.active>
-				<vaultHost>vault-server</vaultHost>
-				<enableVault>true</enableVault>
 			</properties>
 		</profile>
 	</profiles>

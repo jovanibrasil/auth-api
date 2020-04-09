@@ -3,12 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>auth-api</artifactId>
         <groupId>com.security</groupId>
+        <artifactId>auth-api</artifactId>
         <version>1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
+    <packaging>war</packaging>
     <artifactId>security-web</artifactId>
 
     <dependencies>
@@ -19,7 +19,7 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.api</groupId>
+            <groupId>com.security</groupId>
             <artifactId>security-captcha</artifactId>
             <version>1.0</version>
             <scope>compile</scope>
@@ -55,7 +55,15 @@
                     </buildNumberPropertiesFileLocation>
                 </configuration>
             </plugin>
+        	<plugin>
+				<groupId>com.heroku.sdk</groupId>
+				<artifactId>heroku-maven-plugin</artifactId>
+				<version>2.0.11</version>
+				<configuration>
+					<appName>jb-auth-api</appName>
+				</configuration>
+			</plugin>
         </plugins>
     </build>
-
+    
 </project>
