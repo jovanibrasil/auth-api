@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/jovanibrasil/auth-api.svg?branch=develop)](https://travis-ci.org/jovanibrasil/auth-api)
-[![Code Coverage](https://img.shields.io/codecov/c/github/jovanibrasil/auth-api)](https://codecov.io/github/jovanibrasil/auth-api?branch=develop)
+![Codecov branch](https://img.shields.io/codecov/c/github/jovanibrasil/auth-api/develop)
 
 # API para autenticação utilizando JWT
 
