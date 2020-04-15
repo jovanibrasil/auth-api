@@ -107,8 +107,7 @@ public class UserControllerTest {
 		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
-			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.errors").isEmpty());
+			.andExpect(status().isCreated());
 	}
 	
 	/**
@@ -132,7 +131,7 @@ public class UserControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("This user name already exists.")));
+			.andExpect(jsonPath("$.errors[0].message", equalTo("This user name already exists.")));
 		
 	}
 	
@@ -159,7 +158,7 @@ public class UserControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Username must not be blank or null.")));
+			.andExpect(jsonPath("$.errors[0].message", equalTo("Username must not be blank or null.")));
 	}
 	
 	/**
@@ -189,7 +188,7 @@ public class UserControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", 
+			.andExpect(jsonPath("$.errors[0].message", 
 					isIn(passwordErrors)));
 	}
 	
@@ -216,7 +215,7 @@ public class UserControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Username must not be blank or null.")));
+			.andExpect(jsonPath("$.errors[0].message", equalTo("Username must not be blank or null.")));
 	}
 	
 	/**
@@ -242,7 +241,7 @@ public class UserControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Password must not be blank or null.")));
+			.andExpect(jsonPath("$.errors[0].message", equalTo("Password must not be blank or null.")));
 	}
 	
 	/**
@@ -259,7 +258,7 @@ public class UserControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message",
+			.andExpect(jsonPath("$.errors[0].message",
 					equalTo("This email already exists.")));
 	}
 	
@@ -273,7 +272,7 @@ public class UserControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Email must not be blank or null.")));
+			.andExpect(jsonPath("$.errors[0].message", equalTo("Email must not be blank or null.")));
 	}
 	
 	@Test
@@ -286,7 +285,7 @@ public class UserControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Application cannot be null.")));
+			.andExpect(jsonPath("$.errors[0].message", equalTo("Application cannot be null.")));
 	}
 	
 	@Test
@@ -299,7 +298,7 @@ public class UserControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Email must not be blank or null.")));
+			.andExpect(jsonPath("$.errors[0].message", equalTo("Email must not be blank or null.")));
 	}
 	
 //	/**
@@ -344,11 +343,10 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testDeleteUser() throws Exception {
-		BDDMockito.doNothing().when(userService).deleteUser(any());
+		BDDMockito.doNothing().when(userService).deleteUserByName(any());
 		mvc.perform(MockMvcRequestBuilders.delete("/users/test")
 			.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isNoContent())
-			.andExpect(jsonPath("$.errors").isEmpty());
+			.andExpect(status().isNoContent());
 	}
 	
 	/**
@@ -359,11 +357,11 @@ public class UserControllerTest {
 	@Test
 	public void testDeleteInvalidUser() throws Exception {
 		doThrow(new NotFoundException("error.user.notfound"))
-				.when(this.userService).deleteUser(Mockito.anyString());
+				.when(this.userService).deleteUserByName(Mockito.anyString());
 		mvc.perform(MockMvcRequestBuilders.delete("/users/java")
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNotFound())
-			.andExpect(jsonPath("$.errors[0].message",
+			.andExpect(jsonPath("$.message",
 					equalTo("User not found.")));
 	}
 

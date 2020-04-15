@@ -12,7 +12,7 @@ public interface UserService {
 	User saveUser(User user);
 	User findUserByEmail(String email);
 	boolean existUserWithEmail(String email);
-	void deleteUser(String userName);
+	void deleteUserByName(String userName);
 	User updateUser(User user);
 	User findUserById(Long id);
 	List<String> validateUser(User user);

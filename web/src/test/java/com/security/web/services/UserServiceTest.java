@@ -227,7 +227,7 @@ public class UserServiceTest {
 	@Test
 	public void testDeleteUser() {
 		try {
-			this.userService.deleteUser("test");
+			this.userService.deleteUserByName("test");
 			assertTrue(true);
 		} catch (Exception e) {
 			assertTrue(false);
@@ -237,7 +237,7 @@ public class UserServiceTest {
 	@Test(expected = NotFoundException.class)
 	public void testDeleteInvalidUser() {
 		//The user does not exist.
-		userService.deleteUser("java");
+		userService.deleteUserByName("java");
 	}
 
 }

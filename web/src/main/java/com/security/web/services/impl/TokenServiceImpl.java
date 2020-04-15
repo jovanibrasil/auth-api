@@ -100,23 +100,19 @@ public class TokenServiceImpl implements TokenService {
 
 	@Override
 	public User checkToken(String token) {
-		try {
-			token = utils.extractJwtTokenFromBearerHeader(token);
+		token = utils.extractJwtTokenFromBearerHeader(token);
 
-			String userName = jwtTokenUtil.getUserNameFromToken(token);
-			ApplicationType applicationName = ApplicationType.valueOf(jwtTokenUtil.getApplicationName(token));
-			User user = userService.findByUserName(userName);
+		String userName = jwtTokenUtil.getUserNameFromToken(token);
+		ApplicationType applicationName = ApplicationType.valueOf(jwtTokenUtil.getApplicationName(token));
+		User user = userService.findByUserName(userName);
 
-			if(user.hasRegistry(applicationName)) {
-				log.info("Token ok from user {}", userName);
-				return user;
-			}else{
-				log.error("Token checking error. {} not registered for application {}.", userName, applicationName);
-			}
-
-		}catch (Exception e){
-			log.error("Token checking error. {}", e.getMessage());
+		if(user.hasRegistry(applicationName)) {
+			log.info("Token ok from user {}", userName);
+			return user;
+		}else{
+			log.error("Token checking error. {} not registered for application {}.", userName, applicationName);
 		}
+		
 		throw new ValidationException("error.user.notregistered");
 	}
 

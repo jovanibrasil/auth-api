@@ -9,8 +9,6 @@ import com.security.web.mappers.UserMapper;
 import com.security.web.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -37,14 +35,14 @@ public class UserController {
 	 * @return
 	 */
 	@GetMapping("/{userName}")
-	public ResponseEntity<Response<CreateUserDTO>> getUser(@PathVariable String userName) {
+	public ResponseEntity<CreateUserDTO> getUser(@PathVariable String userName) {
 		
 		User user = userService.findByUserName(userName);
 		CreateUserDTO userDto = new CreateUserDTO();
 		userDto.setEmail(user.getEmail());
 		userDto.setUserName(user.getUserName());
 		
-		return ResponseEntity.ok(new Response<>(userDto));
+		return ResponseEntity.ok(userDto);
 	}
 	
 	/**
@@ -56,25 +54,23 @@ public class UserController {
 	 * @throws InvalidRecaptchaException
 	 */
 	@PostMapping
-	public ResponseEntity<Response<?>> createUser(@Valid @RequestBody RegistrationUserDTO userDto, HttpServletRequest request)
+	public ResponseEntity<?> createUser(@Valid @RequestBody RegistrationUserDTO userDto, HttpServletRequest request)
 			throws InvalidRecaptchaException, ReCaptchaInvalidException{
 		log.info("User registration");
-		String recaptchaResponse = request.getParameter("recaptchaResponseToken");
-		captchaService.processResponse(recaptchaResponse);
+//		String recaptchaResponse = request.getParameter("recaptchaResponseToken");
+//		captchaService.processResponse(recaptchaResponse);
 
 		User user = userMapper.registrationUserDtoToUser(userDto);
 		user = userService.saveUser(user);
 
 		// Set the resource location and return 201 Created
-		URI location = ServletUriComponentsBuilder
+		URI uri = ServletUriComponentsBuilder
 				.fromCurrentRequest()
 				.path("/{id}")
 				.buildAndExpand(user.getId())
 				.toUri();
-		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CONTENT_LOCATION, location.toString());
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.headers(headers).body(new Response<>());
+		
+		return ResponseEntity.created(uri).build();
 	}
 	
 	/**
@@ -89,7 +85,7 @@ public class UserController {
 	 * 
 	 */
 	@PostMapping("/confirmation")
-	public ResponseEntity<Response<?>> confirmUserEmail(@Valid @RequestBody ConfirmUserDTO userDto,
+	public ResponseEntity<?> confirmUserEmail(@Valid @RequestBody ConfirmUserDTO userDto,
 			HttpServletRequest request) throws InvalidRecaptchaException, ReCaptchaInvalidException {
 
 		log.info("Creating confirmation token for the email {}", userDto.getEmail());
@@ -98,7 +94,8 @@ public class UserController {
 		captchaService.processResponse(recaptchaResponse);
 
 		userService.confirmUserEmail(userMapper.confirmUserDtoToUser(userDto), userDto.getApplication());
-		return ResponseEntity.ok(new Response<>());
+		
+		return ResponseEntity.ok().build();
 	}
 
 	/**
@@ -106,10 +103,11 @@ public class UserController {
 	 * 
 	 */
 	@PutMapping
-	public ResponseEntity<Response<?>> updateUser(@Valid @RequestBody UpdateUserDTO userDto){
+	public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserDTO userDto){
 		User user = userMapper.updateUserDtoToUser(userDto);
 		user = userService.updateUser(user);
-		return ResponseEntity.ok().body(new Response<>());
+		// TODO userDto = userMapper.user
+		return ResponseEntity.ok().body(userDto);
 	}
 
 	/**
@@ -122,10 +120,10 @@ public class UserController {
 	 * 
 	 */
 	@DeleteMapping(value="/{username}")
-	public ResponseEntity<Response<String>> deleteUser(@PathVariable("username") String userName){
+	public ResponseEntity<?> deleteUser(@PathVariable("username") String userName){
 		log.info("Delete user {}", userName);
-		userService.deleteUser(userName);
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new Response<>());
+		userService.deleteUserByName(userName);
+		return ResponseEntity.noContent().build();
 	}
 	
 	

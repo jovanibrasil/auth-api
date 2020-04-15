@@ -1,18 +1,17 @@
 package com.security.web.dto;
 
-import com.security.web.validators.CustomNameValidator;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 @Getter @Setter
 @NoArgsConstructor
 public class RegistrationUserDTO {
 
-	@CustomNameValidator
+	@NotBlank(message = "{error.user.username.notblank}")
 	private String userName;
 	
 	@NotBlank(message = "{error.user.password.notblank}")

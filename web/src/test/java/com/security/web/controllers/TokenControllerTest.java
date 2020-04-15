@@ -1,5 +1,6 @@
 package com.security.web.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.exceptions.TokenException;
@@ -138,7 +139,7 @@ public class TokenControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(tokenDTO)))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.errors").isEmpty());
+			.andExpect(jsonPath("$").isNotEmpty());
 	}
 	
 	/**
@@ -162,7 +163,7 @@ public class TokenControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(tokenDTO)))
 			.andExpect(status().isUnauthorized())
-			.andExpect(jsonPath("$.errors[0].message", 
+			.andExpect(jsonPath("$.message", 
 					equalTo("Invalid username or password.")));
 	}
 	
@@ -185,7 +186,7 @@ public class TokenControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(asJsonString(tokenDTO)))
 				.andExpect(status().isUnprocessableEntity())
-				.andExpect(jsonPath("$.errors[0].errors[0].message",
+				.andExpect(jsonPath("$.errors[0].message",
 					equalTo("Application cannot be null.")));
 	}
 	
@@ -208,7 +209,7 @@ public class TokenControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(asJsonString(tokenDTO)))
 				.andExpect(status().isUnprocessableEntity())
-				.andExpect(jsonPath("$.errors[0].errors[0].message",
+				.andExpect(jsonPath("$.errors[0].message",
 						equalTo("Username must not be blank or null.")));
 	}
 
@@ -233,7 +234,7 @@ public class TokenControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(asJsonString(tokenDTO)))
 				.andExpect(status().isUnauthorized())
-				.andExpect(jsonPath("$.errors[0].message",
+				.andExpect(jsonPath("$.message",
 						equalTo("Invalid username or password.")));
 	}
 
@@ -256,7 +257,7 @@ public class TokenControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isForbidden())
-			.andExpect(jsonPath("$.errors[0].message", 
+			.andExpect(jsonPath("$.message", 
 					equalTo("User not registered for this application.")));
 	}
 
@@ -280,7 +281,7 @@ public class TokenControllerTest {
 				.locale( new Locale("pt"))
 				.content(asJsonString(userDto)))
 				.andExpect(status().isForbidden())
-				.andExpect(jsonPath("$.errors[0].message",
+				.andExpect(jsonPath("$.message",
 						equalTo("Usuário não registrado para esta aplicação.")));
 	}
 
@@ -296,7 +297,7 @@ public class TokenControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message",
+			.andExpect(jsonPath("$.errors[0].message",
 					isIn(userNameBlankErrors)));
 	}
 	
@@ -312,7 +313,7 @@ public class TokenControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message",
+			.andExpect(jsonPath("$.errors[0].message",
 					equalTo("Username length must be between 2 and 12.")));
 	}
 	
@@ -328,7 +329,7 @@ public class TokenControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Password must not be blank or null.")));
+			.andExpect(jsonPath("$.errors[0].message", equalTo("Password must not be blank or null.")));
 	}
 	
 	/**
@@ -343,7 +344,7 @@ public class TokenControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", isIn(passwordBlankErrors)));
+			.andExpect(jsonPath("$.errors[0].message", isIn(passwordBlankErrors)));
 	}
 	
 	/**
@@ -358,7 +359,7 @@ public class TokenControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userDto)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].errors[0].message", equalTo("Password length must be between 4 and 12.")));
+			.andExpect(jsonPath("$.errors[0].message", equalTo("Password length must be between 4 and 12.")));
 	}
 
 	/**
@@ -389,12 +390,12 @@ public class TokenControllerTest {
 				.andExpect(status().isOk());
 	}
 
-	public static String asJsonString(final Object obj) {
+	public static String asJsonString(final Object obj) throws JsonProcessingException {
 	    try {
 	        final ObjectMapper mapper = new ObjectMapper();
 	        final String jsonContent = mapper.writeValueAsString(obj);
 	        return jsonContent;
-	    } catch (Exception e) {
+	    } catch (TokenException e) {
 	        throw new RuntimeException(e);
 	    }
 	}

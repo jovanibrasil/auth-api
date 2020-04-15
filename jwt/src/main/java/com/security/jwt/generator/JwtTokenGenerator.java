@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /*
- * Set of method used to manipulate JWT tokens.
+ * Set of methods used to manipulate JWT tokens.
  * 
  * @Author Jovani Brasil
  * 
@@ -31,7 +31,7 @@ public class JwtTokenGenerator<T> {
 	private String secret;
 	@Value("${jwt.expiration}")
 	private Long expiration;
-	
+		
 	public JwtTokenGenerator(String secret, Long expiration) {
 		this.secret = secret;
 		this.expiration = expiration;
@@ -115,7 +115,7 @@ public class JwtTokenGenerator<T> {
 			throw new TokenException("Calculating a signature or verifying an existing signature of a JWS failed");
 		} catch (ExpiredJwtException e) {
 			throw new TokenException("The token is expired.");
-		} catch (Exception e) {
+		} catch (TokenException e) {
 			throw new TokenException("Unexpected error while processing the token.");
 		}
 	}
@@ -222,7 +222,7 @@ public class JwtTokenGenerator<T> {
 			Date expirationDate = getExpirationDate(token);
 			if(expirationDate == null) return false;
 			return new Date().before(expirationDate);
-		} catch (Exception e) {
+		} catch (TokenException e) {
 			return false;
 		}
 	}

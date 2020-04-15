@@ -4,7 +4,6 @@ import com.security.jwt.utils.Keys;
 import com.security.web.domain.CheckedTokenInfoDTO;
 import com.security.web.domain.User;
 import com.security.web.dto.JwtAuthenticationDTO;
-import com.security.web.dto.Response;
 import com.security.web.dto.TokenDTO;
 import com.security.web.mappers.UserMapper;
 import com.security.web.services.TokenService;
@@ -33,17 +32,17 @@ public class TokensController {
 	 * @return
 	 */
 	@PostMapping("/create")
-	public ResponseEntity<Response<TokenDTO>> createTokenJwt(@Valid @RequestBody JwtAuthenticationDTO authenticationDto) {
+	public ResponseEntity<TokenDTO> createTokenJwt(@Valid @RequestBody JwtAuthenticationDTO authenticationDto) {
 		User user = userMapper.jwtAuthenticationDtoToUser(authenticationDto);
 		String token = tokenService.createToken(user, authenticationDto.getApplication());
-		return ResponseEntity.ok(new Response<>(new TokenDTO(token)));
+		return ResponseEntity.ok(new TokenDTO(token));
 	}
 	
 	@GetMapping(value="/refresh")
-	public ResponseEntity<Response<TokenDTO>> refreshTokenJwt(HttpServletRequest request){
+	public ResponseEntity<TokenDTO> refreshTokenJwt(HttpServletRequest request){
 		log.info("Refreshing JWT token");
 		String refreshedToken = tokenService.refreshToken(request.getHeader(Keys.TOKEN_HEADER));
-		return ResponseEntity.ok(new Response<>(new TokenDTO(refreshedToken)));
+		return ResponseEntity.ok(new TokenDTO(refreshedToken));
 	}
 	
 	/**
@@ -54,13 +53,11 @@ public class TokensController {
 	 * @return
 	 */
 	@GetMapping(value="/check")
-	public ResponseEntity<Response<CheckedTokenInfoDTO>> checkToken(HttpServletRequest request){
+	public ResponseEntity<CheckedTokenInfoDTO> checkToken(HttpServletRequest request){
 		log.info("Checking JWT token");
 		User user = tokenService.checkToken(request.getHeader(Keys.TOKEN_HEADER));
 		// Verify if user has register for the required application
-		return ResponseEntity.ok(new Response<>(
-				userMapper.userToCheckedTokenInfoDto(user)
-		));
+		return ResponseEntity.ok(userMapper.userToCheckedTokenInfoDto(user));
 	}
 	
 }

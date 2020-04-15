@@ -2,12 +2,13 @@ package com.security.web.exceptions.handlers;
 
 import com.security.jwt.exceptions.TokenException;
 import com.security.web.exceptions.entities.ErrorDetail;
-import com.security.web.exceptions.entities.Response;
 import com.security.web.exceptions.entities.ValidationError;
 import com.security.web.exceptions.implementations.ForbiddenUserException;
 import com.security.web.exceptions.implementations.MicroServiceIntegrationException;
 import com.security.web.exceptions.implementations.NotFoundException;
 import com.security.web.exceptions.implementations.UnauthorizedUserException;
+import com.security.web.exceptions.implementations.ValidationException;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
@@ -48,51 +49,32 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 				.objectName(ex.getBindingResult().getObjectName())
 				.errors(fieldErrors).build();
 
-		Response<Object> response = new Response<Object>();
-		response.addError(error);
-		return ResponseEntity.unprocessableEntity().body(response);
+		return ResponseEntity.unprocessableEntity().body(error);
 
 	}
 
 	@ExceptionHandler(MicroServiceIntegrationException.class)
-	public ResponseEntity<Response<?>> handleServiceIntegrationException(MicroServiceIntegrationException microserviceIntegrationException){
-//		log.info("The required application server is not responding. {}",  e.getMessage());
-//		response.addError(msgSrc.getMessage("error.app.notresponding", locale));
-//		return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
-
-		Response<String> response = new Response<String>();
+	public ResponseEntity<?> handleServiceIntegrationException(MicroServiceIntegrationException microserviceIntegrationException){
 		ErrorDetail errorDetail = ErrorDetail.builder()
 				.message(microserviceIntegrationException.getMessage())
 				.build();
-		response.addError(errorDetail);
-		return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+		return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorDetail);
 	}
 
 	@ExceptionHandler(NotFoundException.class)
-	public ResponseEntity<Response<?>> handleNotFoundException(NotFoundException ex, Locale locale){
-//		log.info("It was not possible to save the user. {}",  e.getMessage());
-//			response.addError("It was not possible to save the user.");
-//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-		Response<String> response = new Response<String>();
+	public ResponseEntity<?> handleNotFoundException(NotFoundException ex, Locale locale){
 		ErrorDetail errorDetail = ErrorDetail.builder()
 				.message(getMessage(ex.getMessage(), locale))
 				.build();
-		response.addError(errorDetail);
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetail);
 	}
 
-	@ExceptionHandler(TokenException.class)
-	public ResponseEntity<Response<?>> handleInvalidTokenException(TokenException invalidTokenException){
-//		log.info(msgSrc.getMessage("error.token.invalid", locale) + e.getMessage());
-//		response.addError(msgSrc.getMessage("error.token.invalid", locale) + e.getMessage());
-//		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
-
-		Response<String> response = new Response<String>();
+	@ExceptionHandler({TokenException.class, ValidationException.class})
+	public ResponseEntity<?> handleInvalidTokenException(Exception ex, Locale locale){
 		ErrorDetail errorDetail = ErrorDetail.builder()
-				.message(invalidTokenException.getMessage())
+				.message(getMessage(ex.getMessage(), locale))
 				.build();
-		response.addError(errorDetail);
-		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(errorDetail);
 	}
 	
 	/**
@@ -103,13 +85,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	 * @return
 	 */
 	@ExceptionHandler(UnauthorizedUserException.class)
-	public ResponseEntity<Response<?>> handleUnauthorizedUserException(UnauthorizedUserException ex, Locale locale){
-		Response<String> response = new Response<>();
+	public ResponseEntity<?> handleUnauthorizedUserException(UnauthorizedUserException ex, Locale locale){
 		ErrorDetail errorDetail = ErrorDetail.builder()
 				.message(getMessage(ex.getMessage(), locale))
 				.build();
-		response.addError(errorDetail);
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorDetail);
 	}
 
 	private String getMessage(String message, Locale locale) {
@@ -124,13 +104,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 	 * @return
 	 */
 	@ExceptionHandler(ForbiddenUserException.class)
-	public ResponseEntity<Response<?>> handleForbiddenUserException(ForbiddenUserException ex, Locale locale){
-		Response<String> response = new Response<String>();
+	public ResponseEntity<?> handleForbiddenUserException(ForbiddenUserException ex, Locale locale){
 		ErrorDetail errorDetail = ErrorDetail.builder()
 				.message(getMessage(ex.getMessage(), locale))
 				.build();
-		response.addError(errorDetail);
-		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorDetail);
 	}
 	
 	

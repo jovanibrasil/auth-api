@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void deleteUser(String userName) {
+	public void deleteUserByName(String userName) {
 		User user = findByUserName(userName);
 		userRepository.delete(user);
 		// remove the user for each registered application

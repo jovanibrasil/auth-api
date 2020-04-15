@@ -52,7 +52,7 @@ public class TokenServiceTest {
     private User user;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws TokenException {
         MockitoAnnotations.initMocks(this);
         tokenService = new TokenServiceImpl(jwtTokenUtil, userDetailsService,
                 userService, authenticationManager, utils);

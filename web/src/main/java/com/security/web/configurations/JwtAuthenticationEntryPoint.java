@@ -1,7 +1,6 @@
 package com.security.web.configurations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.security.web.dto.Response;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -25,11 +24,10 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
 		
-		Response<String> res = new Response<String>();
-		res.addError(msgSrc.getMessage("error.unauthorized", LocaleContextHolder.getLocale()));
 		response.setContentType("application/json");
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		response.getOutputStream().println(new ObjectMapper().writeValueAsString(res));
+		response.getOutputStream().println(new ObjectMapper()
+				.writeValueAsString(msgSrc.getMessage("error.unauthorized", LocaleContextHolder.getLocale())));
 		
 	}	
 	
