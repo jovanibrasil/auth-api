@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.exceptions.TokenException;
-import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.jwt.utils.Utils;
 import com.security.web.domain.Application;
 import com.security.web.domain.ApplicationType;
@@ -43,7 +42,6 @@ import java.util.Locale;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isIn;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -59,9 +57,6 @@ public class TokenControllerTest {
 
 	@MockBean
 	private UserService userService;
-
-	@MockBean
-	private JwtTokenGenerator jwtTokenUtil;
 
 	@MockBean
 	private AuthenticationManager authenticationManager;
@@ -369,10 +364,10 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testCheckingExpiredToken() throws Exception {
-		when(tokenService.checkToken(anyString()))
-				.thenThrow(TokenException.class);
+		String token = "Bearer token";
+		when(tokenService.checkToken(token)).thenThrow(new TokenException("error.token.invalid"));
 		mvc.perform(MockMvcRequestBuilders.get("/token/check")
-				.header("Authorization", "Bearer token"))
+				.header("Authorization", token))
 				.andExpect(status().isUnprocessableEntity());
 	}
 
@@ -383,10 +378,10 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testTokenCheckingValidToken() throws Exception {
-		when(tokenService.checkToken(anyString()))
-				.thenReturn(user);
+		String token = "Bearer token";
+		when(tokenService.checkToken(token)).thenReturn(user);
 		mvc.perform(MockMvcRequestBuilders.get("/token/check")
-				.header("Authorization", "Bearer token"))
+				.header("Authorization", token))
 				.andExpect(status().isOk());
 	}
 

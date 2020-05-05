@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RegistrationUserDTO {
 
-	@NotBlank(message = "{error.user.username.notblank}")
+	@NotBlank(message = "{error.user.name.notblank}")
 	private String userName;
 	
 	@NotBlank(message = "{error.user.password.notblank}")

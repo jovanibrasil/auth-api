@@ -93,16 +93,16 @@ public class UserControllerTest {
 	@Test
 	public void testCreateUser() throws Exception {
 		when(userService.saveUser(Mockito.any())).thenReturn(user);
-		when(userMapper.registrationUserDtoToUser(any())).thenReturn(user);
-
+		
 		// validate recaptcha successfully
 		//	CaptchaService captchaService = mock(CaptchaService.class);
 		Mockito.doNothing().when(captchaService).processResponse(null);
 
 		RegistrationUserDTO userRegDTO = new RegistrationUserDTO();
-		userRegDTO.setPassword("teste");
-		userRegDTO.setUserName("teste");
-		userRegDTO.setToken(jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP));
+		userRegDTO.setPassword(user.getPassword());
+		userRegDTO.setUserName(user.getUserName());
+		String token = jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP);
+		userRegDTO.setToken(token);
 
 		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
@@ -117,21 +117,20 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserNameAlreadyExists() throws Exception {
-		when(userService.saveUser(Mockito.any()))
-				.thenThrow(ValidationException.class);
+		when(userService.saveUser(Mockito.any())).thenThrow(new ValidationException("error.user.name.unique"));
 		when(userMapper.registrationUserDtoToUser(any())).thenReturn(user);
-		when(userService.existUserWithUserName(any())).thenReturn(true);
 
 		RegistrationUserDTO userRegDTO = new RegistrationUserDTO();
-		userRegDTO.setPassword("teste");
-		userRegDTO.setUserName("teste");
-		userRegDTO.setToken(jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP));
+		userRegDTO.setPassword(user.getPassword());
+		userRegDTO.setUserName(user.getUserName());
+		String token = jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP);
+		userRegDTO.setToken(token);
 		
 		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userRegDTO)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].message", equalTo("This user name already exists.")));
+			.andExpect(jsonPath("$.message", equalTo("This user name already exists.")));
 		
 	}
 	
