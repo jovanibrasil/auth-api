@@ -57,8 +57,6 @@ public class UserController {
 	public ResponseEntity<?> createUser(@Valid @RequestBody RegistrationUserDTO userDto, HttpServletRequest request)
 			throws InvalidRecaptchaException, ReCaptchaInvalidException{
 		log.info("User registration");
-//		String recaptchaResponse = request.getParameter("recaptchaResponseToken");
-//		captchaService.processResponse(recaptchaResponse);
 
 		User user = userMapper.registrationUserDtoToUser(userDto);
 		user = userService.saveUser(user);
