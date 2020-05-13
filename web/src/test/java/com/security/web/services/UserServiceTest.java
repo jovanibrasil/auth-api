@@ -62,8 +62,7 @@ public class UserServiceTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		userService = new UserServiceImpl(userRepository,
-				integrationService, authenticationManager, jwtTokenUtil);
+		userService = new UserServiceImpl(userRepository, integrationService, authenticationManager);
 		user = new User();
 		user.setId(1L);
 		user.setEmail("test@gmail.com");

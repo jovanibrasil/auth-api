@@ -17,7 +17,7 @@ import java.util.Map;
  * 
  */
 @Component
-public class JwtTokenGenerator<T> {
+public class JwtTokenGenerator {
 
 	static final String CLAIM_KEY_USERNAME = "sub";
 	static final String CLAIM_KEY_ROLE = "role";
@@ -63,7 +63,7 @@ public class JwtTokenGenerator<T> {
 	 * @param application
 	 * @return
 	 */
-	public String createToken(UserDetails userDetails, T application) {
+	public String createToken(UserDetails userDetails, Object application) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
 		userDetails.getAuthorities().forEach(authority -> {
@@ -82,7 +82,7 @@ public class JwtTokenGenerator<T> {
 	 * @param application
 	 * @return
 	 */
-	public String createRegistrationToken(String email, T application) {
+	public String createRegistrationToken(String email, Object application) {
 		Map<String, Object> claims = new HashMap<>();
 		claims.put(CLAIM_KEY_CREATED, new Date());
 		claims.put(CLAIM_KEY_EMAIL, email);

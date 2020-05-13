@@ -1,17 +1,10 @@
 package com.security.web.services.impl;
 
-import com.security.jwt.enums.ProfileEnum;
-import com.security.jwt.generator.JwtTokenGenerator;
-import com.security.jwt.utils.PasswordUtils;
-import com.security.web.domain.ApplicationType;
-import com.security.web.domain.User;
-import com.security.web.domain.dto.EmailMessageDTO;
-import com.security.web.exceptions.implementations.ForbiddenUserException;
-import com.security.web.exceptions.implementations.NotFoundException;
-import com.security.web.exceptions.implementations.ValidationException;
-import com.security.web.repositories.UserRepository;
-import com.security.web.services.UserService;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,10 +12,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.security.jwt.enums.ProfileEnum;
+import com.security.jwt.utils.PasswordUtils;
+import com.security.web.domain.User;
+import com.security.web.exceptions.implementations.ForbiddenUserException;
+import com.security.web.exceptions.implementations.NotFoundException;
+import com.security.web.exceptions.implementations.ValidationException;
+import com.security.web.repositories.UserRepository;
+import com.security.web.services.UserService;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -31,14 +30,12 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final IntegrationServiceImpl integrationService;
 	private final AuthenticationManager authenticationManager;
-	private final JwtTokenGenerator jwtTokenUtil;
 
 	public UserServiceImpl(UserRepository userRepository, @Lazy IntegrationServiceImpl integrationService,
-						   AuthenticationManager authenticationManager, JwtTokenGenerator jwtTokenUtil) {
+						   AuthenticationManager authenticationManager) {
 		this.userRepository = userRepository;
 		this.integrationService = integrationService;
 		this.authenticationManager = authenticationManager;
-		this.jwtTokenUtil = jwtTokenUtil;
 	}
 
 	@Value("${urls.notes.userconfirmationview}")
