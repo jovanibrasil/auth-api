@@ -2,7 +2,7 @@ package com.security.web.services.impl;
 
 import com.security.web.domain.ApplicationType;
 import com.security.web.domain.User;
-import com.security.web.dto.EmailMessage;
+import com.security.web.domain.dto.EmailMessageDTO;
 import com.security.web.exceptions.implementations.MicroServiceIntegrationException;
 import com.security.web.services.IntegrationService;
 import com.security.web.services.TokenService;
@@ -50,7 +50,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 		log.info("Creating the user in the remote server ...");
 		try {
 			HttpHeaders headers = new HttpHeaders();
-			String finalToken = "Bearer " + tokenService.getToken();
+			String finalToken = "Bearer " + tokenService.createToken();
 			log.info("Token: {}", finalToken);
 			headers.add("Authorization", finalToken);
 			headers.setContentType(MediaType.APPLICATION_JSON);
@@ -89,7 +89,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 		try {
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
-			headers.add("Authorization", "Bearer " + tokenService.getToken());
+			headers.add("Authorization", "Bearer " + tokenService.createToken());
 			HttpEntity<String> entity = new HttpEntity<String>(headers);
 			String url = user.hasRegistry(ApplicationType.BLOG_APP) ? url = deleteBlogUser : deleteNotesUser;
 			// send request and parse result
@@ -114,11 +114,11 @@ public class IntegrationServiceImpl implements IntegrationService {
 	 * @param emailMessage
 	 */
 	@Override
-	public void sendEmail(EmailMessage emailMessage) {
+	public void sendEmail(EmailMessageDTO emailMessage) {
 		log.info("Send remote server ...");
 		try {
 			HttpHeaders headers = new HttpHeaders();
-			String finalToken = "Bearer " + tokenService.getToken();
+			String finalToken = "Bearer " + tokenService.createToken();
 			headers.add("Authorization", finalToken);
 			headers.setContentType(MediaType.APPLICATION_JSON);
 

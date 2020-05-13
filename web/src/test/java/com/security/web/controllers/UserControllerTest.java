@@ -1,16 +1,12 @@
 package com.security.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.security.captcha.CaptchaServiceImpl;
 import com.security.jwt.enums.ProfileEnum;
-import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.web.domain.Application;
 import com.security.web.domain.ApplicationType;
 import com.security.web.domain.Registry;
 import com.security.web.domain.User;
-import com.security.web.dto.ConfirmUserDTO;
-import com.security.web.dto.CreateUserDTO;
-import com.security.web.dto.RegistrationUserDTO;
+import com.security.web.domain.form.UserForm;
 import com.security.web.exceptions.implementations.NotFoundException;
 import com.security.web.exceptions.implementations.ValidationException;
 import com.security.web.mappers.UserMapper;
@@ -49,21 +45,15 @@ public class UserControllerTest {
 
 	@Autowired
 	private MockMvc mvc;
-	
-	@Autowired
-	private JwtTokenGenerator jwtTokenUtil;
-	
+		
 	@MockBean
 	private UserService userService;
-	
-	@MockBean
-	private CaptchaServiceImpl captchaService;
 
 	@MockBean
 	private UserMapper userMapper;
 
 	private User user;
-	private CreateUserDTO userDto;
+	private UserForm userForm;
 	
 	@Before
 	public void setUp() {
@@ -76,13 +66,12 @@ public class UserControllerTest {
 		user.setSignUpDateTime(LocalDateTime.now());
 		user.setRegistries(Arrays.asList(
 				new Registry(new Application(ApplicationType.BLOG_APP), user)));
-		userDto = new CreateUserDTO();
-		userDto.setId(1L);
-		userDto.setEmail("test@gmail.com");
-		userDto.setUserName("test");
-		userDto.setPassword("password");
-		userDto.setApplication(ApplicationType.BLOG_APP);
 		
+		userForm = new UserForm();
+		userForm.setEmail("test@gmail.com");
+		userForm.setUserName("test");
+		userForm.setPassword("password");
+		userForm.setApplication(ApplicationType.BLOG_APP);		
 	}
 
 	/**
@@ -92,21 +81,11 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUser() throws Exception {
-		when(userService.saveUser(Mockito.any())).thenReturn(user);
-		
-		// validate recaptcha successfully
-		//	CaptchaService captchaService = mock(CaptchaService.class);
-		Mockito.doNothing().when(captchaService).processResponse(null);
-
-		RegistrationUserDTO userRegDTO = new RegistrationUserDTO();
-		userRegDTO.setPassword(user.getPassword());
-		userRegDTO.setUserName(user.getUserName());
-		String token = jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP);
-		userRegDTO.setToken(token);
+		when(userService.save(Mockito.any())).thenReturn(user);
 
 		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userRegDTO)))
+			.content(asJsonString(userForm)))
 			.andExpect(status().isCreated());
 	}
 	
@@ -117,18 +96,12 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserNameAlreadyExists() throws Exception {
-		when(userService.saveUser(Mockito.any())).thenThrow(new ValidationException("error.user.name.unique"));
-		when(userMapper.registrationUserDtoToUser(any())).thenReturn(user);
+		when(userService.save(Mockito.any())).thenThrow(new ValidationException("error.user.name.unique"));
+		when(userMapper.userFormToUser(any())).thenReturn(user);
 
-		RegistrationUserDTO userRegDTO = new RegistrationUserDTO();
-		userRegDTO.setPassword(user.getPassword());
-		userRegDTO.setUserName(user.getUserName());
-		String token = jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP);
-		userRegDTO.setToken(token);
-		
 		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userRegDTO)))
+			.content(asJsonString(userForm)))
 			.andExpect(status().isUnprocessableEntity())
 			.andExpect(jsonPath("$.message", equalTo("This user name already exists.")));
 		
@@ -142,22 +115,18 @@ public class UserControllerTest {
 	@Test
 	public void testCreateUserEmptyUserName() throws Exception {
 		BDDMockito.given(userService
-			.saveUser(Mockito.any())).willReturn(user); // save successfully
+			.save(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());
 		
-		RegistrationUserDTO userRegDTO = new RegistrationUserDTO();
-		userRegDTO.setPassword("teste");
-		userRegDTO.setUserName("");
-		userRegDTO.setToken(jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP));
+		userForm.setUserName("");
 		
 		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userRegDTO)))
-			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].message", equalTo("Username must not be blank or null.")));
+			.content(asJsonString(userForm)))
+			.andExpect(status().isBadRequest());
 	}
 	
 	/**
@@ -168,16 +137,13 @@ public class UserControllerTest {
 	@Test
 	public void testCreateUserEmptyPassword() throws Exception {
 		BDDMockito.given(userService
-			.saveUser(Mockito.any())).willReturn(user); // save successfully
+			.save(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());
 		
-		RegistrationUserDTO userRegDTO = new RegistrationUserDTO();
-		userRegDTO.setPassword("");
-		userRegDTO.setUserName("teste");
-		userRegDTO.setToken(jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP));
+		userForm.setPassword("");
 		
 		List<String> passwordErrors = Arrays.asList(
 				"Password must not be blank or null.",
@@ -185,8 +151,8 @@ public class UserControllerTest {
 		
 		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userRegDTO)))
-			.andExpect(status().isUnprocessableEntity())
+			.content(asJsonString(userForm)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0].message", 
 					isIn(passwordErrors)));
 	}
@@ -199,21 +165,19 @@ public class UserControllerTest {
 	@Test
 	public void testCreateUserNullUserName() throws Exception {
 		BDDMockito.given(userService
-			.saveUser(Mockito.any())).willReturn(user); // save successfully
+			.save(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());
 		
-		RegistrationUserDTO userRegDTO = new RegistrationUserDTO();
-		userRegDTO.setPassword("teste");
-		userRegDTO.setUserName(null);
-		userRegDTO.setToken(jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP));
+		userForm.setUserName(null);
+		//userRegDTO.setToken(jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP));
 		
 		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userRegDTO)))
-			.andExpect(status().isUnprocessableEntity())
+			.content(asJsonString(userForm)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0].message", equalTo("Username must not be blank or null.")));
 	}
 	
@@ -225,78 +189,67 @@ public class UserControllerTest {
 	@Test
 	public void testCreateUserNullPassword() throws Exception {
 		BDDMockito.given(this.userService
-			.saveUser(Mockito.any())).willReturn(user); // save successfully
+			.save(Mockito.any())).willReturn(user); // save successfully
 		// send email successfully
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());
 		
-		RegistrationUserDTO userRegDTO = new RegistrationUserDTO();
-		userRegDTO.setPassword(null);
-		userRegDTO.setUserName("teste");
-		userRegDTO.setToken(jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP));
+		userForm.setPassword(null);
+		//userRegDTO.setToken(jwtTokenUtil.createRegistrationToken("teste@gmail.com", ApplicationType.BLOG_APP));
 		
 		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userRegDTO)))
-			.andExpect(status().isUnprocessableEntity())
+			.content(asJsonString(userForm)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0].message", equalTo("Password must not be blank or null.")));
 	}
 	
 	/**
-	 * Tests an email confirmation of an email that already exists.
+	 * Tests user creation with an email that already exists.
 	 * 
 	 * @throws Exception
 	 */
 	@Test
-	public void testConfirmUserEmailAlreadyExists() throws Exception {
-		when(userService.existUserWithEmail(any())).thenReturn(true);
-		BDDMockito.willThrow(new ValidationException(""))
-				.given(userService).confirmUserEmail(any(), any());
-		mvc.perform(MockMvcRequestBuilders.post("/users/confirmation")
+	public void testUserCreationEmailAlreadyExists() throws Exception {
+		when(userService.save(Mockito.any())).thenThrow(new ValidationException("error.email.alreadyexists"));
+		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userDto)))
+			.content(asJsonString(userForm)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.errors[0].message",
+			.andExpect(jsonPath("$.message",
 					equalTo("This email already exists.")));
 	}
 	
 	@Test
-	public void testConfirmUserEmptyEmail() throws Exception {
-		ConfirmUserDTO userRegDTO = new ConfirmUserDTO();
-		userRegDTO.setEmail("");
-		userRegDTO.setApplication(ApplicationType.BLOG_APP);
-		
-		mvc.perform(MockMvcRequestBuilders.post("/users/confirmation")
+	public void testUserCreationEmptyEmail() throws Exception {
+		userForm.setEmail("");
+		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userRegDTO)))
-			.andExpect(status().isUnprocessableEntity())
+			.content(asJsonString(userForm)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0].message", equalTo("Email must not be blank or null.")));
 	}
 	
 	@Test
 	public void testConfirmUserNullApplication() throws Exception {
-		ConfirmUserDTO userRegDTO = new ConfirmUserDTO();
-		userRegDTO.setEmail("jovanibrasil@gmail.com");
-		userRegDTO.setApplication(null);
+		userForm.setApplication(null);
 		
-		mvc.perform(MockMvcRequestBuilders.post("/users/confirmation")
+		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userRegDTO)))
-			.andExpect(status().isUnprocessableEntity())
+			.content(asJsonString(userForm)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0].message", equalTo("Application cannot be null.")));
 	}
 	
 	@Test
 	public void testConfirmUserNullEmail() throws Exception {
-		ConfirmUserDTO userRegDTO = new ConfirmUserDTO();
-		userRegDTO.setEmail(null);
-		userRegDTO.setApplication(ApplicationType.BLOG_APP);
+		userForm.setEmail(null);
 		
-		mvc.perform(MockMvcRequestBuilders.post("/users/confirmation")
+		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userRegDTO)))
-			.andExpect(status().isUnprocessableEntity())
+			.content(asJsonString(userForm)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0].message", equalTo("Email must not be blank or null.")));
 	}
 	
@@ -342,7 +295,7 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testDeleteUser() throws Exception {
-		BDDMockito.doNothing().when(userService).deleteUserByName(any());
+		BDDMockito.doNothing().when(userService).deleteByName(any());
 		mvc.perform(MockMvcRequestBuilders.delete("/users/test")
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNoContent());
@@ -356,7 +309,7 @@ public class UserControllerTest {
 	@Test
 	public void testDeleteInvalidUser() throws Exception {
 		doThrow(new NotFoundException("error.user.notfound"))
-				.when(this.userService).deleteUserByName(Mockito.anyString());
+				.when(this.userService).deleteByName(Mockito.anyString());
 		mvc.perform(MockMvcRequestBuilders.delete("/users/java")
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNotFound())

@@ -3,8 +3,8 @@ package com.security.web.controllers;
 import com.security.jwt.utils.Keys;
 import com.security.web.domain.CheckedTokenInfoDTO;
 import com.security.web.domain.User;
-import com.security.web.dto.JwtAuthenticationDTO;
-import com.security.web.dto.TokenDTO;
+import com.security.web.domain.dto.TokenDTO;
+import com.security.web.domain.form.JwtAuthenticationForm;
 import com.security.web.mappers.UserMapper;
 import com.security.web.services.TokenService;
 import lombok.RequiredArgsConstructor;
@@ -32,12 +32,18 @@ public class TokensController {
 	 * @return
 	 */
 	@PostMapping("/create")
-	public ResponseEntity<TokenDTO> createTokenJwt(@Valid @RequestBody JwtAuthenticationDTO authenticationDto) {
+	public ResponseEntity<TokenDTO> createTokenJwt(@Valid @RequestBody JwtAuthenticationForm authenticationDto) {
 		User user = userMapper.jwtAuthenticationDtoToUser(authenticationDto);
 		String token = tokenService.createToken(user, authenticationDto.getApplication());
 		return ResponseEntity.ok(new TokenDTO(token));
 	}
 	
+	/**
+	 * Refresh a valid token.
+	 * 
+	 * @param request
+	 * @return
+	 */
 	@GetMapping(value="/refresh")
 	public ResponseEntity<TokenDTO> refreshTokenJwt(HttpServletRequest request){
 		log.info("Refreshing JWT token");
@@ -46,8 +52,8 @@ public class TokensController {
 	}
 	
 	/**
-	 * Returns a list of errors if the token has problems. Otherwise, returns an empty
-	 * list of errors.
+	 * Check a token and returns a list of errors if the token has problems. Otherwise, 
+	 * returns an empty list of errors.
 	 * 
 	 * @param request
 	 * @return

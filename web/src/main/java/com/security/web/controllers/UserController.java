@@ -1,21 +1,30 @@
 package com.security.web.controllers;
 
-import com.security.captcha.CaptchaService;
-import com.security.captcha.InvalidRecaptchaException;
-import com.security.captcha.ReCaptchaInvalidException;
-import com.security.web.domain.User;
-import com.security.web.dto.*;
-import com.security.web.mappers.UserMapper;
-import com.security.web.services.UserService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.net.URI;
+
+import javax.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.net.URI;
+import com.security.web.domain.User;
+import com.security.web.domain.dto.UserDTO;
+import com.security.web.domain.form.UpdateUserForm;
+import com.security.web.domain.form.UserForm;
+import com.security.web.mappers.UserMapper;
+import com.security.web.services.UserService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -25,7 +34,6 @@ import java.net.URI;
 public class UserController {
 
 	private final UserService userService;
-	private final CaptchaService captchaService;
 	private final UserMapper userMapper;
 
 	/**
@@ -35,14 +43,9 @@ public class UserController {
 	 * @return
 	 */
 	@GetMapping("/{userName}")
-	public ResponseEntity<CreateUserDTO> getUser(@PathVariable String userName) {
-		
+	public ResponseEntity<UserDTO> getUser(@PathVariable String userName) {
 		User user = userService.findByUserName(userName);
-		CreateUserDTO userDto = new CreateUserDTO();
-		userDto.setEmail(user.getEmail());
-		userDto.setUserName(user.getUserName());
-		
-		return ResponseEntity.ok(userDto);
+		return ResponseEntity.ok(userMapper.userToUserDto(user));
 	}
 	
 	/**
@@ -50,16 +53,13 @@ public class UserController {
 	 *
 	 * @param userDto contains password and user name.
 	 * @return
-	 * @throws ReCaptchaInvalidException
-	 * @throws InvalidRecaptchaException
 	 */
 	@PostMapping
-	public ResponseEntity<?> createUser(@Valid @RequestBody RegistrationUserDTO userDto, HttpServletRequest request)
-			throws InvalidRecaptchaException, ReCaptchaInvalidException{
+	public ResponseEntity<?> createUser(@Valid @RequestBody UserForm userForm) {
 		log.info("User registration");
 
-		User user = userMapper.registrationUserDtoToUser(userDto);
-		user = userService.saveUser(user);
+		User user = userMapper.userFormToUser(userForm);
+		user = userService.save(user);
 
 		// Set the resource location and return 201 Created
 		URI uri = ServletUriComponentsBuilder
@@ -72,40 +72,14 @@ public class UserController {
 	}
 	
 	/**
-	 * 
-	 * Generates a verification email with a token. The token contains user information like email and
-	 * application name.
-	 * 
-	 * @param userDto contains email address and application name. The email address must be unique.
-	 *
-	 * @throws InvalidRecaptchaException  
-	 * @throws ReCaptchaInvalidException 
-	 * 
-	 */
-	@PostMapping("/confirmation")
-	public ResponseEntity<?> confirmUserEmail(@Valid @RequestBody ConfirmUserDTO userDto,
-			HttpServletRequest request) throws InvalidRecaptchaException, ReCaptchaInvalidException {
-
-		log.info("Creating confirmation token for the email {}", userDto.getEmail());
-
-		String recaptchaResponse = request.getParameter("recaptchaResponseToken");
-		captchaService.processResponse(recaptchaResponse);
-
-		userService.confirmUserEmail(userMapper.confirmUserDtoToUser(userDto), userDto.getApplication());
-		
-		return ResponseEntity.ok().build();
-	}
-
-	/**
 	 * Updates a specified user. Valid password for authentication is required.
 	 * 
 	 */
 	@PutMapping
-	public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserDTO userDto){
+	public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserForm userDto){
 		User user = userMapper.updateUserDtoToUser(userDto);
-		user = userService.updateUser(user);
-		// TODO userDto = userMapper.user
-		return ResponseEntity.ok().body(userDto);
+		user = userService.update(user);
+		return ResponseEntity.ok().body(userMapper.userToUserDto(user));
 	}
 
 	/**
@@ -117,10 +91,10 @@ public class UserController {
 	 * @return
 	 * 
 	 */
-	@DeleteMapping(value="/{username}")
+	@DeleteMapping("/{username}")
 	public ResponseEntity<?> deleteUser(@PathVariable("username") String userName){
 		log.info("Delete user {}", userName);
-		userService.deleteUserByName(userName);
+		userService.deleteByName(userName);
 		return ResponseEntity.noContent().build();
 	}
 	

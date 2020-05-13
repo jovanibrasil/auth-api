@@ -4,8 +4,6 @@ import com.security.jwt.enums.ProfileEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -16,8 +14,6 @@ import java.util.Objects;
 
 @Getter @Setter
 @NoArgsConstructor
-@ToString
-@Slf4j
 @Entity(name="User")
 @Table(name="users")
 public class User {

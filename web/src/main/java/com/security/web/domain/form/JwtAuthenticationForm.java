@@ -1,4 +1,4 @@
-package com.security.web.dto;
+package com.security.web.domain.form;
 
 import com.security.web.domain.ApplicationType;
 import com.security.web.validators.EnumValidator;
@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
-public class JwtAuthenticationDTO {
+public class JwtAuthenticationForm {
 
 	@Size(min = 2, max = 12, message="{error.user.name.size}")
 	@NotBlank(message = "{error.user.name.notblank}")
@@ -23,8 +23,7 @@ public class JwtAuthenticationDTO {
 	@EnumValidator(enumClass=ApplicationType.class)
 	private ApplicationType application;
 
-	public JwtAuthenticationDTO(String userName, String password) {
-		super();
+	public JwtAuthenticationForm(String userName, String password) {
 		this.userName = userName;
 		this.password = password;
 	}

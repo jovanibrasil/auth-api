@@ -32,7 +32,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
 	/**
 	 * Handles invalid arguments exception.
-	 *
 	 */
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
@@ -49,7 +48,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 				.objectName(ex.getBindingResult().getObjectName())
 				.errors(fieldErrors).build();
 
-		return ResponseEntity.unprocessableEntity().body(error);
+		return ResponseEntity.badRequest().body(error);
 
 	}
 

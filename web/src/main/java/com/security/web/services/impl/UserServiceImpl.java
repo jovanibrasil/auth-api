@@ -5,7 +5,7 @@ import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.jwt.utils.PasswordUtils;
 import com.security.web.domain.ApplicationType;
 import com.security.web.domain.User;
-import com.security.web.dto.EmailMessage;
+import com.security.web.domain.dto.EmailMessageDTO;
 import com.security.web.exceptions.implementations.ForbiddenUserException;
 import com.security.web.exceptions.implementations.NotFoundException;
 import com.security.web.exceptions.implementations.ValidationException;
@@ -52,24 +52,14 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User findUserByEmail(String email) {
+	public User findByEmail(String email) {
 		Optional<User> optUser = userRepository.findByEmail(email);
 		if(!optUser.isPresent()) throw new NotFoundException("error.user.notfound");
 		return optUser.get();
 	}
 
 	@Override
-	public boolean existUserWithUserName(String userName) {
-		return userRepository.findByUserName(userName).isPresent();
-	}
-
-	@Override
-	public boolean existUserWithEmail(String email) {
-		return userRepository.findByEmail(email).isPresent();
-	}
-
-	@Override
-	public void deleteUserByName(String userName) {
+	public void deleteByName(String userName) {
 		User user = findByUserName(userName);
 		userRepository.delete(user);
 		// remove the user for each registered application
@@ -77,7 +67,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User findUserById(Long id) {
+	public User findById(Long id) {
 		Optional<User> optUser = this.userRepository.findUserById(id);
 		if(!optUser.isPresent()) throw new NotFoundException("error.user.notfound");
 		return optUser.get();
@@ -90,7 +80,6 @@ public class UserServiceImpl implements UserService {
 	 * @param user
 	 * @return
 	 */
-	@Override
 	public List<String> validateUser(User user){
 		List<String> errors = new ArrayList<>();
 		userRepository.findByUserName(user.getUserName()).ifPresent(x -> {
@@ -100,37 +89,32 @@ public class UserServiceImpl implements UserService {
 
 		userRepository.findByEmail(user.getEmail()).ifPresent(x -> {
 			log.info("The email {} already exists.", x.getEmail());
-		errors.add("error.email.alreadyexists");
+			errors.add("error.email.alreadyexists");
 		});
 
 		if(!errors.isEmpty()) { throw new ValidationException(errors); }
 		return errors;
 	}
 
-	@Override
-	public void confirmUserEmail(User user, ApplicationType applicationType) {
-		// generate a token with basic user information
-		String token = jwtTokenUtil
-				.createRegistrationToken(user.getEmail(), applicationType);
-		// Send back the generated token by email
-		EmailMessage em = new EmailMessage();
-		String url = userConfirmationViewUrl + "?token=" + token;
-		em.setTitle("Confirmation Email");
-		em.setText("Please, click the confirmation link to confirm your email and sign "
-				+ "into your NOTES account. " + url);
-		em.setFrom("noreply@notes.jovanibrasil.com");
-		em.setTo(user.getEmail());
-		em.setTextType("text/plain");
-		em.setTitle("NOTES - Email Confirmation");
-		integrationService.sendEmail(em);
-	}
-
 	@Transactional
 	@Override
-	public User saveUser(User user) {
+	public User save(User user) {
 		log.info("Saving user: {}", user);
 		// Validate if user name and email already exists
 		validateUser(user);
+
+		// Send back the generated token by email
+//		EmailMessageDTO em = new EmailMessageDTO();
+//		String url = userConfirmationViewUrl + "?token=" + token;
+//		em.setTitle("Confirmation Email");
+//		em.setText("Please, click the confirmation link to confirm your email and sign "
+//				+ "into your NOTES account. " + url);
+//		em.setFrom("noreply@notes.jovanibrasil.com");
+//		em.setTo(user.getEmail());
+//		em.setTextType("text/plain");
+//		em.setTitle("NOTES - Email Confirmation");
+// 		integrationService.sendEmail(em);
+		
 		user.setSignUpDateTime(LocalDateTime.now());
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user = userRepository.save(user);
@@ -138,7 +122,6 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 
-	@Override
 	public boolean authenticate(String userName, String password){
 		org.springframework.security.core.Authentication auth = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(userName, password));
@@ -147,7 +130,7 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional
 	@Override
-	public User updateUser(User user) {
+	public User update(User user) {
 
 		if(!authenticate(user.getUserName(), user.getPassword())) throw new ForbiddenUserException("");
 

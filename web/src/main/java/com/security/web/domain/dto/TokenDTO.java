@@ -1,4 +1,4 @@
-package com.security.web.dto;
+package com.security.web.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.security.web.dto;
+package com.security.web.domain.form;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @Getter @Setter
 @ToString
-public class UpdateUserDTO {
+public class UpdateUserForm {
 
 	@NotNull
 	@Size(min=4, max=12, message="{error.user.password.size}")
@@ -22,7 +22,7 @@ public class UpdateUserDTO {
 	private String newPassword;
 
 
-	public UpdateUserDTO(String actualPassword, String newPassword) {
+	public UpdateUserForm(String actualPassword, String newPassword) {
 		super();
 		this.actualPassword = actualPassword;
 		this.newPassword = newPassword;

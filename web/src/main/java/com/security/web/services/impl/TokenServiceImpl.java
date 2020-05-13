@@ -42,7 +42,7 @@ public class TokenServiceImpl implements TokenService {
 	}
 
 	@Override
-	public String getToken() {
+	public String createToken() {
 		log.info("Generating Service token.");
 		if(token == null) {
 			try {
@@ -60,8 +60,6 @@ public class TokenServiceImpl implements TokenService {
 	@Override
 	public String createToken(User currentUser, ApplicationType applicationType) {
 		log.info("User {} is requesting a JWT token.", currentUser.getUserName());
-		//String recaptchaResponse = request.getParameter("recaptchaResponseToken");
-		//captchaService.processResponse(recaptchaResponse);
 
 		// Verify if user has registry for the required application
 		try {

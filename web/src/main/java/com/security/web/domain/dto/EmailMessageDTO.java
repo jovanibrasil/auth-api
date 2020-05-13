@@ -1,10 +1,10 @@
-package com.security.web.dto;
+package com.security.web.domain.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class EmailMessage {
+public class EmailMessageDTO {
 
 	private String text;
 	private String textType;

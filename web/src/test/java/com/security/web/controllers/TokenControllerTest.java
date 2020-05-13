@@ -9,8 +9,8 @@ import com.security.web.domain.Application;
 import com.security.web.domain.ApplicationType;
 import com.security.web.domain.Registry;
 import com.security.web.domain.User;
-import com.security.web.dto.CreateUserDTO;
-import com.security.web.dto.JwtAuthenticationDTO;
+import com.security.web.domain.form.JwtAuthenticationForm;
+import com.security.web.domain.form.UserForm;
 import com.security.web.exceptions.implementations.ForbiddenUserException;
 import com.security.web.exceptions.implementations.UnauthorizedUserException;
 import com.security.web.mappers.UserMapper;
@@ -86,7 +86,7 @@ public class TokenControllerTest {
 			"Username must not be blank or null.");
 	
 	private User user;
-	private CreateUserDTO userDto;
+	private UserForm userForm;
 
 	@Before
 	public void setUp() {
@@ -99,11 +99,11 @@ public class TokenControllerTest {
 		user.setSignUpDateTime(LocalDateTime.now());
 		user.setRegistries(Arrays.asList(
 				new Registry(new Application(ApplicationType.BLOG_APP), user)));
-		userDto = new CreateUserDTO();
-		userDto.setEmail("test@gmail.com");
-		userDto.setUserName("test");
-		userDto.setPassword("password");
-		userDto.setApplication(ApplicationType.BLOG_APP);
+		userForm = new UserForm();
+		userForm.setEmail("test@gmail.com");
+		userForm.setUserName("test");
+		userForm.setPassword("password");
+		userForm.setApplication(ApplicationType.BLOG_APP);
 		
 	}
 	
@@ -125,7 +125,7 @@ public class TokenControllerTest {
 		when(tokenService.createToken(ArgumentMatchers.any(), ArgumentMatchers.any()))
 				.thenReturn("TOKEN");
 
-		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
+		JwtAuthenticationForm tokenDTO = new JwtAuthenticationForm();
 		tokenDTO.setUserName(user.getUserName());
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
@@ -149,7 +149,7 @@ public class TokenControllerTest {
 		when(tokenService.createToken(ArgumentMatchers.any(), ArgumentMatchers.any()))
 				.thenThrow(new UnauthorizedUserException("error.login.invalid"));
 
-		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
+		JwtAuthenticationForm tokenDTO = new JwtAuthenticationForm();
 		tokenDTO.setUserName(user.getUserName());
 		tokenDTO.setPassword("kkkk");
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
@@ -172,7 +172,7 @@ public class TokenControllerTest {
 		when(userMapper.jwtAuthenticationDtoToUser(ArgumentMatchers.any()))
 				.thenReturn(user);
 
-		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
+		JwtAuthenticationForm tokenDTO = new JwtAuthenticationForm();
 		tokenDTO.setUserName(user.getUserName());
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(null);
@@ -180,7 +180,7 @@ public class TokenControllerTest {
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(asJsonString(tokenDTO)))
-				.andExpect(status().isUnprocessableEntity())
+				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.errors[0].message",
 					equalTo("Application cannot be null.")));
 	}
@@ -195,7 +195,7 @@ public class TokenControllerTest {
 		when(userMapper.jwtAuthenticationDtoToUser(ArgumentMatchers.any()))
 				.thenReturn(user);
 
-		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
+		JwtAuthenticationForm tokenDTO = new JwtAuthenticationForm();
 		tokenDTO.setUserName(null);
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
@@ -203,7 +203,7 @@ public class TokenControllerTest {
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(asJsonString(tokenDTO)))
-				.andExpect(status().isUnprocessableEntity())
+				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.errors[0].message",
 						equalTo("Username must not be blank or null.")));
 	}
@@ -220,7 +220,7 @@ public class TokenControllerTest {
 		when(tokenService.createToken(ArgumentMatchers.any(), ArgumentMatchers.any()))
 				.thenThrow(new UnauthorizedUserException("error.login.invalid"));
 
-		JwtAuthenticationDTO tokenDTO = new JwtAuthenticationDTO();
+		JwtAuthenticationForm tokenDTO = new JwtAuthenticationForm();
 		tokenDTO.setUserName("kkk");
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
@@ -250,7 +250,7 @@ public class TokenControllerTest {
 
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userDto)))
+			.content(asJsonString(userForm)))
 			.andExpect(status().isForbidden())
 			.andExpect(jsonPath("$.message", 
 					equalTo("User not registered for this application.")));
@@ -274,7 +274,7 @@ public class TokenControllerTest {
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 				.contentType(MediaType.APPLICATION_JSON)
 				.locale( new Locale("pt"))
-				.content(asJsonString(userDto)))
+				.content(asJsonString(userForm)))
 				.andExpect(status().isForbidden())
 				.andExpect(jsonPath("$.message",
 						equalTo("Usuário não registrado para esta aplicação.")));
@@ -287,11 +287,11 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testTokenCreationBlankUserName() throws Exception {
-		userDto.setUserName(" ");
+		userForm.setUserName(" ");
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userDto)))
-			.andExpect(status().isUnprocessableEntity())
+			.content(asJsonString(userForm)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0].message",
 					isIn(userNameBlankErrors)));
 	}
@@ -303,11 +303,11 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testTokenCreationLongUserName() throws Exception {
-		userDto.setUserName("aaaaaaaaaaaaa");
+		userForm.setUserName("aaaaaaaaaaaaa");
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userDto)))
-			.andExpect(status().isUnprocessableEntity())
+			.content(asJsonString(userForm)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0].message",
 					equalTo("Username length must be between 2 and 12.")));
 	}
@@ -319,11 +319,11 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testTokenCreationNullPassword() throws Exception {
-		userDto.setPassword(null);
+		userForm.setPassword(null);
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userDto)))
-			.andExpect(status().isUnprocessableEntity())
+			.content(asJsonString(userForm)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0].message", equalTo("Password must not be blank or null.")));
 	}
 	
@@ -334,11 +334,11 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testTokenCreationBlankPassword() throws Exception {
-		userDto.setPassword(" ");
+		userForm.setPassword(" ");
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userDto)))
-			.andExpect(status().isUnprocessableEntity())
+			.content(asJsonString(userForm)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0].message", isIn(passwordBlankErrors)));
 	}
 	
@@ -349,11 +349,11 @@ public class TokenControllerTest {
 	 */
 	@Test
 	public void testTokenCreationLongPassword() throws Exception {
-		userDto.setPassword("ppppppppppppp");
+		userForm.setPassword("ppppppppppppp");
 		mvc.perform(MockMvcRequestBuilders.post("/token/create")
 			.contentType(MediaType.APPLICATION_JSON)
-			.content(asJsonString(userDto)))
-			.andExpect(status().isUnprocessableEntity())
+			.content(asJsonString(userForm)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errors[0].message", equalTo("Password length must be between 4 and 12.")));
 	}
 

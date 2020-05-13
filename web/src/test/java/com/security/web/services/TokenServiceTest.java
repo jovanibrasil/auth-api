@@ -76,7 +76,7 @@ public class TokenServiceTest {
     public void getFirstToken() {
         when(userDetailsService.loadUserByUsername("AUTH")).thenReturn(jwtUser);
         when(jwtTokenUtil.createToken(jwtUser, ApplicationType.AUTH_APP)).thenReturn("token");
-        token = tokenService.getToken();
+        token = tokenService.createToken();
         assertNotNull(token);
     }
 
@@ -87,7 +87,7 @@ public class TokenServiceTest {
         privateStringField.setAccessible(true);
         privateStringField.set(privateStringField, "token");
         token = "token";
-        assertEquals(token, tokenService.getToken());
+        assertEquals(token, tokenService.createToken());
     }
 
     @Test

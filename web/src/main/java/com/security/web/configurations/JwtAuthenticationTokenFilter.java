@@ -61,10 +61,10 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 					log.info("Verifying token with user name {} and application name {}.", userName, applicationName);
 					UserDetails userDetails = userDetailService.loadUserByUsername(userName);
 
-					if (userDetails == null || !userService.existUserWithUserName(userName)) {
-						log.info("Invalid token information.");
-						throw new UnauthorizedUserException("Invalid token information.");
-					}
+//					if (userDetails == null || !userService.existUserWithUserName(userName)) {
+//						log.info("Invalid token information.");
+//						throw new UnauthorizedUserException("Invalid token information.");
+//					}
 
 					try {
 						// Verify authorization

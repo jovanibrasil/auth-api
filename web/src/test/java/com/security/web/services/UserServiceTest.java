@@ -98,13 +98,13 @@ public class UserServiceTest {
 
 	@Test
 	public void testFindValidUserByEmail() {
-		User savedUser = userService.findUserByEmail("test@gmail.com");
+		User savedUser = userService.findByEmail("test@gmail.com");
 		assertNotNull(savedUser);
 	}
 	
 	@Test(expected = NotFoundException.class)
 	public void testFindInvalidUserByEmail() {
-		userService.findUserByEmail("test");
+		userService.findByEmail("test");
 	}
 	
 	@Test
@@ -124,7 +124,7 @@ public class UserServiceTest {
 		newUser.addApplication(application);
 
 		when(userRepository.save(newUser)).thenReturn(newUser);
-		newUser = userService.saveUser(newUser);
+		newUser = userService.save(newUser);
 		
 		assertNotNull(newUser.getId());
 	}
@@ -142,7 +142,7 @@ public class UserServiceTest {
 		newUser.setProfile(ProfileEnum.ROLE_USER);
 		newUser.setSignUpDateTime(LocalDateTime.now());
 		newUser.setRegistries(Arrays.asList());
-		this.userService.saveUser(newUser);
+		this.userService.save(newUser);
 	}
 	
 	@Test
@@ -158,7 +158,7 @@ public class UserServiceTest {
 		newUser.setProfile(ProfileEnum.ROLE_USER);
 		newUser.setSignUpDateTime(LocalDateTime.now());
 		newUser.setRegistries(Arrays.asList());
-		this.userService.saveUser(newUser);
+		this.userService.save(newUser);
 	}
 
 	@Test
@@ -175,7 +175,7 @@ public class UserServiceTest {
 		expectedEx.expect(ValidationException.class);
 		expectedEx.expectMessage("[error.username.alreadyexists]");
 
-		this.userService.saveUser(newUser);
+		this.userService.save(newUser);
 	}
 
 	@Test
@@ -190,7 +190,7 @@ public class UserServiceTest {
 		newUser.setEmail("test@gmail.com");
 		newUser.setUserName("test2");
 		newUser.setPassword("password");
-		this.userService.saveUser(newUser);
+		this.userService.save(newUser);
 	}
 
 	@Ignore
@@ -204,7 +204,7 @@ public class UserServiceTest {
 		newUser.setEmail("test@gmail.com");
 		newUser.setUserName("test2");
 		newUser.setPassword("password");
-		User updatedUser = this.userService.updateUser(newUser);
+		User updatedUser = this.userService.update(newUser);
 		assertEquals("test2", updatedUser.getUserName());
 	}
 
@@ -220,14 +220,14 @@ public class UserServiceTest {
 		newUser.setUserName("test");
 		newUser.setPassword("password");
 
-		User updatedUser = this.userService.updateUser(newUser);
+		User updatedUser = this.userService.update(newUser);
 		assertEquals("test2@gmail.com", updatedUser.getEmail());
 	}
 	
 	@Test
 	public void testDeleteUser() {
 		try {
-			this.userService.deleteUserByName("test");
+			this.userService.deleteByName("test");
 			assertTrue(true);
 		} catch (Exception e) {
 			assertTrue(false);
@@ -237,7 +237,7 @@ public class UserServiceTest {
 	@Test(expected = NotFoundException.class)
 	public void testDeleteInvalidUser() {
 		//The user does not exist.
-		userService.deleteUserByName("java");
+		userService.deleteByName("java");
 	}
 
 }

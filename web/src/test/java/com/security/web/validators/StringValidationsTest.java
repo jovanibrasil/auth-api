@@ -26,7 +26,6 @@ public class StringValidationsTest {
 		result = strVals.hasValidSize("jovani", 6, 6);
 		assertEquals(true, result);
 		
-		
 	}
 	
 	
