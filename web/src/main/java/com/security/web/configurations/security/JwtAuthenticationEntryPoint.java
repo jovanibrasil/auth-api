@@ -1,6 +1,8 @@
-package com.security.web.configurations;
+package com.security.web.configurations.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.security.web.configurations.data.CustomMessageSource;
+
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

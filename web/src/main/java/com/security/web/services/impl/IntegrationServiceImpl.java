@@ -57,7 +57,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 
 			JSONObject request = new JSONObject();
 			request.put("userId", user.getId());
-			request.put("userName", user.getUserName());
+			request.put("userName", user.getUsername());
 			request.put("email", user.getEmail());
 			HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
 
@@ -94,7 +94,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 			String url = user.hasRegistry(ApplicationType.BLOG_APP) ? url = deleteBlogUser : deleteNotesUser;
 			// send request and parse result
 			log.info("Connecting with service ... {}", url);
-			ResponseEntity<String> loginResponse = restTemplate.exchange(url + "/" + user.getUserName(),
+			ResponseEntity<String> loginResponse = restTemplate.exchange(url + "/" + user.getUsername(),
 					HttpMethod.DELETE, entity, String.class);
 
 			if (!loginResponse.getStatusCode().equals(HttpStatus.OK)) {
@@ -128,7 +128,7 @@ public class IntegrationServiceImpl implements IntegrationService {
 			request.put("to", emailMessage.getTo());
 			request.put("from", emailMessage.getFrom());
 			request.put("title", emailMessage.getTitle());
-			HttpEntity<String> entity = new HttpEntity<String>(request.toString(), headers);
+			HttpEntity<String> entity = new HttpEntity<>(request.toString(), headers);
 
 			log.info("Connecting with service ... {}", emailServerUrl);
 			// send request and parse result

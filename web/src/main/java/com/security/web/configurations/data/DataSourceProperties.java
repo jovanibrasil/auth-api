@@ -1,4 +1,4 @@
-package com.security.web.configurations;
+package com.security.web.configurations.data;
 
 import lombok.Getter;
 import lombok.Setter;

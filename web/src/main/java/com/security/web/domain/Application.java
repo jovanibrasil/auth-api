@@ -25,7 +25,7 @@ public class Application {
 	
 	@Enumerated(EnumType.STRING)
 	@Column(name = "application_type", nullable = false)
-	private ApplicationType application;
+	private ApplicationType type;
 
 	@OneToMany(
 	        mappedBy = "application",
@@ -36,7 +36,7 @@ public class Application {
 	private List<Registry> registries = new ArrayList<Registry>();
 
 	public Application(ApplicationType applicationType) {
-		this.application = applicationType;
+		this.type = applicationType;
 	}
 
 	@Override
@@ -44,13 +44,13 @@ public class Application {
 		if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Application app = (Application) o;
-        return this.application.name().equals(app.application.name())
+        return this.type.name().equals(app.type.name())
         		&& this.id.equals(app.getId());
 	}
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, application);
+		return Objects.hash(id, type);
 	}
 	
 }

@@ -1,4 +1,4 @@
-package com.security.web.configurations;
+package com.security.web.configurations.data;
 
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;

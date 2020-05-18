@@ -6,6 +6,7 @@ import java.util.List;
 public class ValidationException extends RuntimeException {
 
 	private static final long serialVersionUID = -5138097093406207128L;
+
 	private List<String> errorMessages;
 
     public ValidationException(List<String> errorList) {

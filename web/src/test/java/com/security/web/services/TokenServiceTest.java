@@ -54,10 +54,9 @@ public class TokenServiceTest {
     @Before
     public void setUp() throws TokenException {
         MockitoAnnotations.initMocks(this);
-        tokenService = new TokenServiceImpl(jwtTokenUtil, userDetailsService,
-                userService, authenticationManager, utils);
+        tokenService = new TokenServiceImpl(jwtTokenUtil, userService, authenticationManager, utils);
         user = new User();
-        user.setUserName("username");
+        user.setUsername("username");
         user.setEmail("email");
         user.setPassword("password");
         user.setProfile(ProfileEnum.ROLE_USER);
@@ -67,7 +66,7 @@ public class TokenServiceTest {
                 new Registry(app, user)
         ));
 
-        jwtUser = new JwtUser(user.getUserName(),
+        jwtUser = new JwtUser(user.getUsername(),
                 user.getPassword(),
                 JwtUserFactory.mapToGrantedAuthorities(user.getProfile()));
     }
@@ -128,10 +127,10 @@ public class TokenServiceTest {
         when(utils.extractJwtTokenFromBearerHeader(token))
                 .thenReturn(token);
         when(jwtTokenUtil.getUserNameFromToken(token))
-                .thenReturn(user.getUserName());
+                .thenReturn(user.getUsername());
         when(jwtTokenUtil.getApplicationName(token))
                 .thenReturn("BLOG_APP");
-        when(userService.findByUserName(user.getUserName()))
+        when(userService.findUserByUserName(user.getUsername()))
                 .thenReturn(user);
         assertEquals(user, tokenService.checkToken(token));
     }
@@ -139,11 +138,11 @@ public class TokenServiceTest {
     @Test
     public void createToken() {
         token = "token";
-        when(userService.findByUserName(user.getUserName()))
+        when(userService.findUserByUserName(user.getUsername()))
             .thenReturn(user);
         when(authenticationManager.authenticate(any()))
             .thenReturn(new AuthenticationMock());
-        when(userDetailsService.loadUserByUsername(user.getUserName()))
+        when(userDetailsService.loadUserByUsername(user.getUsername()))
             .thenReturn(jwtUser);
         when(jwtTokenUtil.createToken(jwtUser, ApplicationType.BLOG_APP))
             .thenReturn(token);

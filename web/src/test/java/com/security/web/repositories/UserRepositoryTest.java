@@ -1,28 +1,31 @@
 package com.security.web.repositories;
 
-import com.security.jwt.enums.ProfileEnum;
-import com.security.web.domain.Application;
-import com.security.web.domain.ApplicationType;
-import com.security.web.domain.Registry;
-import com.security.web.domain.User;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.junit.Assert.*;
+import com.security.web.ScenariosFactory;
+import com.security.web.domain.Application;
+import com.security.web.domain.Registry;
+import com.security.web.domain.User;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @ActiveProfiles("test")
 @Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class UserRepositoryTest {
 
 	@Autowired
@@ -30,94 +33,115 @@ public class UserRepositoryTest {
 
 	@Autowired
 	private ApplicationRepository applicationRepository;
-
-	private Optional<User> optUser;
+	
+	private User user;
+	private Application blogApplication;
+	private Application notesApplication;
 	
 	@Before
 	public void setUp() {
-		Application blog = new Application(ApplicationType.BLOG_APP);
-		applicationRepository.save(blog);
-		User user = new User();
-		user.setEmail("test@gmail.com");
-		user.setUserName("test");
-		user.setPassword("password");
-		user.setProfile(ProfileEnum.ROLE_USER);
-		user.setSignUpDateTime(LocalDateTime.now());
-		user.addApplication(blog);		
-		user = userRepository.save(user);
+		blogApplication = applicationRepository.save(ScenariosFactory.createBlogApplication());
+		notesApplication = applicationRepository.save(ScenariosFactory.createNotesApplication());
+		user = ScenariosFactory.createUser();
 	}
 	
 	@Test
 	public void testFindValidUserByName() {
-		optUser = userRepository.findByUserName("test");
-		assertTrue(optUser.isPresent());
+		User savedUser = userRepository.save(user);
+		assertEquals(savedUser.getUsername(), userRepository.findByUsername("test").get().getUsername());
 	}
 	
 	@Test
 	public void testFindValidUserByEmail() {
-		optUser = userRepository.findByEmail("test@gmail.com");
-		assertTrue(optUser.isPresent());
+		User savedUser = userRepository.save(user);
+		assertEquals(savedUser.getEmail(), userRepository.findByEmail("test@gmail.com").get().getEmail());
 	}
 	
 	@Test
 	public void testFindInvalidUserByName() {
-		optUser = userRepository.findByUserName("test@gmail.com");
-		assertFalse(optUser.isPresent());
+		assertFalse(userRepository.findByUsername("test@gmail.com").isPresent());
 	}
 	
 	@Test
 	public void testFindInvalidUserByEmail() {
-		optUser = userRepository.findByEmail("test");
-		assertFalse(optUser.isPresent());
+		assertFalse(userRepository.findByEmail("test").isPresent());
 	}
 
+	/**
+	 * Delete a valid user.
+	 * 
+	 */
 	@Test
 	public void testDeleteUser() {
-		optUser = userRepository.findByUserName("test");
-		userRepository.delete(optUser.get());
-		Optional<User> u = userRepository.findById(optUser.get().getId());
-		assertEquals(false, u.isPresent());
+		user.addApplication(blogApplication);
+		User savedUser = userRepository.save(user);
+		userRepository.delete(savedUser);
+		Optional<User> optUser = userRepository.findById(savedUser.getId());
+		
+		assertFalse(optUser.isPresent());
+		assertTrue(applicationRepository.findById(blogApplication.getId()).isPresent());
 	}
 	
+	/**
+	 * Save a blog user.
+	 * 
+	 */
 	@Test
-	public void testSaveUser() {
-		Application blog = new Application(ApplicationType.BLOG_APP);
-		blog = applicationRepository.save(blog);
-		User u = new User();
-		u.setEmail("test@gmail.com");
-		u.setUserName("test");
-		u.setPassword("password");
-		u.setProfile(ProfileEnum.ROLE_USER);
-		u.setSignUpDateTime(LocalDateTime.now());
-		u.addApplication(blog);		
-		u = userRepository.save(u);
-		assertNotNull(u.getId());
+	public void testSaveUserBlogApplication() {
+		user.addApplication(blogApplication);
+		user = userRepository.save(user);
+		
+		assertNotNull(user.getId());
+		assertEquals(1, user.getRegistries().size());
+		assertEquals(blogApplication.getType(), user.getRegistries().get(0).getApplication().getType());
 	}
 
+	/**
+	 * Save a user without application.
+	 * 
+	 */
 	@Test
-	public void testFindValidUserByNameVerifyApplications() {
-		optUser = userRepository.findByUserName("test");
-		Application app = optUser.get().getRegistries().get(0).getApplication();
-		assertEquals(ApplicationType.BLOG_APP, app.getApplication());
+	public void testSaveUserWithoutApplication() {
+		user = userRepository.save(user);
+		
+		assertNotNull(user.getId());
+		assertEquals(0, user.getRegistries().size());
 	}
 	
+	/**
+	 * Add application to an existent registered user.
+	 * 
+	 */
 	@Test
-	public void testHasSpecificApplication() {
-		optUser = userRepository.findByUserName("test");
-		assertTrue(optUser.get().hasRegistry(ApplicationType.BLOG_APP));
+	public void testUpdateAddUserApplication() {
+		user.addApplication(blogApplication);
+		user = userRepository.save(user);
+		
+		user.addApplication(notesApplication);
+		
+		User savedUser = userRepository.findById(user.getId()).get();
+		assertEquals(2, savedUser.getRegistries().size());
 	}
 	
+	/**
+	 * Delete application blog registry from an existent registered user.
+	 * 
+	 */
 	@Test
-	public void testHasValidApplications() {
-		optUser = userRepository.findByEmail("test@gmail.com");
-		assertNotNull(optUser.get().getRegistries());
-		assertNotEquals(0, optUser.get().getRegistries().size());
-		Registry registry = optUser.get().getRegistries().get(0);
-		if(registry != null) {
-			assertNotNull(registry.getApplication());
-			assertNotNull(registry.getApplication().getId());
-			assertNotNull(registry.getUser());
-		}		
+	public void testDeleteApplicationRegistryFromExistentUser() {
+		user.addApplication(blogApplication);
+		user.addApplication(notesApplication);
+		user = userRepository.save(user);
+		
+		User savedUser = userRepository.findById(user.getId()).get();
+		Registry registry = savedUser.getRegistries().get(0);
+		savedUser.getRegistries().remove(0);
+		userRepository.save(user);
+		
+		savedUser = userRepository.findById(user.getId()).get();
+		assertEquals(1, savedUser.getRegistries().size());
+		// the application is not affected 
+		assertTrue(applicationRepository.findById(registry.getApplication().getId()).isPresent());
 	}
-
+	
 }

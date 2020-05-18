@@ -68,7 +68,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetail);
 	}
 
-	@ExceptionHandler({TokenException.class, ValidationException.class})
+	@ExceptionHandler(ValidationException.class)
+	public ResponseEntity<?> handleValidationException(ValidationException ex, Locale locale){
+		List<ValidationError> validationErrors = ex.getErrorMessages().stream()
+				.map(message -> new ValidationError(getMessage(message, locale), null, null))
+				.collect(Collectors.toList());
+		
+		ErrorDetail errorDetail = ErrorDetail.builder()
+				.message("Invalid field values")
+				.errors(validationErrors)
+				.build();
+		return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(errorDetail);
+	}
+	
+	@ExceptionHandler(TokenException.class)
 	public ResponseEntity<?> handleInvalidTokenException(Exception ex, Locale locale){
 		ErrorDetail errorDetail = ErrorDetail.builder()
 				.message(getMessage(ex.getMessage(), locale))
@@ -109,6 +122,5 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 				.build();
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorDetail);
 	}
-	
 	
 }

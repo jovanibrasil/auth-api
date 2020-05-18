@@ -17,7 +17,8 @@ import java.util.Objects;
  *
  */
 @Getter
-@NoArgsConstructor @AllArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor 
 @Embeddable
 public class RegistryId implements Serializable {
 

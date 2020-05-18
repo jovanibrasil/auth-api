@@ -1,11 +1,11 @@
 package com.security.web.controllers;
 
 import com.security.jwt.utils.Keys;
-import com.security.web.domain.CheckedTokenInfoDTO;
 import com.security.web.domain.User;
+import com.security.web.domain.dto.CheckedTokenInfoDTO;
 import com.security.web.domain.dto.TokenDTO;
 import com.security.web.domain.form.JwtAuthenticationForm;
-import com.security.web.mappers.UserMapper;
+import com.security.web.domain.mappers.UserMapper;
 import com.security.web.services.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,6 @@ import javax.validation.Valid;
 
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/token")
 public class TokensController {
@@ -27,7 +26,7 @@ public class TokensController {
 
 	/**
 	 * Creates and returns a new token JWT.
-	 * 
+	 *
 	 * @param authenticationDto
 	 * @return
 	 */
@@ -61,8 +60,8 @@ public class TokensController {
 	@GetMapping(value="/check")
 	public ResponseEntity<CheckedTokenInfoDTO> checkToken(HttpServletRequest request){
 		log.info("Checking JWT token");
+		// Verify if the token is valid and the user has register for the required application
 		User user = tokenService.checkToken(request.getHeader(Keys.TOKEN_HEADER));
-		// Verify if user has register for the required application
 		return ResponseEntity.ok(userMapper.userToCheckedTokenInfoDto(user));
 	}
 	

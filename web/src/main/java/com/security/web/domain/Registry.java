@@ -12,7 +12,7 @@ import java.util.Objects;
 @Getter @Setter
 @NoArgsConstructor
 @ToString
-@Entity(name = "Registry")
+@Entity
 @Table(name = "registries")
 public class Registry {
 

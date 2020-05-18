@@ -26,16 +26,13 @@ public class TokenServiceImpl implements TokenService {
 
 	private static String token = null;
 	private final JwtTokenGenerator jwtTokenUtil;
-	private final UserDetailsService userDetailsService;
 	private final UserService userService;
 	private final AuthenticationManager authenticationManager;
 	private final Utils utils;
 
-	public TokenServiceImpl(JwtTokenGenerator jwtTokenUtil,
-							@Lazy @Qualifier("userDetailServiceImpl") UserDetailsService userDetailsService,
-							UserService userService, AuthenticationManager authenticationManager, Utils utils) {
+	public TokenServiceImpl(JwtTokenGenerator jwtTokenUtil, UserService userService, 
+			AuthenticationManager authenticationManager, Utils utils) {
 		this.jwtTokenUtil = jwtTokenUtil;
-		this.userDetailsService = userDetailsService;
 		this.userService = userService;
 		this.authenticationManager = authenticationManager;
 		this.utils = utils;
@@ -46,7 +43,7 @@ public class TokenServiceImpl implements TokenService {
 		log.info("Generating Service token.");
 		if(token == null) {
 			try {
-				UserDetails userDetails = userDetailsService.loadUserByUsername("AUTH");
+				UserDetails userDetails = userService.loadUserByUsername("AUTH");
 				log.info("Creating the token ...");
 				token = jwtTokenUtil.createToken(userDetails, ApplicationType.AUTH_APP);
 				log.info("Generated token: {}.", token);
@@ -59,11 +56,11 @@ public class TokenServiceImpl implements TokenService {
 
 	@Override
 	public String createToken(User currentUser, ApplicationType applicationType) {
-		log.info("User {} is requesting a JWT token.", currentUser.getUserName());
+		log.info("User {} is requesting a JWT token.", currentUser.getUsername());
 
 		// Verify if user has registry for the required application
 		try {
-			User savedUser = userService.findByUserName(currentUser.getUserName());
+			User savedUser = userService.findUserByUserName(currentUser.getUsername());
 			if(!savedUser.hasRegistry(applicationType)) {
 				log.error("Authentication error. User not register for {}", applicationType);
 				throw new ForbiddenUserException("error.user.notregistered");
@@ -73,9 +70,9 @@ public class TokenServiceImpl implements TokenService {
 		}
 
 		// Does user authentication
-		log.info("Authenticating {} ...", currentUser.getUserName());
+		log.info("Authenticating {} ...", currentUser.getUsername());
 		org.springframework.security.core.Authentication auth = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(currentUser.getUserName(), currentUser.getPassword()));
+				new UsernamePasswordAuthenticationToken(currentUser.getUsername(), currentUser.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(auth);
 
 		// Verify authentication result
@@ -83,10 +80,10 @@ public class TokenServiceImpl implements TokenService {
 			log.error("Authentication error {}");
 			throw new UnauthorizedUserException("error.login.invalid");
 		}
-		log.info("Creating token for {}", currentUser.getUserName());
-		UserDetails userDetails = userDetailsService.loadUserByUsername(currentUser.getUserName());
+		log.info("Creating token for {}", currentUser.getUsername());
+		UserDetails userDetails = userService.loadUserByUsername(currentUser.getUsername());
 		String token = jwtTokenUtil.createToken(userDetails, applicationType);
-		log.info("Token successfully generated for {}.", currentUser.getUserName());
+		log.info("Token successfully generated for {}.", currentUser.getUsername());
 		return token;
 	}
 
@@ -102,7 +99,7 @@ public class TokenServiceImpl implements TokenService {
 
 		String userName = jwtTokenUtil.getUserNameFromToken(token);
 		ApplicationType applicationName = ApplicationType.valueOf(jwtTokenUtil.getApplicationName(token));
-		User user = userService.findByUserName(userName);
+		User user = userService.findUserByUserName(userName);
 
 		if(user.hasRegistry(applicationName)) {
 			log.info("Token ok from user {}", userName);

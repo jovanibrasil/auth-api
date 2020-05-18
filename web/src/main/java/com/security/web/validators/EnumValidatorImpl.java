@@ -13,7 +13,7 @@ public class EnumValidatorImpl implements ConstraintValidator<EnumValidator, Enu
     public void initialize(EnumValidator constraintAnnotation){
     	values = new ArrayList<String>();
 	    Class<? extends Enum<?>> enumClass = constraintAnnotation.enumClass();
-	    for(Enum enumVal : enumClass.getEnumConstants()) {
+	    for(Enum<?> enumVal : enumClass.getEnumConstants()) {
 	    	values.add(enumVal.toString().toUpperCase());
 	    }
     }

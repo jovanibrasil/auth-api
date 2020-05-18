@@ -3,19 +3,18 @@ package com.security.web.services.impl;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.security.jwt.enums.ProfileEnum;
+import com.security.jwt.utils.JwtUserFactory;
 import com.security.jwt.utils.PasswordUtils;
 import com.security.web.domain.User;
-import com.security.web.exceptions.implementations.ForbiddenUserException;
 import com.security.web.exceptions.implementations.NotFoundException;
 import com.security.web.exceptions.implementations.ValidationException;
 import com.security.web.repositories.UserRepository;
@@ -29,45 +28,38 @@ public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
 	private final IntegrationServiceImpl integrationService;
-	private final AuthenticationManager authenticationManager;
 
-	public UserServiceImpl(UserRepository userRepository, @Lazy IntegrationServiceImpl integrationService,
-						   AuthenticationManager authenticationManager) {
+	public UserServiceImpl(UserRepository userRepository, @Lazy IntegrationServiceImpl integrationService) {
 		this.userRepository = userRepository;
 		this.integrationService = integrationService;
-		this.authenticationManager = authenticationManager;
 	}
 
 	@Value("${urls.notes.userconfirmationview}")
 	private String userConfirmationViewUrl;
 
 	@Override
-	public User findByUserName(String userName) {
-		Optional<User> optUser = userRepository.findByUserName(userName);
-		if(!optUser.isPresent()) throw new NotFoundException("error.user.notfound");
-		return optUser.get();
+	public User findUserByUserName(String userName) {
+		return userRepository.findByUsername(userName).orElseThrow(() -> new NotFoundException("error.user.notfound"));
 	}
 
 	@Override
-	public User findByEmail(String email) {
-		Optional<User> optUser = userRepository.findByEmail(email);
-		if(!optUser.isPresent()) throw new NotFoundException("error.user.notfound");
-		return optUser.get();
+	public User findUserByEmail(String email) {
+		return userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("error.user.notfound"));
 	}
 
 	@Override
-	public void deleteByName(String userName) {
-		User user = findByUserName(userName);
-		userRepository.delete(user);
-		// remove the user for each registered application
-		integrationService.deleteServiceUser(user);
+	public void deleteUserByName(String userName) {
+		userRepository.findByUsername(userName).ifPresentOrElse(user -> {
+			// remove the user for each registered application
+			integrationService.deleteServiceUser(user);
+			userRepository.delete(user);
+		},
+		() -> new NotFoundException("error.user.notfound"));
 	}
 
 	@Override
-	public User findById(Long id) {
-		Optional<User> optUser = this.userRepository.findUserById(id);
-		if(!optUser.isPresent()) throw new NotFoundException("error.user.notfound");
-		return optUser.get();
+	public User findUserById(Long id) {
+		return this.userRepository.findUserById(id).orElseThrow(() -> new NotFoundException("error.user.notfound"));
 	}
 
 	/**
@@ -79,9 +71,9 @@ public class UserServiceImpl implements UserService {
 	 */
 	public List<String> validateUser(User user){
 		List<String> errors = new ArrayList<>();
-		userRepository.findByUserName(user.getUserName()).ifPresent(x -> {
-			log.info("The username {} already exists.", x.getUserName());
-			errors.add("error.username.alreadyexists");
+		userRepository.findByUsername(user.getUsername()).ifPresent(x -> {
+			log.info("The username {} already exists.", x.getUsername());
+			errors.add("error.user.name.alreadyexists");
 		});
 
 		userRepository.findByEmail(user.getEmail()).ifPresent(x -> {
@@ -95,7 +87,7 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional
 	@Override
-	public User save(User user) {
+	public User saveUser(User user) {
 		log.info("Saving user: {}", user);
 		// Validate if user name and email already exists
 		validateUser(user);
@@ -111,7 +103,7 @@ public class UserServiceImpl implements UserService {
 //		em.setTextType("text/plain");
 //		em.setTitle("NOTES - Email Confirmation");
 // 		integrationService.sendEmail(em);
-		
+		user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
 		user.setSignUpDateTime(LocalDateTime.now());
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user = userRepository.save(user);
@@ -119,35 +111,33 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 
-	public boolean authenticate(String userName, String password){
-		org.springframework.security.core.Authentication auth = authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(userName, password));
-		return auth.isAuthenticated();
-	}
-
 	@Transactional
 	@Override
-	public User update(User user) {
+	public User updateUser(User user) {
 
-		if(!authenticate(user.getUserName(), user.getPassword())) throw new ForbiddenUserException("");
-
-		User currentUser = findByUserName(user.getUserName());
-		List<String> errors = new ArrayList<>();
+		User currentUser = findUserByUserName(user.getUsername());
 
 		// Apply validations to the user. Validates if the user name and email already exist.
 		if (!currentUser.getEmail().equals(user.getEmail())) {
 			userRepository.findByEmail(user.getEmail())
-					.ifPresent(x -> errors.add("error.email.alreadyexists"));
+					.ifPresent(savedUser -> {
+						throw new ValidationException("error.email.alreadyexists");
+					});
+			
 			currentUser.setEmail(user.getEmail());
 		}
-
-		if(!errors.isEmpty()) throw new ValidationException(errors);
 
 		currentUser.setPassword(PasswordUtils.generateHash(user.getPassword()));
 		userRepository.save(currentUser);
 		return currentUser;
 	}
 
-
+	@Override
+	public UserDetails loadUserByUsername(String username) {
+		log.info("Searching for " + username);
+		User user = findUserByUserName(username);
+		return JwtUserFactory.create(user.getUsername(),
+				user.getPassword(), user.getProfile());
+	}
 
 }

@@ -1,4 +1,4 @@
-package com.security.web.domain;
+package com.security.web.domain.dto;
 
 import com.security.jwt.enums.ProfileEnum;
 import lombok.*;

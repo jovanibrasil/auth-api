@@ -11,7 +11,6 @@ import javax.validation.constraints.Size;
 @Getter @Setter
 @Builder
 @NoArgsConstructor @AllArgsConstructor
-@ToString
 public class UserForm {
 
 	@NotBlank(message = "{error.email.notnull}")

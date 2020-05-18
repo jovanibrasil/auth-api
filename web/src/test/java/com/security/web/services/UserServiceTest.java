@@ -62,19 +62,19 @@ public class UserServiceTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		userService = new UserServiceImpl(userRepository, integrationService, authenticationManager);
+		userService = new UserServiceImpl(userRepository, integrationService);
 		user = new User();
 		user.setId(1L);
 		user.setEmail("test@gmail.com");
-		user.setUserName("test");
+		user.setUsername("test");
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user.setSignUpDateTime(LocalDateTime.now());
 
 		BDDMockito.given(userRepository.findByEmail("test@gmail.com")).willReturn(Optional.of(user));
 		BDDMockito.given(userRepository.findByEmail("test2@gmail.com")).willReturn(null);
-		BDDMockito.given(userRepository.findByUserName("test")).willReturn(Optional.of(user));
-		BDDMockito.given(userRepository.findByUserName("test2")).willReturn(Optional.empty());
+		BDDMockito.given(userRepository.findByUsername("test")).willReturn(Optional.of(user));
+		BDDMockito.given(userRepository.findByUsername("test2")).willReturn(Optional.empty());
 		BDDMockito.given(userRepository.findUserById(1L)).willReturn(Optional.of(user));
 		
 		Mockito.doNothing().when(integrationService).createServiceUser(Mockito.any());
@@ -86,24 +86,24 @@ public class UserServiceTest {
 	
 	@Test
 	public void testFindValidUserByUserName() {
-		User savedUser = userService.findByUserName("test");
+		User savedUser = userService.findUserByUserName("test");
 		assertNotNull(savedUser);
 	}
 	
 	@Test(expected = NotFoundException.class)
 	public void testFindInvalidUserByUserName() {
-		userService.findByUserName("invalidUser");
+		userService.findUserByUserName("invalidUser");
 	}
 
 	@Test
 	public void testFindValidUserByEmail() {
-		User savedUser = userService.findByEmail("test@gmail.com");
+		User savedUser = userService.findUserByEmail("test@gmail.com");
 		assertNotNull(savedUser);
 	}
 	
 	@Test(expected = NotFoundException.class)
 	public void testFindInvalidUserByEmail() {
-		userService.findByEmail("test");
+		userService.findUserByEmail("test");
 	}
 	
 	@Test
@@ -116,117 +116,117 @@ public class UserServiceTest {
 		User newUser = new User();
 		newUser.setId(0L);
 		newUser.setEmail("tes2t@gmail.com");
-		newUser.setUserName("test2");
+		newUser.setUsername("test2");
 		newUser.setPassword("password");
 		newUser.setProfile(ProfileEnum.ROLE_USER);
 		newUser.setSignUpDateTime(LocalDateTime.now());
 		newUser.addApplication(application);
 
 		when(userRepository.save(newUser)).thenReturn(newUser);
-		newUser = userService.save(newUser);
+		newUser = userService.saveUser(newUser);
 		
 		assertNotNull(newUser.getId());
 	}
 	
 	@Test
 	public void testSaveRepeatedEmail() {
-		when(userRepository.findByUserName(any())).thenReturn(Optional.empty());
+		when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
 		when(userRepository.findByEmail(any())).thenReturn(Optional.of(user));
 		expectedEx.expect(ValidationException.class);
 		expectedEx.expectMessage("[error.email.alreadyexists]");
 		User newUser = new User();
 		newUser.setEmail("test@gmail.com");
-		newUser.setUserName("test2");
+		newUser.setUsername("test2");
 		newUser.setPassword("password");
 		newUser.setProfile(ProfileEnum.ROLE_USER);
 		newUser.setSignUpDateTime(LocalDateTime.now());
 		newUser.setRegistries(Arrays.asList());
-		this.userService.save(newUser);
+		this.userService.saveUser(newUser);
 	}
 	
 	@Test
 	public void testSaveRepeatedUserName() {
 		when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
-		when(userRepository.findByUserName(any())).thenReturn(Optional.of(user));
+		when(userRepository.findByUsername(any())).thenReturn(Optional.of(user));
 		expectedEx.expect(ValidationException.class);
 		expectedEx.expectMessage("[error.username.alreadyexists]");
 		User newUser = new User();
 		newUser.setEmail("test2@gmail.com");
-		newUser.setUserName("test");
+		newUser.setUsername("test");
 		newUser.setPassword("password");
 		newUser.setProfile(ProfileEnum.ROLE_USER);
 		newUser.setSignUpDateTime(LocalDateTime.now());
 		newUser.setRegistries(Arrays.asList());
-		this.userService.save(newUser);
+		this.userService.saveUser(newUser);
 	}
 
 	@Test
 	public void testInvalidUpdateUserName() {
 		when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
-		when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(user));
+		when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
 
 		User newUser = new User();
 		newUser.setId(1L);
 		newUser.setEmail("test2@gmail.com");
-		newUser.setUserName("test");
+		newUser.setUsername("test");
 		newUser.setPassword("password");
 
 		expectedEx.expect(ValidationException.class);
 		expectedEx.expectMessage("[error.username.alreadyexists]");
 
-		this.userService.save(newUser);
+		this.userService.saveUser(newUser);
 	}
 
 	@Test
 	public void testInvalidUpdateEmail() {
 		when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
-		when(userRepository.findByUserName(anyString())).thenReturn(Optional.empty());
+		when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
 		expectedEx.expect(ValidationException.class);
 		expectedEx.expectMessage("[error.email.alreadyexists]");
 		User newUser = new User();
 		newUser.setId(1L);
 		newUser.setEmail("test@gmail.com");
-		newUser.setUserName("test2");
+		newUser.setUsername("test2");
 		newUser.setPassword("password");
-		this.userService.save(newUser);
+		this.userService.saveUser(newUser);
 	}
 
 	@Ignore
 	@Test
 	public void testValidUpdateUserName() {
 		when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
-		when(userRepository.findByUserName(anyString())).thenReturn(Optional.empty());
+		when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
 
 		User newUser = new User();
 		newUser.setId(1L);
 		newUser.setEmail("test@gmail.com");
-		newUser.setUserName("test2");
+		newUser.setUsername("test2");
 		newUser.setPassword("password");
-		User updatedUser = this.userService.update(newUser);
-		assertEquals("test2", updatedUser.getUserName());
+		User updatedUser = this.userService.updateUser(newUser);
+		assertEquals("test2", updatedUser.getUsername());
 	}
 
 	@Test
 	public void testValidUpdateEmail() {
 
 		when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
-		when(userRepository.findByUserName(anyString())).thenReturn(Optional.of(user));
+		when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(user));
 
 		User newUser = new User();
 		newUser.setId(1L);
 		newUser.setEmail("test2@gmail.com");
-		newUser.setUserName("test");
+		newUser.setUsername("test");
 		newUser.setPassword("password");
 
-		User updatedUser = this.userService.update(newUser);
+		User updatedUser = this.userService.updateUser(newUser);
 		assertEquals("test2@gmail.com", updatedUser.getEmail());
 	}
 	
 	@Test
 	public void testDeleteUser() {
 		try {
-			this.userService.deleteByName("test");
+			this.userService.deleteUserByName("test");
 			assertTrue(true);
 		} catch (Exception e) {
 			assertTrue(false);
@@ -235,8 +235,9 @@ public class UserServiceTest {
 	
 	@Test(expected = NotFoundException.class)
 	public void testDeleteInvalidUser() {
-		//The user does not exist.
-		userService.deleteByName("java");
+		String userName = "java";
+		when(userRepository.findByUsername(userName)).thenThrow(NotFoundException.class);
+		userService.deleteUserByName(userName);
 	}
 
 }

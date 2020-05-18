@@ -1,23 +1,16 @@
 package com.security.web.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.security.jwt.enums.ProfileEnum;
-import com.security.jwt.exceptions.TokenException;
-import com.security.jwt.utils.Utils;
-import com.security.web.domain.Application;
-import com.security.web.domain.ApplicationType;
-import com.security.web.domain.Registry;
-import com.security.web.domain.User;
-import com.security.web.domain.form.JwtAuthenticationForm;
-import com.security.web.domain.form.UserForm;
-import com.security.web.exceptions.implementations.ForbiddenUserException;
-import com.security.web.exceptions.implementations.UnauthorizedUserException;
-import com.security.web.mappers.UserMapper;
-import com.security.web.repositories.UserRepository;
-import com.security.web.services.TokenService;
-import com.security.web.services.UserService;
-import org.junit.After;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.isIn;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,24 +20,25 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.isIn;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.security.jwt.enums.ProfileEnum;
+import com.security.jwt.exceptions.TokenException;
+import com.security.web.domain.Application;
+import com.security.web.domain.ApplicationType;
+import com.security.web.domain.Registry;
+import com.security.web.domain.User;
+import com.security.web.domain.form.JwtAuthenticationForm;
+import com.security.web.domain.form.UserForm;
+import com.security.web.domain.mappers.UserMapper;
+import com.security.web.exceptions.implementations.ForbiddenUserException;
+import com.security.web.exceptions.implementations.UnauthorizedUserException;
+import com.security.web.services.TokenService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -56,28 +50,10 @@ public class TokenControllerTest {
 	private MockMvc mvc;
 
 	@MockBean
-	private UserService userService;
-
-	@MockBean
-	private AuthenticationManager authenticationManager;
-
-	@MockBean
-	private UserDetailsService userDetailsService;
-
-	@MockBean
-	private UserRepository userRepository;
-
-	@MockBean
-	private RestTemplate restTemplate;
-
-	@MockBean
 	private TokenService tokenService;
 
 	@MockBean
 	private UserMapper userMapper;
-
-	@MockBean
-	private Utils utils;
 
 	private List<String> passwordBlankErrors = Arrays.asList("Password length must be between 4 and 12.", 
 			"Password must not be blank or null.");
@@ -93,7 +69,7 @@ public class TokenControllerTest {
 		user = new User();
 		user.setId(1L);
 		user.setEmail("test@gmail.com");
-		user.setUserName("test");
+		user.setUsername("test");
 		user.setPassword("password");
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user.setSignUpDateTime(LocalDateTime.now());
@@ -105,11 +81,6 @@ public class TokenControllerTest {
 		userForm.setPassword("password");
 		userForm.setApplication(ApplicationType.BLOG_APP);
 		
-	}
-	
-	@After
-	public void tearDown() {
-		this.userRepository.deleteAll();
 	}
 	
 	/**
@@ -126,7 +97,7 @@ public class TokenControllerTest {
 				.thenReturn("TOKEN");
 
 		JwtAuthenticationForm tokenDTO = new JwtAuthenticationForm();
-		tokenDTO.setUserName(user.getUserName());
+		tokenDTO.setUserName(user.getUsername());
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
 
@@ -150,7 +121,7 @@ public class TokenControllerTest {
 				.thenThrow(new UnauthorizedUserException("error.login.invalid"));
 
 		JwtAuthenticationForm tokenDTO = new JwtAuthenticationForm();
-		tokenDTO.setUserName(user.getUserName());
+		tokenDTO.setUserName(user.getUsername());
 		tokenDTO.setPassword("kkkk");
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
 
@@ -173,7 +144,7 @@ public class TokenControllerTest {
 				.thenReturn(user);
 
 		JwtAuthenticationForm tokenDTO = new JwtAuthenticationForm();
-		tokenDTO.setUserName(user.getUserName());
+		tokenDTO.setUserName(user.getUsername());
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(null);
 

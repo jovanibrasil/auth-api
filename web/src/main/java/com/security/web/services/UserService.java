@@ -1,15 +1,17 @@
 package com.security.web.services;
 
+import org.springframework.security.core.userdetails.UserDetailsService;
+
 import com.security.web.domain.User;
 
-public interface UserService {
+public interface UserService extends UserDetailsService {
 
-	User findByUserName(String userName);
-	User findByEmail(String email);
-	User findById(Long id);
+	User findUserByUserName(String userName);
+	User findUserByEmail(String email);
+	User findUserById(Long id);
 	
-	User save(User user);
-	User update(User user);
-	void deleteByName(String userName);
+	User saveUser(User user);
+	User updateUser(User user);
+	void deleteUserByName(String userName);
 	
 }

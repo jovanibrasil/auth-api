@@ -1,4 +1,4 @@
-package com.security.web.configurations;
+package com.security.web.configurations.data;
 
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
