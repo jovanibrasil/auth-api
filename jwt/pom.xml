@@ -11,6 +11,14 @@
 
     <artifactId>security-jwt</artifactId>
 
+	<dependencies>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.7.0</version>
+		</dependency>
+	</dependencies>
+
     <properties>
         <spring-boot.repackage.skip>true</spring-boot.repackage.skip>
     </properties>
