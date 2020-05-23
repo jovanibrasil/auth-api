@@ -20,6 +20,8 @@ import com.security.web.ScenariosFactory;
 import com.security.web.domain.Application;
 import com.security.web.domain.Registry;
 import com.security.web.domain.User;
+import com.security.web.repository.ApplicationRepository;
+import com.security.web.repository.UserRepository;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest

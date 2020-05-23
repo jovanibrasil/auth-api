@@ -1,12 +1,13 @@
 package com.security.jwt.model;
 
-import com.security.jwt.enums.ProfileEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+
+import com.security.jwt.model.enums.ProfileEnum;
 
 @Getter @Setter
 @NoArgsConstructor

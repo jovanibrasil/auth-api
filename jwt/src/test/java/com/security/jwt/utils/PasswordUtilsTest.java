@@ -2,6 +2,8 @@ package com.security.jwt.utils;
 
 import org.junit.Test;
 
+import com.security.jwt.util.PasswordUtils;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 

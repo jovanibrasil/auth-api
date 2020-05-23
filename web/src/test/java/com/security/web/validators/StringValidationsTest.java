@@ -2,6 +2,8 @@ package com.security.web.validators;
 
 import org.junit.Test;
 
+import com.security.web.validator.StringValidations;
+
 import static org.junit.Assert.assertEquals;
 
 public class StringValidationsTest {

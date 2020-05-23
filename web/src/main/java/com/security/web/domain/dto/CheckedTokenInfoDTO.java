@@ -1,6 +1,7 @@
 package com.security.web.domain.dto;
 
-import com.security.jwt.enums.ProfileEnum;
+import com.security.jwt.model.enums.ProfileEnum;
+
 import lombok.*;
 
 @Getter @Setter

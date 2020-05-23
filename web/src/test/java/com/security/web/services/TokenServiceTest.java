@@ -1,17 +1,19 @@
 package com.security.web.services;
 
-import com.security.jwt.enums.ProfileEnum;
-import com.security.jwt.exceptions.TokenException;
+import com.security.jwt.exception.TokenException;
 import com.security.jwt.generator.JwtTokenGenerator;
-import com.security.jwt.utils.JwtUser;
-import com.security.jwt.utils.JwtUserFactory;
-import com.security.jwt.utils.Utils;
+import com.security.jwt.model.enums.ProfileEnum;
+import com.security.jwt.util.JwtUser;
+import com.security.jwt.util.JwtUserFactory;
+import com.security.jwt.util.Utils;
 import com.security.web.AuthenticationMock;
 import com.security.web.domain.Application;
 import com.security.web.domain.ApplicationType;
 import com.security.web.domain.Registry;
 import com.security.web.domain.User;
-import com.security.web.services.impl.TokenServiceImpl;
+import com.security.web.service.UserService;
+import com.security.web.service.impl.TokenServiceImpl;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

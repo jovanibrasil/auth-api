@@ -27,8 +27,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.security.jwt.enums.ProfileEnum;
-import com.security.jwt.exceptions.TokenException;
+import com.security.jwt.exception.TokenException;
+import com.security.jwt.model.enums.ProfileEnum;
 import com.security.web.domain.Application;
 import com.security.web.domain.ApplicationType;
 import com.security.web.domain.Registry;
@@ -36,9 +36,9 @@ import com.security.web.domain.User;
 import com.security.web.domain.form.JwtAuthenticationForm;
 import com.security.web.domain.form.UserForm;
 import com.security.web.domain.mappers.UserMapper;
-import com.security.web.exceptions.implementations.ForbiddenUserException;
-import com.security.web.exceptions.implementations.UnauthorizedUserException;
-import com.security.web.services.TokenService;
+import com.security.web.exception.implementation.ForbiddenUserException;
+import com.security.web.exception.implementation.UnauthorizedUserException;
+import com.security.web.service.TokenService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

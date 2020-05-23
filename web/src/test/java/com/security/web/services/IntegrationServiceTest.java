@@ -1,7 +1,5 @@
 package com.security.web.services;
 
-import com.security.web.exceptions.handlers.RestTemplateResponseErrorHandler;
-import com.security.web.exceptions.implementations.MicroServiceIntegrationException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -18,6 +16,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+
+import com.security.web.exception.handler.RestTemplateResponseErrorHandler;
+import com.security.web.exception.implementation.MicroServiceIntegrationException;
 
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;

@@ -1,17 +1,18 @@
 package com.security.web.services;
 
-import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.generator.JwtTokenGenerator;
+import com.security.jwt.model.enums.ProfileEnum;
 import com.security.web.AuthenticationMock;
 import com.security.web.domain.Application;
 import com.security.web.domain.ApplicationType;
 import com.security.web.domain.User;
-import com.security.web.exceptions.implementations.NotFoundException;
-import com.security.web.exceptions.implementations.ValidationException;
-import com.security.web.repositories.ApplicationRepository;
-import com.security.web.repositories.UserRepository;
-import com.security.web.services.impl.IntegrationServiceImpl;
-import com.security.web.services.impl.UserServiceImpl;
+import com.security.web.exception.implementation.NotFoundException;
+import com.security.web.exception.implementation.ValidationException;
+import com.security.web.repository.ApplicationRepository;
+import com.security.web.repository.UserRepository;
+import com.security.web.service.impl.IntegrationServiceImpl;
+import com.security.web.service.impl.UserServiceImpl;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;

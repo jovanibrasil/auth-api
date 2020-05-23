@@ -1,6 +1,5 @@
 package com.security.web.domain;
 
-import com.security.jwt.enums.ProfileEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,6 +8,8 @@ import javax.persistence.*;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.security.jwt.model.enums.ProfileEnum;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

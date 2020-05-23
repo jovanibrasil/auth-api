@@ -1,10 +1,11 @@
 package com.security.jwt.generator;
 
-import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.model.User;
-import com.security.jwt.utils.JwtUser;
-import com.security.jwt.utils.JwtUserFactory;
-import com.security.jwt.utils.PasswordUtils;
+import com.security.jwt.model.enums.ProfileEnum;
+import com.security.jwt.util.JwtUser;
+import com.security.jwt.util.JwtUserFactory;
+import com.security.jwt.util.PasswordUtils;
+
 import org.junit.Before;
 import org.junit.Test;
 

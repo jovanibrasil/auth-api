@@ -29,8 +29,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.security.jwt.enums.ProfileEnum;
 import com.security.jwt.generator.JwtTokenGenerator;
+import com.security.jwt.model.enums.ProfileEnum;
 import com.security.web.domain.Application;
 import com.security.web.domain.ApplicationType;
 import com.security.web.domain.Registry;
@@ -38,10 +38,10 @@ import com.security.web.domain.User;
 import com.security.web.domain.form.UpdateUserForm;
 import com.security.web.domain.form.UserForm;
 import com.security.web.domain.mappers.UserMapper;
-import com.security.web.exceptions.implementations.NotFoundException;
-import com.security.web.exceptions.implementations.ValidationException;
-import com.security.web.services.UserService;
-import com.security.web.services.impl.IntegrationServiceImpl;
+import com.security.web.exception.implementation.NotFoundException;
+import com.security.web.exception.implementation.ValidationException;
+import com.security.web.service.UserService;
+import com.security.web.service.impl.IntegrationServiceImpl;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

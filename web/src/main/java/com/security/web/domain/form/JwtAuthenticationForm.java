@@ -1,7 +1,8 @@
 package com.security.web.domain.form;
 
 import com.security.web.domain.ApplicationType;
-import com.security.web.validators.EnumValidator;
+import com.security.web.validator.EnumValidator;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
