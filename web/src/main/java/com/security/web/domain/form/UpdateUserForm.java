@@ -13,15 +13,10 @@ public class UpdateUserForm {
 
 	@NotNull
 	@Size(min=4, max=12, message="{error.user.password.size}")
-	private String actualPassword;
+	private String password;
 
-	@NotNull
-	@Size(min=4, max=12, message="{error.user.password.size}")
-	private String newPassword;
-
-	public UpdateUserForm(String actualPassword, String newPassword) {
-		this.actualPassword = actualPassword;
-		this.newPassword = newPassword;
+	public UpdateUserForm(String password) {
+		this.password = password;
 	}
 	
 }

@@ -5,6 +5,7 @@ import java.net.URI;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.jovanibrasil.captcha.aspect.Recaptcha;
 import com.security.web.domain.User;
 import com.security.web.domain.dto.UserDTO;
 import com.security.web.domain.form.UpdateUserForm;
@@ -26,6 +28,7 @@ import com.security.web.services.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@CrossOrigin(maxAge = 3600)
 @RequiredArgsConstructor
 @Slf4j
 @RestController
@@ -34,7 +37,7 @@ public class UserController {
 
 	private final UserService userService;
 	private final UserMapper userMapper;
-
+	
 	/**
 	 * Returns the user with the specified name.
 	 * 
@@ -66,6 +69,7 @@ public class UserController {
 	 * @param userDto contains password and user name.
 	 * @return
 	 */
+	@Recaptcha
 	@PostMapping
 	public ResponseEntity<?> createUser(@Valid @RequestBody UserForm userForm) {
 		log.info("User registration");
@@ -86,6 +90,7 @@ public class UserController {
 	 * Updates a specified user. Valid password for authentication is required.
 	 * 
 	 */
+	@Recaptcha
 	@PutMapping
 	public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UpdateUserForm userDto){
 		User user = userService.updateUser(userMapper.updateUserDtoToUser(userDto));
@@ -107,7 +112,5 @@ public class UserController {
 		userService.deleteUserByName(userName);
 		return ResponseEntity.noContent().build();
 	}
-	
-	
 	
 }

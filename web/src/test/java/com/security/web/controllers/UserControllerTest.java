@@ -278,7 +278,7 @@ public class UserControllerTest {
 
 		BDDMockito.given(this.userService.findUserByUserName("newtest")).willReturn(updatedUser);
 
-		UpdateUserForm updateUserDto = new UpdateUserForm("password", "newpassword");
+		UpdateUserForm updateUserDto = new UpdateUserForm("newpassword");
 		BDDMockito.given(this.userService.updateUser(Mockito.any()))
 			.willReturn(updatedUser);
 

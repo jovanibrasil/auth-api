@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -114,19 +115,9 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	@Override
 	public User updateUser(User user) {
-
-		User currentUser = findUserByUserName(user.getUsername());
-
-		// Apply validations to the user. Validates if the user name and email already exist.
-		if (!currentUser.getEmail().equals(user.getEmail())) {
-			userRepository.findByEmail(user.getEmail())
-					.ifPresent(savedUser -> {
-						throw new ValidationException("error.email.alreadyexists");
-					});
-			
-			currentUser.setEmail(user.getEmail());
-		}
-
+		String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+		log.info("Updating user {}", userName);
+		User currentUser = findUserByUserName(userName);
 		currentUser.setPassword(PasswordUtils.generateHash(user.getPassword()));
 		userRepository.save(currentUser);
 		return currentUser;

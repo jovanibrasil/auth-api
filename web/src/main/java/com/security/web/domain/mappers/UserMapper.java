@@ -18,6 +18,7 @@ public interface UserMapper {
 
     @Mapping(source = "userName", target = "username")
     User jwtAuthenticationDtoToUser(JwtAuthenticationForm jwtAuthenticationMapper);
+    
     User updateUserDtoToUser(UpdateUserForm updateUserDTO);
 
     @Mappings({

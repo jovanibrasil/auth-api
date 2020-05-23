@@ -13,12 +13,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import com.jovanibrasil.captcha.EnableRecaptchaVerification;
 import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.web.exceptions.handlers.ExceptionHandlerFilter;
 import com.security.web.services.UserService;
 
 @Configuration
 @EnableWebSecurity
+@EnableRecaptchaVerification
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private final JwtAuthenticationEntryPoint unauthorizedHandler; // is an exception
@@ -66,6 +68,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS) // then disable session
 			.and()
 				.authorizeRequests()
+					.antMatchers(HttpMethod.PUT, "/users/**").hasAnyRole("SERVICE", "ADMIN", "USER")
 					.antMatchers(HttpMethod.POST, "/users").permitAll()
 					.antMatchers(HttpMethod.HEAD, "/users").permitAll()
 					.antMatchers(HttpMethod.HEAD, "/users/*").permitAll()
