@@ -83,8 +83,7 @@ public class TokenServiceTest {
 
     @Test
     public void getTokenButAlreadyExists() throws NoSuchFieldException, IllegalAccessException {
-        Field privateStringField = TokenServiceImpl.class
-                .getDeclaredField("token");
+        Field privateStringField = TokenServiceImpl.class.getDeclaredField("token");
         privateStringField.setAccessible(true);
         privateStringField.set(privateStringField, "token");
         token = "token";
@@ -93,63 +92,52 @@ public class TokenServiceTest {
 
     @Test
     public void refreshToken() {
-        when(utils.extractJwtTokenFromBearerHeader("Bearer token"))
-                .thenReturn("token");
+        when(utils.extractJwtTokenFromBearerHeader("Bearer token")).thenReturn("token");
         when(jwtTokenUtil.refreshToken("token")).thenReturn("newToken");
 
-        assertEquals("newToken", tokenService
-                .refreshToken("Bearer token"));
+        assertEquals("newToken", tokenService.refreshToken("Bearer token"));
     }
 
     @Test(expected = TokenException.class)
     public void refreshNullToken() {
-        when(utils.extractJwtTokenFromBearerHeader(null))
-                .thenThrow(TokenException.class);
+        when(utils.extractJwtTokenFromBearerHeader(null)).thenThrow(TokenException.class);
         tokenService.refreshToken(null);
     }
 
     @Test(expected = TokenException.class)
     public void refreshBlankToken() {
-        when(utils.extractJwtTokenFromBearerHeader(""))
-                .thenThrow(TokenException.class);
+        when(utils.extractJwtTokenFromBearerHeader("")).thenThrow(TokenException.class);
         tokenService.refreshToken("");
     }
 
     @Test(expected = TokenException.class)
     public void refreshInvalidToken() {
         token = "pOa";
-        when(utils.extractJwtTokenFromBearerHeader(token))
-                .thenThrow(TokenException.class);
+        when(utils.extractJwtTokenFromBearerHeader(token)).thenThrow(TokenException.class);
         tokenService.refreshToken(token);
     }
 
     @Test
     public void checkValidToken() {
         token = "token";
-        when(utils.extractJwtTokenFromBearerHeader(token))
-                .thenReturn(token);
-        when(jwtTokenUtil.getUserNameFromToken(token))
-                .thenReturn(user.getUsername());
-        when(jwtTokenUtil.getApplicationName(token))
-                .thenReturn("BLOG_APP");
-        when(userService.findUserByUserName(user.getUsername()))
-                .thenReturn(user);
+        when(utils.extractJwtTokenFromBearerHeader(token)).thenReturn(token);
+        when(jwtTokenUtil.getUserNameFromToken(token)).thenReturn(user.getUsername());
+        when(jwtTokenUtil.getApplicationName(token)).thenReturn("BLOG_APP");
+        when(userService.findUserByUserName(user.getUsername())).thenReturn(user);
+        
         assertEquals(user, tokenService.checkToken(token));
     }
 
     @Test
     public void createToken() {
         token = "token";
-        when(userService.findUserByUserName(user.getUsername()))
-            .thenReturn(user);
-        when(authenticationManager.authenticate(any()))
-            .thenReturn(new AuthenticationMock());
-        when(userDetailsService.loadUserByUsername(user.getUsername()))
-            .thenReturn(jwtUser);
-        when(jwtTokenUtil.createToken(jwtUser, ApplicationType.BLOG_APP))
-            .thenReturn(token);
-        assertEquals("token", tokenService.createToken(user,
-                ApplicationType.BLOG_APP));
+        when(userService.findUserByUserName(user.getUsername())).thenReturn(user);
+        when(userService.loadUserByUsername(user.getUsername())).thenReturn(jwtUser);
+        when(authenticationManager.authenticate(any())).thenReturn(new AuthenticationMock());
+        when(userDetailsService.loadUserByUsername(user.getUsername())).thenReturn(jwtUser);
+        when(jwtTokenUtil.createToken(jwtUser, ApplicationType.BLOG_APP)).thenReturn(token);
+        
+        assertEquals("token", tokenService.createToken(user, ApplicationType.BLOG_APP));
     }
 
 }

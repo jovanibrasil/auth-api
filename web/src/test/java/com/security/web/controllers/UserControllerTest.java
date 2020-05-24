@@ -3,6 +3,7 @@ package com.security.web.controllers;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isIn;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -23,12 +24,18 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jovanibrasil.captcha.exception.InvalidRecaptchaException;
+import com.jovanibrasil.captcha.exception.ReCaptchaInvalidException;
+import com.jovanibrasil.captcha.service.CaptchaService;
 import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.jwt.model.enums.ProfileEnum;
 import com.security.web.domain.Application;
@@ -60,15 +67,18 @@ public class UserControllerTest {
 	
 	@MockBean
 	private UserMapper userMapper;
-
-	private User user;
-	private UserForm userForm;
 	
 	@MockBean
 	private JwtTokenGenerator tokenUtil;
 	
+	@MockBean
+	private CaptchaService captchaService;
+
+	private User user;
+	private UserForm userForm;
+	
 	@Before
-	public void setUp() {
+	public void setUp() throws InvalidRecaptchaException, ReCaptchaInvalidException {
 		user = new User();
 		user.setId(1L);
 		user.setEmail("test@gmail.com");
@@ -87,7 +97,7 @@ public class UserControllerTest {
 	
 		when(tokenUtil.tokenIsValid(any())).thenReturn(true);
 		when(userService.findUserByUserName(any())).thenReturn(user);
-		
+		doNothing().when(captchaService).processResponse(any());
 	}
 
 	/**
@@ -112,14 +122,14 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserNameAlreadyExists() throws Exception {
-		when(userService.saveUser(Mockito.any())).thenThrow(new ValidationException("error.user.name.unique"));
+		when(userService.saveUser(Mockito.any())).thenThrow(new ValidationException("error.user.name.alreadyexists"));
 		when(userMapper.userFormToUser(any())).thenReturn(user);
 
 		mvc.perform(MockMvcRequestBuilders.post("/users")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userForm)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.message", equalTo("This user name already exists.")));
+			.andExpect(jsonPath("$.errors[0].message", equalTo("This user name already exists.")));
 	}
 	
 	/**
@@ -226,7 +236,7 @@ public class UserControllerTest {
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userForm)))
 			.andExpect(status().isUnprocessableEntity())
-			.andExpect(jsonPath("$.message",
+			.andExpect(jsonPath("$.errors[0].message",
 					equalTo("This email already exists.")));
 	}
 	
