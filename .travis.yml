@@ -2,9 +2,9 @@ language: java
 jdk:
   - openjdk11
 install: true
-before_install:
-  - chmod +x mvnw
 script:
+  - chmod +x mvnw
+  - mvn install -U
   - mvn -Ptest test -B
 after_success:
   - bash <(curl -s https://codecov.io/bash)
