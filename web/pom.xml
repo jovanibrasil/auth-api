@@ -12,15 +12,38 @@
 	<artifactId>security-web</artifactId>
 
 	<repositories>
-	    <repository>
-	        <id>recaptcha-sec-module</id>
-	        <url>https://github.com/jovanibrasil/recaptcha-sec-module</url>
-	        <snapshots>
-	            <enabled>true</enabled>
-	            <updatePolicy>always</updatePolicy>
-	        </snapshots>
-	    </repository>
+		<repository>
+			<id>recaptcha-sec-module</id>
+			<url>https://github.com/jovanibrasil/recaptcha-sec-module</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>dependency-snapshots-repo</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>plugin-snapshots-repo</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<dependencies>
 		<dependency>
@@ -35,7 +58,7 @@
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
 		</dependency>
-				<dependency>
+		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
 		</dependency>
@@ -60,9 +83,9 @@
 			<version>${mapstruct.version}</version>
 		</dependency>
 		<dependency>
-		  <groupId>com.jovanibrasil</groupId>
-		  <artifactId>recaptcha-sec-module</artifactId>
-		  <version>0.0.3-SNAPSHOT</version>
+			<groupId>com.jovanibrasil</groupId>
+			<artifactId>recaptcha-sec-module</artifactId>
+			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.security</groupId>
@@ -86,9 +109,9 @@
 			<version>2.7.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>de.codecentric</groupId>
-		    <artifactId>spring-boot-admin-starter-client</artifactId>
-		    <version>2.2.3</version>
+			<groupId>de.codecentric</groupId>
+			<artifactId>spring-boot-admin-starter-client</artifactId>
+			<version>2.2.3</version>
 		</dependency>
 	</dependencies>
 
