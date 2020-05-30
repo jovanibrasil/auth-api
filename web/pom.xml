@@ -11,19 +11,6 @@
 	<packaging>war</packaging>
 	<artifactId>security-web</artifactId>
 
-	<repositories>
-		<repository>
-			<id>mvn-repo</id>
-			<url>https://rawgit.com/jovanibrasil/artifacts/recaptcha-sec-module</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
