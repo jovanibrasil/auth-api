@@ -13,11 +13,13 @@
 
 	<repositories>
 		<repository>
-			<id>recaptcha-sec-module</id>
-			<url>https://github.com/jovanibrasil/recaptcha-sec-module</url>
+			<id>mvn-repo</id>
+			<url>https://rawgit.com/jovanibrasil/artifacts/recaptcha-sec-module</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 			<snapshots>
 				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
 			</snapshots>
 		</repository>
 	</repositories>
