@@ -11,6 +11,17 @@
 	<packaging>war</packaging>
 	<artifactId>security-web</artifactId>
 
+	<repositories>
+	    <repository>
+	        <id>recaptcha-sec-module</id>
+	        <url>https://github.com/jovanibrasil/recaptcha-sec-module</url>
+	        <snapshots>
+	            <enabled>true</enabled>
+	            <updatePolicy>always</updatePolicy>
+	        </snapshots>
+	    </repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
