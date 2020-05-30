@@ -25,6 +25,9 @@ import com.security.web.domain.form.UserForm;
 import com.security.web.domain.mappers.UserMapper;
 import com.security.web.service.UserService;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,45 +41,34 @@ public class UserController {
 	private final UserService userService;
 	private final UserMapper userMapper;
 	
-	/**
-	 * Returns the user with the specified name.
-	 * 
-	 * @param userName
-	 * @return
-	 */
+	@ApiOperation(value = "Busca usuário por nome.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message = "Usuario encontrado e retornado.", response = UserDTO.class),
+		@ApiResponse(code = 404, message = "Usuário não encontrado.")})
 	@GetMapping("/{userName}")
 	public ResponseEntity<UserDTO> getUser(@PathVariable String userName) {
 		User user = userService.findUserByUserName(userName);
 		return ResponseEntity.ok(userMapper.userToUserDto(user));
 	}
 	
-	/**
-	 * Returns the user with the specified email.
-	 * 
-	 * @param email
-	 * @return
-	 */
+	@ApiOperation(value = "Busca usuário por email.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message = "Usuario encontrado e retornado.", response = UserDTO.class),
+		@ApiResponse(code = 404, message = "Usuário não encontrado.")})
 	@GetMapping
 	public ResponseEntity<UserDTO> getUserByEmail(@RequestParam(required = true) String email) {
 		User user = userService.findUserByEmail(email);
 		return ResponseEntity.ok(userMapper.userToUserDto(user));
 	}
 	
-	
-	/**
-	 * Creates an user.
-	 *
-	 * @param userDto contains password and user name.
-	 * @return
-	 */
+	@ApiOperation("Cria um usuário.")
+	@ApiResponses({@ApiResponse(code = 200, message = "Usuário criado com sucesso.", response = Object.class)})
 	@Recaptcha
 	@PostMapping
 	public ResponseEntity<?> createUser(@Valid @RequestBody UserForm userForm) {
 		log.info("User registration");
 
 		User user = userService.saveUser(userMapper.userFormToUser(userForm));
-
-		// Set the resource location and return 201 Created
 		URI uri = ServletUriComponentsBuilder
 				.fromCurrentRequest()
 				.path("/{userName}")
@@ -85,11 +77,12 @@ public class UserController {
 		
 		return ResponseEntity.created(uri).build();
 	}
-	
-	/**
-	 * Updates a specified user. Valid password for authentication is required.
-	 * 
-	 */
+
+	@ApiOperation("Atualiza um usuário.")
+	@ApiResponses({
+		@ApiResponse(code = 200, message = "Usuário atualizado com sucesso.", response = UserDTO.class),
+		@ApiResponse(code = 404, message = "Usuário não encontrado.", response = Object.class)
+	})
 	@Recaptcha
 	@PutMapping
 	public ResponseEntity<UserDTO> updateUser(@Valid @RequestBody UpdateUserForm userDto){
@@ -97,17 +90,12 @@ public class UserController {
 		return ResponseEntity.ok().body(userMapper.userToUserDto(user));
 	}
 
-	/**
-	 * Deletes an user by name.
-	 * 
-	 * This endpoint is accessible only for services. Please, see the security configuration.
-	 * 
-	 * @param userName is the name of the user that you want to delete.
-	 * @return
-	 * 
-	 */
+	@ApiOperation(value = "Remove um usuário.")
+	@ApiResponses({
+		@ApiResponse(code = 204, message = "Usuário removido."),
+		@ApiResponse(code = 404, message = "Usuário não encontrado.")})
 	@DeleteMapping("/{username}")
-	public ResponseEntity<?> deleteUser(@PathVariable("username") String userName){
+	public ResponseEntity<Void> deleteUser(@PathVariable("username") String userName){
 		log.info("Delete user {}", userName);
 		userService.deleteUserByName(userName);
 		return ResponseEntity.noContent().build();

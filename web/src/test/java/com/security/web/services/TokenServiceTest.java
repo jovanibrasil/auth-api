@@ -1,5 +1,21 @@
 package com.security.web.services;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
+
 import com.security.jwt.exception.TokenException;
 import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.jwt.model.enums.ProfileEnum;
@@ -13,24 +29,6 @@ import com.security.web.domain.Registry;
 import com.security.web.domain.User;
 import com.security.web.service.UserService;
 import com.security.web.service.impl.TokenServiceImpl;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetailsService;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class TokenServiceTest {
@@ -71,23 +69,6 @@ public class TokenServiceTest {
         jwtUser = new JwtUser(user.getUsername(),
                 user.getPassword(),
                 JwtUserFactory.mapToGrantedAuthorities(user.getProfile()));
-    }
-
-    @Test
-    public void getFirstToken() {
-        when(userDetailsService.loadUserByUsername("AUTH")).thenReturn(jwtUser);
-        when(jwtTokenUtil.createToken(jwtUser, ApplicationType.AUTH_APP)).thenReturn("token");
-        token = tokenService.createToken();
-        assertNotNull(token);
-    }
-
-    @Test
-    public void getTokenButAlreadyExists() throws NoSuchFieldException, IllegalAccessException {
-        Field privateStringField = TokenServiceImpl.class.getDeclaredField("token");
-        privateStringField.setAccessible(true);
-        privateStringField.set(privateStringField, "token");
-        token = "token";
-        assertEquals(token, tokenService.createToken());
     }
 
     @Test

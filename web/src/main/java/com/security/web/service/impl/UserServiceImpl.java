@@ -38,16 +38,35 @@ public class UserServiceImpl implements UserService {
 	@Value("${urls.notes.userconfirmationview}")
 	private String userConfirmationViewUrl;
 
+	/**
+	 * Returns the user with the specified name.
+	 * 
+	 * @param userName
+	 * @return
+	 */
 	@Override
 	public User findUserByUserName(String userName) {
 		return userRepository.findByUsername(userName).orElseThrow(() -> new NotFoundException("error.user.notfound"));
 	}
 
+	/**
+	 * Returns the user with the specified email.
+	 * 
+	 * @param email
+	 * @return
+	 */
 	@Override
 	public User findUserByEmail(String email) {
 		return userRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("error.user.notfound"));
 	}
 
+	/**
+	 * Deletes an user by name.
+	 * 
+	 * @param userName is the name of the user that you want to delete.
+	 * @return
+	 * 
+	 */
 	@Override
 	public void deleteUserByName(String userName) {
 		userRepository.findByUsername(userName).ifPresentOrElse(user -> {
@@ -86,6 +105,12 @@ public class UserServiceImpl implements UserService {
 		return errors;
 	}
 
+	/**
+	 * Creates an user.
+	 *
+	 * @param userDto contains password and user name.
+	 * @return
+	 */
 	@Transactional
 	@Override
 	public User saveUser(User user) {
@@ -112,6 +137,10 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 
+	/**
+	 * Updates a specified user. Valid password for authentication is required.
+	 * 
+	 */
 	@Transactional
 	@Override
 	public User updateUser(User user) {

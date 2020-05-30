@@ -41,18 +41,19 @@ public class TokenServiceImpl implements TokenService {
 	public String createToken() {
 		log.info("Generating Service token.");
 		if(token == null) {
-			try {
-				UserDetails userDetails = userService.loadUserByUsername("AUTH");
-				log.info("Creating the token ...");
-				token = jwtTokenUtil.createToken(userDetails, ApplicationType.AUTH_APP);
-				log.info("Generated token: {}.", token);
-			} catch (Exception e) {
-				e.printStackTrace(); // todo handle this exception
-			}	
+			UserDetails userDetails = userService.loadUserByUsername("AUTH");
+			log.info("Creating the token ...");
+			return jwtTokenUtil.createToken(userDetails, ApplicationType.AUTH_APP);
 		}
-		return token;
+		return null;
 	}
 
+	/**
+	 * Creates and returns a new token JWT.
+	 *
+	 * @param authenticationDto
+	 * @return
+	 */
 	@Override
 	public String createToken(User currentUser, ApplicationType applicationType) {
 		log.info("User {} is requesting a JWT token.", currentUser.getUsername());
@@ -86,12 +87,24 @@ public class TokenServiceImpl implements TokenService {
 		return token;
 	}
 
+	/**
+	 * Refresh a valid token.
+	 * 
+	 * @param request
+	 * @return
+	 */
 	@Override
 	public String refreshToken(String token) {
 		token = utils.extractJwtTokenFromBearerHeader(token);
 		return jwtTokenUtil.refreshToken(token);
 	}
 
+	/**
+	 * Check a token and returns a list of errors if the token has problems.
+	 * 
+	 * @param request
+	 * @return
+	 */
 	@Override
 	public User checkToken(String token) {
 		token = utils.extractJwtTokenFromBearerHeader(token);
