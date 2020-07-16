@@ -1,9 +1,6 @@
 captcha:
   keysecret: ${RECAPTCHA_KEY_SECRET}
   keysite: ${RECAPTCHA_KEY_SITE}
-server:
-  servlet:
-    context-path: /api
 spring:
   application:
     name: auth-api

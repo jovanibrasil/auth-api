@@ -37,7 +37,7 @@ public class TokensController {
 	@ApiResponses({
 		@ApiResponse(code = 200, message = "Token criado com sucesso.", response = TokenDTO.class),
 		@ApiResponse(code = 400, message = "Requisição inválida.")})
-	@PostMapping("/create")
+	@PostMapping
 	public ResponseEntity<TokenDTO> createTokenJwt(@Valid @RequestBody JwtAuthenticationForm authenticationDto) {
 		User user = userMapper.jwtAuthenticationDtoToUser(authenticationDto);
 		String token = tokenService.createToken(user, authenticationDto.getApplication());

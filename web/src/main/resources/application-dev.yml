@@ -15,12 +15,12 @@ spring:
       ddl-auto: none
 urls:
   blog:
-    createuser: http://127.0.0.1:8081/api/users
-    deleteuser: http://127.0.0.1:8081/api/users
+    createuser: http://127.0.0.1:8081/users
+    deleteuser: http://127.0.0.1:8081/users
   email:
     server:
-      url: http://127.0.0.1:8084/api/emails
+      url: http://127.0.0.1:8084/emails
   notes:
-    createuser: http://127.0.0.1:8082/api/users
-    deleteuser: http://127.0.0.1:8082/api/users
+    createuser: http://127.0.0.1:8082/users
+    deleteuser: http://127.0.0.1:8082/users
     userconfirmationview: http://127.0.0.1:4200/confirmation

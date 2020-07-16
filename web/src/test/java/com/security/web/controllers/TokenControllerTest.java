@@ -101,7 +101,7 @@ public class TokenControllerTest {
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
 
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+		mvc.perform(MockMvcRequestBuilders.post("/token")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(tokenDTO)))
 			.andExpect(status().isOk())
@@ -125,7 +125,7 @@ public class TokenControllerTest {
 		tokenDTO.setPassword("kkkk");
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
 
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+		mvc.perform(MockMvcRequestBuilders.post("/token")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(tokenDTO)))
 			.andExpect(status().isUnauthorized())
@@ -148,7 +148,7 @@ public class TokenControllerTest {
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(null);
 
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+		mvc.perform(MockMvcRequestBuilders.post("/token")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(asJsonString(tokenDTO)))
 				.andExpect(status().isBadRequest())
@@ -171,7 +171,7 @@ public class TokenControllerTest {
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
 
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+		mvc.perform(MockMvcRequestBuilders.post("/token")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(asJsonString(tokenDTO)))
 				.andExpect(status().isBadRequest())
@@ -196,7 +196,7 @@ public class TokenControllerTest {
 		tokenDTO.setPassword(user.getPassword());
 		tokenDTO.setApplication(ApplicationType.BLOG_APP);
 
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+		mvc.perform(MockMvcRequestBuilders.post("/token")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(asJsonString(tokenDTO)))
 				.andExpect(status().isUnauthorized())
@@ -219,7 +219,7 @@ public class TokenControllerTest {
 		when(tokenService.createToken(ArgumentMatchers.any(), ArgumentMatchers.any()))
 				.thenThrow(new ForbiddenUserException("error.user.notregistered"));
 
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+		mvc.perform(MockMvcRequestBuilders.post("/token")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userForm)))
 			.andExpect(status().isForbidden())
@@ -242,7 +242,7 @@ public class TokenControllerTest {
 		when(tokenService.createToken(ArgumentMatchers.any(), ArgumentMatchers.any()))
 				.thenThrow(new ForbiddenUserException("error.user.notregistered"));
 
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+		mvc.perform(MockMvcRequestBuilders.post("/token")
 				.contentType(MediaType.APPLICATION_JSON)
 				.locale( new Locale("pt"))
 				.content(asJsonString(userForm)))
@@ -259,7 +259,7 @@ public class TokenControllerTest {
 	@Test
 	public void testTokenCreationBlankUserName() throws Exception {
 		userForm.setUserName(" ");
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+		mvc.perform(MockMvcRequestBuilders.post("/token")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userForm)))
 			.andExpect(status().isBadRequest())
@@ -275,7 +275,7 @@ public class TokenControllerTest {
 	@Test
 	public void testTokenCreationLongUserName() throws Exception {
 		userForm.setUserName("aaaaaaaaaaaaa");
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+		mvc.perform(MockMvcRequestBuilders.post("/token")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userForm)))
 			.andExpect(status().isBadRequest())
@@ -291,7 +291,7 @@ public class TokenControllerTest {
 	@Test
 	public void testTokenCreationNullPassword() throws Exception {
 		userForm.setPassword(null);
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+		mvc.perform(MockMvcRequestBuilders.post("/token")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userForm)))
 			.andExpect(status().isBadRequest())
@@ -306,7 +306,7 @@ public class TokenControllerTest {
 	@Test
 	public void testTokenCreationBlankPassword() throws Exception {
 		userForm.setPassword(" ");
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+		mvc.perform(MockMvcRequestBuilders.post("/token")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userForm)))
 			.andExpect(status().isBadRequest())
@@ -321,7 +321,7 @@ public class TokenControllerTest {
 	@Test
 	public void testTokenCreationLongPassword() throws Exception {
 		userForm.setPassword("ppppppppppppp");
-		mvc.perform(MockMvcRequestBuilders.post("/token/create")
+		mvc.perform(MockMvcRequestBuilders.post("/token")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(asJsonString(userForm)))
 			.andExpect(status().isBadRequest())
