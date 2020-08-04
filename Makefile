@@ -39,4 +39,4 @@ stats:
 	docker stats auth-api
 
 deploy-production:
-	/bin/sh scripts/deploy-docker-tomcat.sh VAULT_TOKEN=$(VAULT_TOKEN) SPRING_PROFILES_ACTIVE=$(PROFILE)
+	/bin/sh scripts/deploy-docker-tomcat.sh VAULT_TOKEN=$(VAULT_TOKEN) SPRING_PROFILES_ACTIVE=$(PROFILE)	

@@ -1,3 +1,2 @@
-ALTER TABLE users MODIFY user_name varchar(12);
-ALTER TABLE users MODIFY email varchar(30);
-
+ALTER TABLE users ALTER COLUMN user_name TYPE varchar(12);
+ALTER TABLE users ALTER COLUMN email TYPE varchar(30);

@@ -1,7 +1,3 @@
-db:
-  password: root
-  url: jdbc:mariadb://127.0.0.1:3307/usersdb
-  username: root
 jwt:
   expiration: 604800
   secret: MY_KEY
@@ -13,6 +9,18 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+    properties:  
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        temp:
+            use_jdbc_metadata_defaults: false
+  datasource:
+    plataform: postgres
+    url: ${DB_URL:jdbc:postgresql://127.0.0.1:5432/usersdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    testWhileIdle: true
+    test-on-borrow: true
 urls:
   blog:
     createuser: http://127.0.0.1:8081/users
