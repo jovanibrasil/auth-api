@@ -63,7 +63,7 @@ public class UserController {
 	
 	@ApiOperation("Cria um usuário.")
 	@ApiResponses({@ApiResponse(code = 200, message = "Usuário criado com sucesso.", response = Object.class)})
-	@Recaptcha
+	//@Recaptcha
 	@PostMapping
 	public ResponseEntity<?> createUser(@Valid @RequestBody UserForm userForm) {
 		log.info("User registration");

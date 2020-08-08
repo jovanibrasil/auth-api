@@ -26,12 +26,12 @@ spring:
           use_jdbc_metadata_defaults: false
 urls:
   blog:
-    createuser: http://apps-server:8080/blog-api/users
-    deleteuser: http://apps-server:8080/blog-api/users
+    createuser: https://jb-blog-api.herokuapp.com/users
+    deleteuser: https://jb-blog-api.herokuapp.com/users
   email:
     server:
       url: https://master-email-api.herokuapp.com/emails
   notes:
-    createuser: http://apps-server:8080/notes-api/users
-    deleteuser: http://apps-server:8080/notes-api/users
+    createuser: https://jb-notes-api.herokuapp.com/users
+    deleteuser: https://jb-notes-api.herokuapp.com/users
     userconfirmationview: https://notes.jovanibrasil.com/confirmation
