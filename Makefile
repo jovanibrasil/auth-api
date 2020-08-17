@@ -1,6 +1,10 @@
 ifndef PROFILE
-override PROFILE = stage
+override PROFILE = dev
 endif
+
+PKG_VERSION_PATH := "./web/src/main/resources/buildNumber.properties"
+LAST_VERSION := $(shell (grep buildNumber= | cut -d= -f2) < $(PKG_VERSION_PATH))
+$(eval VERSION=$(shell echo $$(($(LAST_VERSION)+1))))
 
 run-tests:
 	mvn clean test -Ptest
@@ -10,12 +14,11 @@ stop:
 clean: stop
 	- docker rm auth-api
 build: clean
-	mvn clean package -P$(PROFILE) -Dmaven.test.skip=true
-	FILE_NAME=blog-api\#\#$(shell find target/*.war -type f | grep -Eo '[0-9]+)
-	docker build  --build-arg ENVIRONMENT=stage --build-arg FILE_NAME -t auth-api .
-	chmod -R ugo+rw target/
+	mvn clean package -pl web -P$(PROFILE) -Dmaven.test.skip=true
+	docker build  --build-arg ENVIRONMENT=dev --build-arg VERSION=$(VERSION)  -t auth-api .
+	chmod -R ugo+rw web/target/
 run: clean
-	docker run -d -p 8083:8080 -m 192m --memory-swap 256m \
+	docker run -m 192m --memory-swap 256m --env-file ./.env \
 		-e "SPRING_PROFILES_ACTIVE=${PROFILE}" -e "VAULT_TOKEN=${VAULT_TOKEN}" \
 		--name=auth-api --network net auth-api
 start: stop

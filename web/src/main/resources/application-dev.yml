@@ -2,7 +2,7 @@ jwt:
   expiration: 604800
   secret: MY_KEY
 server:
-  port: 8083
+  port: ${PORT:8083}
 spring:
   flyway:
     locations: classpath:/db/migration,classpath:/db/testdata
@@ -21,14 +21,3 @@ spring:
     password: ${DB_PASSWORD:postgres}
     testWhileIdle: true
     test-on-borrow: true
-urls:
-  blog:
-    createuser: http://127.0.0.1:8081/users
-    deleteuser: http://127.0.0.1:8081/users
-  email:
-    server:
-      url: http://127.0.0.1:8084/emails
-  notes:
-    createuser: http://127.0.0.1:8082/users
-    deleteuser: http://127.0.0.1:8082/users
-    userconfirmationview: http://127.0.0.1:4200/confirmation

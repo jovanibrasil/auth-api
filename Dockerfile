@@ -1,4 +1,4 @@
-FROM tomcat
+FROM tomcat:9.0.37-jdk11-openjdk
 LABEL maintainer="jovanibrasil@gmail.com"
 USER root
 
@@ -10,7 +10,7 @@ ARG USERS_MYSQL_PASSWORD
 ARG RECAPTCHA_KEY_SECRET
 ARG RECAPTCHA_KEY_SITE
 ARG ENVIRONMENT
-ARG FILE_NAME
+ARG VERSION
 ARG DBSERVICEPORT
 ARG DBSERVICENAME
 
@@ -20,16 +20,14 @@ ENV USERS_MYSQL_PASSWORD=$USERS_MYSQL_PASSWORD
 ENV ENVIRONMENT=$ENVIRONMENT
 ENV RECAPTCHA_KEY_SECRET=$RECAPTCHA_KEY_SECRET
 ENV RECAPTCHA_KEY_SITE=$RECAPTCHA_KEY_SITE
-ENV FILE_NAME=${FILE_NAME}
 ENV VAULT_HOST="vault-server"
 
 ENV DBSERVICEPORT=$DBSERVICEPORT
 ENV DBSERVICENAME=$DBSERVICENAME
 
-COPY ./target/${FILE_NAME} /usr/local/tomcat/webapps/${FILE_NAME}
+COPY ./web/target/security-web##${VERSION}.war /usr/local/tomcat/webapps/ROOT##${VERSION}.war
+COPY ./web/target/security-web##${VERSION} /usr/local/tomcat/webapps/ROOT##${VERSION}
 COPY ./scripts ./scripts
-
-RUN sed -i 's/port="8080"/port="8083"/' /usr/local/tomcat/conf/server.xml
 
 RUN if [ "$ENVIRONMENT" = "stage" ]; \
 	then cp ./scripts/startup-dev.sh /startup.sh; \
@@ -37,7 +35,7 @@ RUN if [ "$ENVIRONMENT" = "stage" ]; \
 	fi
 
 RUN rm ./scripts -rf
-EXPOSE 8083
+EXPOSE 8080
 
 RUN ["chmod", "+x", "/startup.sh"]
 CMD ["sh", "-c", "/startup.sh $DBSERVICENAME $DBSERVICEPORT"]

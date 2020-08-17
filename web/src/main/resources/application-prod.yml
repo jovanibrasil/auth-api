@@ -24,14 +24,3 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         temp:
           use_jdbc_metadata_defaults: false
-urls:
-  blog:
-    createuser: https://jb-blog-api.herokuapp.com/users
-    deleteuser: https://jb-blog-api.herokuapp.com/users
-  email:
-    server:
-      url: https://master-email-api.herokuapp.com/emails
-  notes:
-    createuser: https://jb-notes-api.herokuapp.com/users
-    deleteuser: https://jb-notes-api.herokuapp.com/users
-    userconfirmationview: https://notes.jovanibrasil.com/confirmation

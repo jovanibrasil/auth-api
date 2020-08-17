@@ -18,14 +18,19 @@ management:
     web:
       exposure:
         include: '*'
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/  
 urls:
   blog:
-    createuser: http://blog-api:8080/blog-api/users
-    deleteuser: http://blog-api:8080/blog-api/users
+    createuser: http://blog-api:8080/users
+    deleteuser: http://blog-api:8080/users
   email:
     server:
-      url: http://email-api:8080/email-api/emails
+      url: https://email-api/emails
   notes:
-    createuser: http://notes-api:8080/notes-api/users
-    deleteuser: http://notes-api:8080/notes-api/users
-    userconfirmationview: http://127.0.0.1:4200/confirmation
+    createuser: http://notes-api:8080/users
+    deleteuser: http://notes-api:8080/users
+    userconfirmationview: http://notes.jovanibrasil.com/confirmation
+    
