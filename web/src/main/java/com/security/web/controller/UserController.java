@@ -4,6 +4,7 @@ import java.net.URI;
 
 import javax.validation.Valid;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -76,6 +78,12 @@ public class UserController {
 				.toUri();
 		
 		return ResponseEntity.created(uri).build();
+	}
+	
+	@GetMapping("/confirmation")
+	@ResponseStatus(HttpStatus.OK)
+	public void confirmUserEmail(@RequestParam(required=true) String confirmationToken){
+		userService.confirmUser(confirmationToken);
 	}
 
 	@ApiOperation("Atualiza um usuário.")

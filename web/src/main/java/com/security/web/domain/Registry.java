@@ -26,6 +26,9 @@ public class Registry {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@MapsId("applicationId")
 	private Application application;
+	
+	@Enumerated(EnumType.STRING)
+	private UserStatus userStatus;
 
 	@Column(name = "registered_at")
 	private LocalDateTime registeredAt;

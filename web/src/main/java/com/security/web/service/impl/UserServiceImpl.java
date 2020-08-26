@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,10 +13,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.security.jwt.generator.JwtTokenGenerator;
 import com.security.jwt.model.enums.ProfileEnum;
 import com.security.jwt.util.JwtUserFactory;
 import com.security.jwt.util.PasswordUtils;
+import com.security.web.domain.Registry;
 import com.security.web.domain.User;
+import com.security.web.domain.UserStatus;
+import com.security.web.domain.dto.UserDTO;
+import com.security.web.domain.mappers.UserMapper;
 import com.security.web.exception.implementation.NotFoundException;
 import com.security.web.exception.implementation.ValidationException;
 import com.security.web.repository.UserRepository;
@@ -29,10 +35,20 @@ public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
 	private final IntegrationServiceImpl integrationService;
-
-	public UserServiceImpl(UserRepository userRepository, @Lazy IntegrationServiceImpl integrationService) {
+	private final RabbitTemplate rabbitTemplate;
+	private final UserMapper userMapper;
+	private final JwtTokenGenerator tokenGenerator;
+	
+	public UserServiceImpl(UserRepository userRepository, 
+			RabbitTemplate rabbitTemplate,
+			@Lazy IntegrationServiceImpl integrationService,
+			UserMapper userMapper,
+			JwtTokenGenerator tokenGenerator) {
 		this.userRepository = userRepository;
+		this.rabbitTemplate = rabbitTemplate;
 		this.integrationService = integrationService;
+		this.userMapper = userMapper;
+		this.tokenGenerator = tokenGenerator;
 	}
 
 	@Value("${urls.notes.userconfirmationview}")
@@ -117,24 +133,50 @@ public class UserServiceImpl implements UserService {
 		log.info("Saving user: {}", user);
 		// Validate if user name and email already exists
 		validateUser(user);
-
-		// Send back the generated token by email
-//		EmailMessageDTO em = new EmailMessageDTO();
-//		String url = userConfirmationViewUrl + "?token=" + token;
-//		em.setTitle("Confirmation Email");
-//		em.setText("Please, click the confirmation link to confirm your email and sign "
-//				+ "into your NOTES account. " + url);
-//		em.setFrom("noreply@notes.jovanibrasil.com");
-//		em.setTo(user.getEmail());
-//		em.setTextType("text/plain");
-//		em.setTitle("NOTES - Email Confirmation");
-// 		integrationService.sendEmail(em);
 		user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
 		user.setSignUpDateTime(LocalDateTime.now());
 		user.setProfile(ProfileEnum.ROLE_USER);
+		user.getRegistries().get(0).setUserStatus(UserStatus.CREATED);
 		user = userRepository.save(user);
-		integrationService.createServiceUser(user);
+		
+		String registrationToken = tokenGenerator
+				.createRegistrationToken(user.getUsername(), user.getRegistries().get(0).getApplication().getType());
+		
+		try {
+			integrationService.createServiceUser(user);
+			UserDTO userDTO = userMapper.userToUserDto(user);
+			
+			userDTO.setApplication(user.getRegistries().get(0).getApplication().getType());
+			rabbitTemplate.convertAndSend("user-created", userDTO, message -> {
+					message.getMessageProperties()
+						.getHeaders()
+						.put("registrationToken", registrationToken);
+					return message;
+				}
+			);
+		} catch (Exception e) {
+			log.info("Communication error. {}", e.getMessage());
+			userRepository.delete(user);
+		}
+		
 		return user;
+	}
+	
+	@Transactional
+	@Override
+	public void confirmUser(String confirmationToken) {
+		String userName = tokenGenerator.getUserNameFromToken(confirmationToken);
+		String appName = tokenGenerator.getApplicationName(confirmationToken);
+		log.info("Confirming user {} to application {}", userName, appName);
+		userRepository.findByUsername(userName).ifPresent(user -> {
+			Registry registry = user.getRegistries().stream()
+				.filter(r ->  r.getApplication().getType().toString().equals(appName) )
+				.findFirst()
+				.get();
+			log.info("Changing registry status from {} to {}", 
+					registry.getUserStatus(), UserStatus.ACTIVATED);
+			registry.setUserStatus(UserStatus.ACTIVATED);
+		});
 	}
 
 	/**
@@ -151,7 +193,7 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(currentUser);
 		return currentUser;
 	}
-
+	
 	@Override
 	public UserDetails loadUserByUsername(String username) {
 		log.info("Searching for " + username);
