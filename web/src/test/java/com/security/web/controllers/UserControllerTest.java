@@ -136,9 +136,7 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserEmptyUserName() throws Exception {
-		BDDMockito.given(userService
-			.saveUser(Mockito.any())).willReturn(user); // save successfully
-		// send email successfully
+		BDDMockito.given(userService.saveUser(Mockito.any())).willReturn(user); 
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration).sendEmail(BDDMockito.any());
 		
@@ -157,9 +155,7 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserEmptyPassword() throws Exception {
-		BDDMockito.given(userService
-			.saveUser(Mockito.any())).willReturn(user); // save successfully
-		// send email successfully
+		BDDMockito.given(userService.saveUser(Mockito.any())).willReturn(user); 
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration).sendEmail(BDDMockito.any());
 		
@@ -184,9 +180,7 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserNullUserName() throws Exception {
-		BDDMockito.given(userService
-			.saveUser(Mockito.any())).willReturn(user); // save successfully
-		// send email successfully
+		BDDMockito.given(userService.saveUser(Mockito.any())).willReturn(user);
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration).sendEmail(BDDMockito.any());
 		
@@ -206,8 +200,7 @@ public class UserControllerTest {
 	 */
 	@Test
 	public void testCreateUserNullPassword() throws Exception {
-		BDDMockito.given(this.userService.saveUser(Mockito.any())).willReturn(user); // save successfully
-		// send email successfully
+		BDDMockito.given(this.userService.saveUser(Mockito.any())).willReturn(user); 
 		IntegrationServiceImpl integration = mock(IntegrationServiceImpl.class);
 		BDDMockito.doNothing().when(integration)
 			.sendEmail(BDDMockito.any());

@@ -4,6 +4,8 @@ jwt:
 server:
   port: ${PORT:8083}
 spring:
+  rabbitmq:
+    host: rabbitmq
   flyway:
     locations: classpath:/db/migration,classpath:/db/testdata
   jpa:
@@ -13,7 +15,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         temp:
-            use_jdbc_metadata_defaults: false
+            use_jdbc_metadata_defaults: false 
   datasource:
     plataform: postgres
     url: ${DB_URL:jdbc:postgresql://127.0.0.1:5432/usersdb}
@@ -21,3 +23,7 @@ spring:
     password: ${DB_PASSWORD:postgres}
     testWhileIdle: true
     test-on-borrow: true
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/ 

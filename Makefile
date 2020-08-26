@@ -14,11 +14,11 @@ stop:
 clean: stop
 	- docker rm auth-api
 build: clean
-	mvn clean package -pl web -P$(PROFILE) -Dmaven.test.skip=true
+	mvn clean package -pl web -am -P$(PROFILE) -Dmaven.test.skip=true
 	docker build  --build-arg ENVIRONMENT=dev --build-arg VERSION=$(VERSION)  -t auth-api .
 	chmod -R ugo+rw web/target/
 run: clean
-	docker run -m 192m --memory-swap 256m --env-file ./.env \
+	docker run -m 396m --memory-swap 512m --env-file ./.env \
 		-e "SPRING_PROFILES_ACTIVE=${PROFILE}" -e "VAULT_TOKEN=${VAULT_TOKEN}" \
 		--name=auth-api --network net auth-api
 start: stop
