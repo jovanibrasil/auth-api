@@ -1,0 +1,36 @@
+captcha:
+  keysecret: ${RECAPTCHA_KEY_SECRET}
+  keysite: ${RECAPTCHA_KEY_SITE}
+spring:
+  application:
+    name: auth-api
+  flyway:
+    baseline-on-migrate: true
+    clean-on-validation-error: true
+  profiles:
+    active: '@activatedProperties@'
+  boot:
+    admin:
+      client:
+        url: http://localhost:8090  
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/  
+urls:
+  blog:
+    createuser: http://blog-api:8080/users
+    deleteuser: http://blog-api:8080/users
+  email:
+    server:
+      url: https://email-api/emails
+  notes:
+    createuser: http://notes-api:8080/users
+    deleteuser: http://notes-api:8080/users
+    userconfirmationview: http://notes.jovanibrasil.com/confirmation
+    

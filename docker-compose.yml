@@ -3,13 +3,17 @@ networks:
   net:
     external: true
 services:
-  mysql-database:
-    image: mysql-database
-    container_name: mysql-database
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
     ports:
-      - 3306:3306
-    networks:
-      - net
+      - 5432:5432
+    volumes:
+      - ./scripts/postgres-scripts:/docker-entrypoint-initdb.d/
     deploy:
       resources:
         limits:
