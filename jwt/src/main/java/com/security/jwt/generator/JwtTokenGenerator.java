@@ -1,6 +1,8 @@
 package com.security.jwt.generator;
 
 import io.jsonwebtoken.*;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,7 @@ import java.util.Map;
  * @Author Jovani Brasil
  * 
  */
+@Slf4j
 @Component
 public class JwtTokenGenerator {
 
@@ -77,16 +80,17 @@ public class JwtTokenGenerator {
 	}
 
 	/**
-	 * Creates a new token JWT with user email, creation date and application name. 
+	 * Creates a new token JWT with username, creation date and application name. 
 	 * 
 	 * @param email
 	 * @param application
 	 * @return
 	 */
-	public String createRegistrationToken(String email, Object application) {
+	public String createRegistrationToken(String username, Object application) {
+		log.info("Creating registration token to user {} in application {}", username, application);
 		Map<String, Object> claims = new HashMap<>();
 		claims.put(CLAIM_KEY_CREATED, new Date());
-		claims.put(CLAIM_KEY_EMAIL, email);
+		claims.put(CLAIM_KEY_USERNAME, username);
 		claims.put(CLAIM_KEY_APPLICATION_NAME, application);	
 		return Jwts.builder()
 				.setClaims(claims)

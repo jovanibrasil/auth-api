@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -17,11 +18,10 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +36,8 @@ import com.security.web.AuthenticationMock;
 import com.security.web.domain.Application;
 import com.security.web.domain.ApplicationType;
 import com.security.web.domain.User;
+import com.security.web.domain.dto.UserDTO;
+import com.security.web.domain.mappers.UserMapper;
 import com.security.web.exception.implementation.NotFoundException;
 import com.security.web.exception.implementation.ValidationException;
 import com.security.web.repository.ApplicationRepository;
@@ -49,6 +51,9 @@ public class UserServiceTest {
 	
 	@Mock
     private UserRepository userRepository;
+	
+	@Mock
+	private RabbitTemplate rabbitTemplate;
 
 	@Mock
     private IntegrationServiceImpl integrationService;
@@ -67,13 +72,20 @@ public class UserServiceTest {
 
 	@MockBean
 	private JwtTokenGenerator jwtTokenUtil;
+	
+	@Mock
+	private UserMapper userMapper;
+	
+	@Mock
+	private JwtTokenGenerator tokenGenerator;
 
 	private User user;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		userService = new UserServiceImpl(userRepository, integrationService);
+		userService = new UserServiceImpl(userRepository, rabbitTemplate, 
+				integrationService, userMapper, tokenGenerator);
 		user = new User();
 		user.setId(1L);
 		user.setEmail("test@gmail.com");
@@ -82,15 +94,18 @@ public class UserServiceTest {
 		user.setProfile(ProfileEnum.ROLE_USER);
 		user.setSignUpDateTime(LocalDateTime.now());
 
-		BDDMockito.given(userRepository.findByEmail("test@gmail.com")).willReturn(Optional.of(user));
-		BDDMockito.given(userRepository.findByEmail("test2@gmail.com")).willReturn(null);
-		BDDMockito.given(userRepository.findByUsername("test")).willReturn(Optional.of(user));
-		BDDMockito.given(userRepository.findByUsername("test2")).willReturn(Optional.empty());
-		BDDMockito.given(userRepository.findUserById(1L)).willReturn(Optional.of(user));
+		when(userRepository.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+		when(userRepository.findByEmail("test2@gmail.com")).thenReturn(null);
+		when(userRepository.findByUsername("test")).thenReturn(Optional.of(user));
+		when(userRepository.findByUsername("test2")).thenReturn(Optional.empty());
+		when(userRepository.findUserById(1L)).thenReturn(Optional.of(user));
 		
-		Mockito.doNothing().when(integrationService).createServiceUser(Mockito.any());
-		Mockito.doNothing().when(integrationService).deleteServiceUser(Mockito.any());
-
+		when(tokenGenerator.createRegistrationToken(anyString(), any())).thenReturn("token");
+		
+		doNothing().when(integrationService).createServiceUser(any());
+		doNothing().when(integrationService).deleteServiceUser(any());
+		doNothing().when(rabbitTemplate).convertAndSend(anyString(), any(User.class));
+		
 		AuthenticationMock auth = new AuthenticationMock();
 		when(authenticationManager.authenticate(any())).thenReturn(auth);
 		
@@ -140,6 +155,8 @@ public class UserServiceTest {
 		newUser.addApplication(application);
 
 		when(userRepository.save(newUser)).thenReturn(newUser);
+		when(userMapper.userToUserDto(newUser)).thenReturn(new UserDTO());
+		
 		newUser = userService.saveUser(newUser);
 		
 		assertNotNull(newUser.getId());

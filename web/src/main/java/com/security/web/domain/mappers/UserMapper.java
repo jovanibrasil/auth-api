@@ -28,5 +28,6 @@ public interface UserMapper {
     CheckedTokenInfoDTO userToCheckedTokenInfoDto(User user);
     @Mapping(source = "userName", target = "username")
 	User userFormToUser(UserForm userDto);
+    @Mapping(source = "username", target = "userName")
 	UserDTO userToUserDto(User user);
 }
